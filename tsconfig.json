@@ -1,0 +1,11 @@
+// Type-checks the server, the shared types, the tests and the scripts (no emit).
+// The client is checked with tsconfig.client.json (it needs the DOM types).
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ES2024"],
+    "types": ["node"]
+  },
+  "include": ["src/server/**/*.ts", "src/shared/**/*.ts", "tests/**/*.ts", "scripts/**/*.ts", "vitest.config.ts", "eslint.config.js"]
+}
