@@ -41,7 +41,13 @@ Las ejecuciones las lanza el Programador de tareas de Windows con los scripts de
 2. **Revisar las respuestas** del responsable en la [sección 4](#4-preguntas-para-el-responsable) y en la [sección 3](#3-decisiones-pendientes-que-bloquean-tareas). Si desbloquean alguna tarea, pasarla a `PENDIENTE`.
 3. **Recuperar el trabajo a medias** de la ejecución anterior, si existe (`git stash list` → `wip-desarrollador`).
 4. **Continuar** la tarea `EN_CURSO` o, si no hay ninguna, empezar la **primera `PENDIENTE`** de la lista cuyas dependencias estén en `EN_REVISION` o `APROBADA`.
-5. Al terminar una tarea, marcarla `EN_REVISION` y, si queda tiempo, seguir con la siguiente.
+5. Al terminar una tarea, marcarla `EN_REVISION`, hacer su commit y **seguir con la siguiente**, encadenando tareas durante unos **40 minutos** desde el inicio de la ejecución:
+   - Terminar una fase no es motivo para parar.
+   - Pasados los 40 minutos no se empieza otra tarea.
+   - Si una tarea se alarga más de 50 minutos, se guarda lo que haya (commit de lo que esté en verde y stash del resto) y se termina.
+   - Si no queda ninguna tarea disponible, se termina antes.
+
+   Así cada ejecución aprovecha su coste fijo (leer la documentación) para hacer varias tareas.
 
 ### Commits
 

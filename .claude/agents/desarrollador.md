@@ -72,7 +72,15 @@ Cuando el encargo indica que es una **ejecución programada**, trabajas sin nadi
    - tareas **CAMBIOS SOLICITADOS**: márcalas `CAMBIOS` y corrígelas **antes que nada**.
 2. **Respuestas del responsable** en las secciones 3 y 4 del plan: desbloquea las tareas que correspondan.
 3. **Trabajo a medias** de la ejecución anterior: si existe el stash `wip-desarrollador`, recupéralo con `git stash pop`.
-4. **Avanza:** la tarea `EN_CURSO` o, si no hay, la primera `PENDIENTE` cuyas dependencias estén en `EN_REVISION` o `APROBADA`. Al terminarla, márcala `EN_REVISION` y sigue con la siguiente.
+4. **Avanza:** la tarea `EN_CURSO` o, si no hay, la primera `PENDIENTE` cuyas dependencias estén en `EN_REVISION` o `APROBADA`. Al terminarla, márcala `EN_REVISION`, haz su commit y **sigue con la siguiente**.
+
+**Presupuesto de tiempo: encadena tareas durante unos 40 minutos.** Cada ejecución tiene un coste fijo (leer la documentación), así que conviene aprovecharla.
+- La hora de inicio viene en el encargo.
+- Después de cada commit, comprueba la hora con `date +%H:%M`.
+- **Menos de 40 minutos desde el inicio:** empieza la siguiente tarea disponible. Terminar una fase **no** es motivo para parar.
+- **40 minutos o más:** no empieces otra tarea y termina la ejecución.
+- **Si una tarea se alarga más de 50 minutos desde el inicio:** cierra lo que esté en verde en un commit, guarda el resto en el stash `wip-desarrollador` y termina.
+- **Si no queda ninguna tarea disponible** (todas hechas, en revisión con dependencias pendientes o bloqueadas): termina antes.
 
 **Commits:**
 - Solo en la rama `develop`.

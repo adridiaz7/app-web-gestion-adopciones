@@ -24,7 +24,7 @@ try {
     Save-LeftoverWork 'before the run'
 
     $before = Get-GitValue @('rev-parse', 'HEAD')
-    $prompt = 'Ejecucion programada del agente desarrollador ({0}). Trabajas en modo autonomo: sigue la seccion "Modo autonomo" de tus instrucciones y docs/plan-de-desarrollo.md.' -f (Get-Date -Format 'yyyy-MM-dd HH:mm')
+    $prompt = 'Ejecucion programada del agente desarrollador. Hora de inicio: {0}. Trabajas en modo autonomo: sigue la seccion "Modo autonomo" de tus instrucciones y docs/plan-de-desarrollo.md, incluido el presupuesto de tiempo (encadenar tareas durante unos 40 minutos desde la hora de inicio).' -f (Get-Date -Format 'yyyy-MM-dd HH:mm')
 
     Write-RunLog "Starting agent (HEAD $before)."
     Push-Location $AgentWorktree
