@@ -39,3 +39,72 @@ export async function insertShelterIfCifFree(db: Db, shelter: ShelterInsert): Pr
   );
   return rowCount === 1;
 }
+
+export type ValidationStatus = "PENDING" | "VALIDATED" | "REJECTED";
+
+export interface ShelterForAdmin {
+  id: number;
+  name: string;
+  cif: string;
+  email: string;
+  phone: string;
+  address: string;
+  locality: string;
+  provinceName: string;
+  validationStatus: ValidationStatus;
+  validationReason: string | null;
+  registeredAt: Date;
+  validatedAt: Date | null;
+}
+
+const SHELTER_FOR_ADMIN = `
+  SELECT s.user_id AS id, s.name, s.cif, u.email, s.phone, s.address, s.locality, p.name AS "provinceName",
+         s.validation_status AS "validationStatus", s.validation_reason AS "validationReason",
+         u.created_at AS "registeredAt", s.validated_at AS "validatedAt"
+    FROM "Shelter" s
+    JOIN "App_user" u ON u.id = s.user_id
+    JOIN "Province" p ON p.id = s.province_id
+   WHERE u.deleted_at IS NULL`;
+
+/** CU-39: shelters of an account not deleted, with that validation status, oldest sign-up first. */
+export async function selectSheltersByStatus(db: Db, status: ValidationStatus): Promise<ShelterForAdmin[]> {
+  const { rows } = await db.query<ShelterForAdmin>(
+    `${SHELTER_FOR_ADMIN} AND s.validation_status = $1 ORDER BY u.created_at, s.user_id`,
+    [status],
+  );
+  return rows;
+}
+
+export async function selectShelterForAdmin(db: Db, id: number): Promise<ShelterForAdmin | null> {
+  const { rows } = await db.query<ShelterForAdmin>(`${SHELTER_FOR_ADMIN} AND s.user_id = $1`, [id]);
+  return rows[0] ?? null;
+}
+
+/** The validation status of a shelter of an account not deleted, locked for the change. */
+export async function lockShelterStatus(db: Db, id: number): Promise<ValidationStatus | null> {
+  const { rows } = await db.query<{ status: ValidationStatus }>(
+    `SELECT s.validation_status AS status
+       FROM "Shelter" s JOIN "App_user" u ON u.id = s.user_id
+      WHERE s.user_id = $1 AND u.deleted_at IS NULL
+        FOR UPDATE OF s`,
+    [id],
+  );
+  return rows[0]?.status ?? null;
+}
+
+export async function markShelterValidated(db: Db, id: number): Promise<void> {
+  await db.query(
+    `UPDATE "Shelter"
+        SET validation_status = 'VALIDATED', validation_reason = NULL, validated_at = now(), updated_at = now()
+      WHERE user_id = $1`,
+    [id],
+  );
+}
+
+/** RN-18, RN-19: rejected (a new request or a revoked validation), always with a reason. */
+export async function markShelterRejected(db: Db, id: number, reason: string): Promise<void> {
+  await db.query(
+    `UPDATE "Shelter" SET validation_status = 'REJECTED', validation_reason = $2, updated_at = now() WHERE user_id = $1`,
+    [id, reason],
+  );
+}

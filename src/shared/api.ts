@@ -81,6 +81,40 @@ export interface ProvincesResponse {
   provinces: { id: number; name: string }[];
 }
 
+export type ValidationStatus = "PENDING" | "VALIDATED" | "REJECTED";
+
+/** A shelter as the administrator sees it to manage its validation (CU-39). */
+export interface AdminShelter {
+  id: number;
+  name: string;
+  cif: string;
+  email: string;
+  phone: string;
+  address: string;
+  locality: string;
+  provinceName: string;
+  validationStatus: ValidationStatus;
+  validationReason: string | null;
+  /** ISO dates. */
+  registeredAt: string;
+  validatedAt: string | null;
+}
+
+/** CU-39 · GET /api/admin/shelters */
+export interface AdminSheltersResponse {
+  shelters: AdminShelter[];
+}
+
+/** CU-39 · POST /api/admin/shelters/:id/validate, /reject and /revoke */
+export interface AdminShelterResponse {
+  shelter: AdminShelter;
+}
+
+/** CU-39 · body of POST /api/admin/shelters/:id/reject and /revoke */
+export interface ReasonRequest {
+  reason: string;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

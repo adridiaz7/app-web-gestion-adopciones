@@ -534,3 +534,87 @@ a {
   padding: var(--space-14);
   text-align: center;
 }
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  resize: vertical;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.tabs__tab {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.tabs__tab[aria-current="page"] {
+  border-color: var(--color-accent-border);
+  background: var(--color-accent-soft);
+}
+
+/* Shelters (administrator) */
+.shelter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-4);
+}
+
+.shelter-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.shelter-card__name {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.shelter-card__data {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+}
+
+.shelter-card__data dt {
+  color: var(--color-text-muted);
+}
+
+.shelter-card__data dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.shelter-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.reason-form {
+  width: 100%;
+  margin-top: 0;
+}

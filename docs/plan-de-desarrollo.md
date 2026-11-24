@@ -89,6 +89,8 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 
 **25/11/2026 · T-08 (no bloquea).** Al restablecer la contraseña (CU-05), ¿se cierran las sesiones abiertas de esa cuenta? Es lo habitual por seguridad (si alguien robó la contraseña, pierde el acceso), pero ninguna RN lo dice, así que de momento **no** se cierran. Si la respuesta es sí, se hará en una tarea aparte con tests nuevos.
 
+**25/11/2026 · T-11 (no bloquea).** RN-23 dice que las mascotas de una protectora con la validación revocada no se ven "hasta que vuelva a estar validada", pero CU-39 solo permite validar una protectora **pendiente**, y al revocar pasa a `REJECTED`. ¿Cómo vuelve una protectora rechazada o revocada a estar validada? Opciones: (a) el administrador puede validar también desde `REJECTED`; (b) la protectora pide una nueva revisión y vuelve a `PENDING`. De momento se ha implementado lo que dice CU-39: solo se valida desde `PENDING`.
+
 ---
 
 ## 5. Tareas
@@ -122,7 +124,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | PENDIENTE |
+| T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | EN_REVISION |
 | T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | PENDIENTE |
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | PENDIENTE |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | PENDIENTE |

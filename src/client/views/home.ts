@@ -1,5 +1,6 @@
 import { currentUser } from "../api/auth.js";
 import { appLayout } from "../components/app-layout.js";
+import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
 import { h, mount } from "../dom.js";
 import { navigate } from "../router.js";
@@ -14,7 +15,7 @@ export async function renderHome(root: HTMLElement): Promise<void> {
 
   mount(
     root,
-    appLayout(user, [{ href: "/inicio", label: "Inicio" }], [
+    appLayout(user, navFor(user.role), [
       h("p", { class: "overline" }, "Inicio"),
       h("h1", { class: "display" }, "Hola de nuevo"),
       notice("info", "Has iniciado sesión", `Estás dentro con ${user.email}.`),
