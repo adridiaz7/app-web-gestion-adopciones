@@ -115,6 +115,54 @@ export interface ReasonRequest {
   reason: string;
 }
 
+/** GET /api/breeds (RN-39, RN-40) */
+export interface BreedsResponse {
+  species: { id: number; name: string; breeds: { id: number; name: string }[] }[];
+}
+
+export type PetStatus = "AVAILABLE" | "RESERVED" | "ADOPTED" | "UNLISTED";
+
+/** Body of POST /api/shelter/pets and PUT /api/shelter/pets/:id (CU-15, CU-16). */
+export interface PetDataRequest {
+  breedId: number;
+  name: string;
+  description: string;
+  /** YYYY-MM-DD, approximate (RN-43). */
+  birthDate: string;
+  sex: "MALE" | "FEMALE";
+  size: "SMALL" | "MEDIUM" | "LARGE";
+  activityLevel: "LOW" | "MEDIUM" | "HIGH";
+  goodWithChildren: "YES" | "NO" | "UNKNOWN";
+  /** RN-46: one entry per species; a species without an entry is unknown. */
+  getsAlongWith: { speciesId: number; getsAlong: boolean }[];
+  vaccinated: boolean;
+  dewormed: boolean;
+  sterilized: boolean;
+  microchipped: boolean;
+  specialNeeds: string | null;
+}
+
+/** A pet as its shelter sees it. */
+export interface ShelterPet extends PetDataRequest {
+  id: number;
+  speciesId: number;
+  speciesName: string;
+  breedName: string;
+  status: PetStatus;
+  /** ISO date (RN-49). */
+  createdAt: string;
+}
+
+/** CU-14 · GET /api/shelter/pets */
+export interface ShelterPetsResponse {
+  pets: ShelterPet[];
+}
+
+/** CU-15, CU-16 · POST /api/shelter/pets, GET and PUT /api/shelter/pets/:id */
+export interface ShelterPetResponse {
+  pet: ShelterPet;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

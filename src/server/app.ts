@@ -4,11 +4,12 @@ import express from "express";
 import { z } from "zod";
 import type { HealthResponse } from "../shared/api.js";
 import { NotFoundError } from "./errors.js";
-import { getProvinces } from "./controllers/catalogues.js";
+import { getBreeds, getProvinces } from "./controllers/catalogues.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { loadSession } from "./middlewares/session.js";
 import { createAdminRouter } from "./routes/admin.js";
 import { createAuthRouter } from "./routes/auth.js";
+import { createShelterRouter } from "./routes/shelter.js";
 
 // Default Zod messages in Spanish: they can reach the user (UI texts are in Spanish).
 z.config(z.locales.es());
@@ -35,7 +36,9 @@ export function createApp(): express.Express {
   api.use(loadSession);
   api.use("/auth", createAuthRouter());
   api.get("/provinces", getProvinces);
+  api.get("/breeds", getBreeds);
   api.use("/admin", createAdminRouter());
+  api.use("/shelter", createShelterRouter());
 
   api.use(() => {
     throw new NotFoundError();
