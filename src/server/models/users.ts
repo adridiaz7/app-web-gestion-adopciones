@@ -48,3 +48,21 @@ export async function claimExistingAccountNotice(
   );
   return rows[0] ?? null;
 }
+
+export async function markEmailVerified(db: Db, userId: number): Promise<void> {
+  await db.query(`UPDATE "App_user" SET email_verified_at = now(), updated_at = now() WHERE id = $1`, [userId]);
+}
+
+/**
+ * The account with this email if it is still unverified and not deleted, locked so two
+ * requests for the same account are handled one after the other (RN-180).
+ */
+export async function findUnverifiedUserForUpdate(db: Db, email: string): Promise<{ id: number; email: string } | null> {
+  const { rows } = await db.query<{ id: number; email: string }>(
+    `SELECT id, email FROM "App_user"
+      WHERE lower(email) = lower($1) AND email_verified_at IS NULL AND deleted_at IS NULL
+        FOR UPDATE`,
+    [email],
+  );
+  return rows[0] ?? null;
+}

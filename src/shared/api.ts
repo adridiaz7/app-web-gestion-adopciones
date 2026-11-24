@@ -25,6 +25,32 @@ export interface AdopterRegistrationRequest {
   acceptTerms: boolean;
 }
 
+/** CU-02 · POST /api/auth/register/shelter */
+export interface ShelterRegistrationRequest {
+  email: string;
+  /** RN-175: 12 to 256 characters. */
+  password: string;
+  name: string;
+  /** RN-17: unique. Spaces and hyphens are ignored. */
+  cif: string;
+  address: string;
+  provinceId: number;
+  locality: string;
+  phone: string;
+  /** RN-186: must be true. */
+  acceptTerms: boolean;
+}
+
+/** CU-03 · POST /api/auth/verify-email */
+export interface VerifyEmailRequest {
+  token: string;
+}
+
+/** CU-03 · POST /api/auth/resend-verification */
+export interface ResendVerificationRequest {
+  email: string;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

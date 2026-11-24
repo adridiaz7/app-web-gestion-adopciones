@@ -6,7 +6,7 @@ import { insertAdopter } from "../models/adopters.js";
 import { provinceExists } from "../models/provinces.js";
 import { cifExists, insertShelterIfCifFree } from "../models/shelters.js";
 import { claimExistingAccountNotice, insertUserIfEmailFree } from "../models/users.js";
-import { createEmailToken } from "./email-tokens.js";
+import { createVerificationEmail } from "./email-verification.js";
 import { sendEmail, type Email } from "./email.js";
 import { hashPassword } from "./passwords.js";
 
@@ -39,22 +39,6 @@ export interface AdopterRegistration extends AccountRegistration {
   phone: string;
   birthDate: string;
   locality: string;
-}
-
-function verificationEmail(to: string, token: string): Email {
-  const link = `${getConfig().appUrl}/verificar-email?token=${token}`;
-  return {
-    to,
-    subject: "Verifica tu email",
-    text: [
-      "¡Gracias por registrarte!",
-      "",
-      "Para activar tu cuenta, verifica tu email con este enlace:",
-      link,
-      "",
-      `El enlace caduca en ${String(getConfig().rules.emailVerificationValidityHours)} horas.`,
-    ].join("\n"),
-  };
 }
 
 /** RN-182: notice to the owner of an email someone tried to sign up with. */
@@ -116,8 +100,7 @@ async function registerAccount(
 
     await insertProfile(client, user.id);
     // RN-177: the verification link expires after the configured hours.
-    const token = await createEmailToken(client, user.id, "VERIFY_EMAIL", rules.emailVerificationValidityHours * 3600);
-    return [verificationEmail(input.email, token)];
+    return [await createVerificationEmail(client, user.id, input.email)];
   });
 
   for (const email of emails) await sendEmail(email);

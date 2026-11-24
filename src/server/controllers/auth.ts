@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
 import type { MessageResponse } from "../../shared/api.js";
+import { resendVerification, verifyEmail } from "../services/email-verification.js";
 import { registerAdopter, registerShelter } from "../services/registration.js";
 
 const REQUIRED = "Este campo es obligatorio.";
@@ -92,4 +93,30 @@ export const postRegisterShelter: RequestHandler = async (req, res) => {
   const input = shelterRegistrationSchema.parse(req.body ?? {});
   await registerShelter(input);
   res.status(202).json(REGISTERED);
+};
+
+const verifyEmailSchema = z.object({
+  token: z.string({ error: "Falta el enlace de verificación." }).min(1, { error: "Falta el enlace de verificación." }),
+});
+
+/** CU-03 · POST /api/auth/verify-email */
+export const postVerifyEmail: RequestHandler = async (req, res) => {
+  const { token } = verifyEmailSchema.parse(req.body ?? {});
+  await verifyEmail(token);
+  const body: MessageResponse = { message: "Tu email está verificado. Ya puedes iniciar sesión." };
+  res.json(body);
+};
+
+const resendVerificationSchema = z.object({ email: emailSchema });
+
+/** Same answer whether the email has an unverified account or not. */
+const RESENT: MessageResponse = {
+  message: "Si ese email tiene una cuenta pendiente de verificar, te hemos enviado un enlace nuevo. Revisa tu correo.",
+};
+
+/** CU-03 · POST /api/auth/resend-verification */
+export const postResendVerification: RequestHandler = async (req, res) => {
+  const { email } = resendVerificationSchema.parse(req.body ?? {});
+  await resendVerification(email);
+  res.status(202).json(RESENT);
 };
