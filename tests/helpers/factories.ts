@@ -130,3 +130,45 @@ export async function createPet(options: PetOptions): Promise<CreatedPet> {
   if (!row) throw new Error("createPet: no row returned");
   return { id: row.id };
 }
+
+export interface VisitSlotOptions {
+  shelterId: number;
+  /** Defaults to 7 days from now. */
+  startsAt?: Date;
+  /** Defaults to one hour. */
+  durationMinutes?: number;
+  capacity?: number;
+}
+
+export async function createVisitSlot(options: VisitSlotOptions): Promise<{ id: number }> {
+  const startsAt = options.startsAt ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const endsAt = new Date(startsAt.getTime() + (options.durationMinutes ?? 60) * 60 * 1000);
+  const { rows } = await getPool().query<{ id: number }>(
+    `INSERT INTO "Visit_slot" (shelter_id, starts_at, ends_at, capacity) VALUES ($1, $2, $3, $4) RETURNING id`,
+    [options.shelterId, startsAt, endsAt, options.capacity ?? 1],
+  );
+  const row = rows[0];
+  if (!row) throw new Error("createVisitSlot: no row returned");
+  return { id: row.id };
+}
+
+export interface VisitOptions {
+  adopterId: number;
+  shelterId: number;
+  petId: number;
+  slotId: number;
+  status?: "PENDING" | "CONFIRMED";
+}
+
+export async function createVisit(options: VisitOptions): Promise<{ id: number }> {
+  const status = options.status ?? "PENDING";
+  const { rows } = await getPool().query<{ id: number }>(
+    `INSERT INTO "Visit" (adopter_id, shelter_id, pet_id, slot_id, status, responded_at)
+     VALUES ($1, $2, $3, $4, $5, CASE WHEN $5 = 'CONFIRMED' THEN now() END)
+     RETURNING id`,
+    [options.adopterId, options.shelterId, options.petId, options.slotId, status],
+  );
+  const row = rows[0];
+  if (!row) throw new Error("createVisit: no row returned");
+  return { id: row.id };
+}
