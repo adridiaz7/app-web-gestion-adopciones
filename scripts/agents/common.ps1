@@ -144,12 +144,18 @@ function Initialize-AgentWorktree {
         }
     }
 
-    # While develop has no commits of its own, bring in the owner's latest changes from master.
-    $headSha   = Get-GitValue @('rev-parse', 'HEAD')
-    $masterSha = Get-GitValue @('rev-parse', 'master')
-    if ($headSha -ne $masterSha) {
+    # Bring in the owner's changes from master (docs, designs, scripts) before the agent works.
+    & git -C $AgentWorktree merge-base --is-ancestor master HEAD 2>$null
+    if ($LASTEXITCODE -ne 0) {
         & git -C $AgentWorktree merge-base --is-ancestor HEAD master 2>$null
-        if ($LASTEXITCODE -eq 0) { Invoke-Git @('merge', '--ff-only', 'master') | Out-Null }
+        if ($LASTEXITCODE -eq 0) {
+            # develop has no commits of its own yet: just move it forward.
+            Invoke-Git @('merge', '--ff-only', 'master') | Out-Null
+        } elseif (-not (Invoke-Git @('merge', '--no-ff', '--no-edit', '-m', 'chore: incorpora a develop los cambios de master', 'master'))) {
+            # A conflict: leave develop as it was and let the owner merge by hand.
+            Invoke-Git @('merge', '--abort') | Out-Null
+            Write-RunLog 'WARNING: master could not be merged into develop automatically (conflict). Merge it by hand.'
+        }
     }
 
     # Dependencies: install them if the project has a package.json but no node_modules yet.

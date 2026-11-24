@@ -198,7 +198,8 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 |---|---|
 | `scripts/agents/run-desarrollador.ps1` | Una ejecución del desarrollador. Comprueba que no haya cambios sin commit del responsable, se sitúa en `develop`, lanza el agente, verifica el candado de tests y hace `push` de `develop`. |
 | `scripts/agents/run-revisor.ps1` | La revisión diaria. Espera a que termine el desarrollador si está trabajando, revisa los commits nuevos de `develop`, guarda el informe en `docs/revisiones/` y hace commit y `push`. |
-| `scripts/agents/register-tasks.ps1` | Crea (o elimina con `-Remove`) las dos tareas en el Programador de tareas de Windows. |
+| `scripts/agents/register-tasks.ps1` | Crea (o elimina con `-Remove`) las dos tareas en el Programador de tareas de Windows. Con `-IntervalHours N`, el desarrollador se ejecuta cada N horas. |
+| `scripts/agents/status.ps1` | Estado de un vistazo: si hay un agente trabajando y desde cuándo, las tareas programadas, el trabajo en curso, los commits pendientes de pasar a `master`, el resumen del plan, la última revisión y la última ejecución. Solo lee, no cambia nada. |
 
 Cómo trabajan los agentes:
 - **En una copia aparte.** Usan un *worktree* de Git en una carpeta hermana del proyecto (`lagun-app-adopciones-agentes`) con la rama `develop`. Nunca tocan la carpeta de trabajo del responsable. Para ver su trabajo: `git log develop`, o la rama `develop` en GitHub.
