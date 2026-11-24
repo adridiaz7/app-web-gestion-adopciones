@@ -76,6 +76,11 @@ export interface ResetPasswordRequest {
   password: string;
 }
 
+/** GET /api/provinces */
+export interface ProvincesResponse {
+  provinces: { id: number; name: string }[];
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

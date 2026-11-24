@@ -115,7 +115,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | T-06 | Verificar el email y reenviar el enlace (solo API). | CU-03; RN-07, 177, 180 | T-04 | EN_REVISION |
 | T-07 | Iniciar y cerrar sesión: sesiones en base de datos, cookie, middleware de sesión y de rol, y límite de intentos (solo API). | CU-04; RN-10, 176, 179 | T-06 | EN_REVISION |
 | T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | EN_REVISION |
-| T-09 | **Frontend base y pantallas de acceso:** `index.html`, router con History API, layout con barra lateral, tokens CSS del sistema de diseño y cliente de la API. Pantallas de inicio de sesión, tipo de cuenta, registros, verificación y recuperación. | Mockups `docs/ux-ui/acceso`; especificaciones §5 | T-08 | EN_CURSO |
+| T-09 | **Frontend base y pantallas de acceso:** `index.html`, router con History API, layout con barra lateral, tokens CSS del sistema de diseño y cliente de la API. Pantallas de inicio de sesión, tipo de cuenta, registros, verificación y recuperación. | Mockups `docs/ux-ui/acceso`; especificaciones §5 | T-08 | EN_REVISION |
 | T-10 | **`db/seed.sql` mínimo:** administrador, una protectora validada, un adoptante y 4 mascotas sin fotos. Incluye un script que genera los hashes Argon2id de las contraseñas de demo, documentadas en el propio seed. | Especificaciones §5 | T-07 | PENDIENTE |
 
 ### Fase 2 · Mascotas, galería y ficha

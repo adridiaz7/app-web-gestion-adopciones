@@ -4,6 +4,7 @@ import express from "express";
 import { z } from "zod";
 import type { HealthResponse } from "../shared/api.js";
 import { NotFoundError } from "./errors.js";
+import { getProvinces } from "./controllers/catalogues.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { loadSession } from "./middlewares/session.js";
 import { createAuthRouter } from "./routes/auth.js";
@@ -32,6 +33,7 @@ export function createApp(): express.Express {
 
   api.use(loadSession);
   api.use("/auth", createAuthRouter());
+  api.get("/provinces", getProvinces);
 
   api.use(() => {
     throw new NotFoundError();
@@ -40,8 +42,9 @@ export function createApp(): express.Express {
   app.use("/api", api);
 
   // One origin: the SPA is served next to the API.
-  app.use(express.static(CLIENT_BUILD_DIR, { index: false }));
-  app.use(express.static(CLIENT_SOURCE_DIR, { index: false }));
+  // Under /assets, so a client folder (like src/client/api) never clashes with the /api routes.
+  app.use("/assets", express.static(CLIENT_BUILD_DIR, { index: false }));
+  app.use("/assets", express.static(CLIENT_SOURCE_DIR, { index: false }));
   // History API router: any page route (no /api, no file extension) gets index.html.
   app.get(/.*/, (req, res, next) => {
     if (extname(req.path) !== "") {

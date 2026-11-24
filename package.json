@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "tsx watch --env-file=.env src/server/server.ts",
+    "dev:client": "tsc -p tsconfig.client.json --watch",
     "build": "tsc -p tsconfig.server.json && tsc -p tsconfig.client.json",
     "start": "node --env-file=.env dist/server/server.js",
     "pretest": "node scripts/test-lock.ts check",

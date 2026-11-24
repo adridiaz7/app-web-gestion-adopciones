@@ -20,8 +20,8 @@ describe("T-09 serving the SPA from the same origin as the API", () => {
     expect(res.text).toContain('<div id="app"');
   });
 
-  it("T-09: serves the CSS with the design system tokens", async () => {
-    const res = await request(createApp()).get("/styles/tokens.css");
+  it("T-09: serves the client files under /assets, so they never clash with /api", async () => {
+    const res = await request(createApp()).get("/assets/styles/tokens.css");
 
     expect(res.status).toBe(200);
     expect(res.headers["content-type"]).toMatch(/text\/css/);
@@ -36,7 +36,7 @@ describe("T-09 serving the SPA from the same origin as the API", () => {
   });
 
   it("T-09: a missing file with an extension is a 404, not the page", async () => {
-    const res = await request(createApp()).get("/styles/no-existe.css");
+    const res = await request(createApp()).get("/assets/styles/no-existe.css");
 
     expect(res.status).toBe(404);
   });
