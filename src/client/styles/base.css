@@ -618,3 +618,90 @@ textarea {
   width: 100%;
   margin-top: 0;
 }
+
+/* Shelter: pets */
+.page-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.pet-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pet-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.pet-row:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.pet-row__name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pet-form {
+  max-width: 760px;
+  margin-top: 0;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.radio-group,
+.pet-form fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.pet-form legend {
+  margin-bottom: var(--space-2);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.radio-group__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+/* Status badges (design system §8) */
+.badge {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge--available {
+  border-color: var(--color-accent-border);
+  background: var(--color-accent);
+}
+
+.badge--reserved,
+.badge--adopted {
+  border-color: var(--color-primary-border);
+  background: var(--color-primary);
+}
+
+.badge--unlisted {
+  border-color: var(--neutral-300);
+  color: var(--color-text-muted);
+}

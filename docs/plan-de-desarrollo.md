@@ -125,7 +125,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | EN_REVISION |
-| T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_CURSO |
+| T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_REVISION |
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | PENDIENTE |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | PENDIENTE |
 | T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | PENDIENTE |
