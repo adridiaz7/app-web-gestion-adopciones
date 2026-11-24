@@ -1,3 +1,5 @@
+import { extname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import express from "express";
 import { z } from "zod";
 import type { HealthResponse } from "../shared/api.js";
@@ -8,6 +10,12 @@ import { createAuthRouter } from "./routes/auth.js";
 
 // Default Zod messages in Spanish: they can reach the user (UI texts are in Spanish).
 z.config(z.locales.es());
+
+/** Project root: app.ts runs from src/server (dev, tests) or dist/server (build), two levels down. */
+const ROOT = fileURLToPath(new URL("../../", import.meta.url));
+/** index.html and the CSS are served from the sources; the compiled client code, from dist/client. */
+const CLIENT_SOURCE_DIR = join(ROOT, "src", "client");
+const CLIENT_BUILD_DIR = join(ROOT, "dist", "client");
 
 /** Builds the Express app. It does not listen: server.ts does, and the tests use supertest. */
 export function createApp(): express.Express {
@@ -30,6 +38,18 @@ export function createApp(): express.Express {
   });
 
   app.use("/api", api);
+
+  // One origin: the SPA is served next to the API.
+  app.use(express.static(CLIENT_BUILD_DIR, { index: false }));
+  app.use(express.static(CLIENT_SOURCE_DIR, { index: false }));
+  // History API router: any page route (no /api, no file extension) gets index.html.
+  app.get(/.*/, (req, res, next) => {
+    if (extname(req.path) !== "") {
+      next();
+      return;
+    }
+    res.sendFile("index.html", { root: CLIENT_SOURCE_DIR });
+  });
   app.use(errorHandler);
 
   return app;

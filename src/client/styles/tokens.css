@@ -1,0 +1,90 @@
+/* Design system tokens: docs/ux-ui/design-system.md §10. Code uses the roles, not the primitives. */
+:root {
+  /* Primitivos */
+  --neutral-0: #FFFFFF;
+  --neutral-50: #FEFAF6;
+  --neutral-100: #F9F3EB;
+  --neutral-200: #EDE4D9;
+  --neutral-300: #D7CDC1;
+  --neutral-400: #AC9F91;
+  --neutral-500: #81766A;
+  --neutral-600: #675F56;
+  --neutral-700: #4C463E;
+  --neutral-800: #312C26;
+  --neutral-900: #1D1A16;
+  --primary-50: #FDF6EC;
+  --primary-100: #FBECDA;
+  --primary-200: #F8DAB5;
+  --primary-300: #F1B873;
+  --primary-400: #D8964B;
+  --primary-500: #C07A30;
+  --primary-600: #9B5E22;
+  --primary-700: #79481B;
+  --primary-800: #563315;
+  --primary-900: #372210;
+  --accent-50: #F1F7FE;
+  --accent-100: #E3EEFC;
+  --accent-200: #BFD8F8;
+  --accent-300: #73ACF1;
+  --accent-400: #4D8BD5;
+  --accent-500: #3271BD;
+  --accent-600: #255B9D;
+  --accent-700: #1C487D;
+  --accent-800: #15355B;
+  --accent-900: #10243C;
+  --error-50: #FDEDEC;
+  --error-200: #F6C2C1;
+  --error-600: #BE2C27;
+  --error-800: #7E1A16;
+  --success-50: #ECF9F1;
+  --success-200: #B8E0C9;
+  --success-600: #1E7643;
+  --success-800: #11502B;
+  --warning-50: #FEF6DC;
+  --warning-200: #F4D87B;
+  --warning-600: #9D6607;
+  --warning-800: #683D08;
+  --info-50: #EDF3FD;
+  --info-200: #C0D5F2;
+  --info-600: #1F5CB2;
+  --info-800: #133D76;
+
+  /* Roles */
+  --color-bg: var(--neutral-50);
+  --color-surface: var(--neutral-0);
+  --color-surface-alt: var(--neutral-100);
+  --color-border: var(--neutral-200);
+  --color-border-strong: var(--neutral-500);
+  --color-text: var(--neutral-900);
+  --color-text-muted: var(--neutral-600);
+  --color-primary: var(--primary-300);
+  --color-primary-hover: var(--primary-200);
+  --color-primary-border: var(--primary-400);
+  --color-primary-soft: var(--primary-100);
+  --color-accent: var(--accent-300);
+  --color-accent-border: var(--accent-400);
+  --color-accent-soft: var(--accent-100);
+  --color-focus: var(--accent-400);
+
+  /* Tipografía, espaciado, radios y sombras */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 999px;
+  --shadow-sm: 0 1px 2px rgba(80,50,10,.08);
+  --shadow-md: 0 10px 24px rgba(80,50,10,.10);
+  --shadow-lg: 0 20px 44px rgba(80,50,10,.18);
+}
