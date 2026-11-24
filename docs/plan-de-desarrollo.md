@@ -97,7 +97,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-01 | **Esqueleto.** `package.json` (ESM), los tres `tsconfig`, ESLint estricto, Vitest y supertest, scripts npm (`dev`, `build`, `start`, `test`, `lint`, `typecheck`, `db:reset`, `pretest` → `test-lock.ts check`), `.env.example` y un `.env` local **sin contraseña** (`pg` la toma de `pgpass.conf`), `config.ts` que valida las variables de entorno y los parámetros de la sección 16 con Zod, y la app de Express con `GET /api/health`. Sin pantalla. | Especificaciones §3–§5 y §10 | — | EN_REVISION |
-| T-02 | **Base de datos.** Pool de `pg`, función para ejecutar en una transacción, y utilidades de test: recrear `lagun_test` con `db/schema.sql` y fábricas de datos para los tests. Script `db:reset` (schema + seed). Sin pantalla. | RN-171; especificaciones §5 | T-01 | PENDIENTE |
+| T-02 | **Base de datos.** Pool de `pg`, función para ejecutar en una transacción, y utilidades de test: recrear `lagun_test` con `db/schema.sql` y fábricas de datos para los tests. Script `db:reset` (schema + seed). Sin pantalla. | RN-171; especificaciones §5 | T-01 | EN_REVISION |
 | T-03 | **Piezas transversales.** Middleware de errores (los errores de la base de datos no llegan en crudo al cliente), `audit()` para el registro de auditoría, servicio para **crear** notificaciones con plantillas, y envío de emails simulado que escribe los enlaces en la consola. Sin pantalla. | RN-140–144, RN-208–210 | T-02 | PENDIENTE |
 
 ### Fase 1 · Cuenta y acceso
