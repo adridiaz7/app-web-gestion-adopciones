@@ -37,9 +37,11 @@ try {
 
     Save-LeftoverWork 'after the run'
 
-    $after = Get-GitValue @('rev-parse', 'HEAD')
-    if ($after -eq $before) {
-        Write-RunLog 'No new commits.'
+    $after  = Get-GitValue @('rev-parse', 'HEAD')
+    $remote = Get-GitValue @('rev-parse', '--verify', '--quiet', 'refs/remotes/origin/develop')
+    if ($after -eq $before) { Write-RunLog 'The agent made no new commits.' }
+    if ($after -eq $remote) {
+        Write-RunLog 'Nothing to push.'
     } elseif (-not (Test-TestLock)) {
         Write-RunLog 'Locked tests were modified: NOT pushing. Review the commits by hand.'
     } else {
