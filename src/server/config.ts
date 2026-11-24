@@ -20,6 +20,8 @@ const envSchema = z
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     PORT: z.coerce.number().int().min(1).max(65535).default(3000),
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+    // Public URL of the app, for the links in the emails. Defaults to localhost on PORT.
+    APP_URL: z.url({ protocol: /^https?$/ }).optional(),
 
     VISIT_MIN_NOTICE_HOURS: positiveInt(48), // RN-87
     VISIT_RESPONSE_DEADLINE_HOURS: positiveInt(24), // RN-94
@@ -59,6 +61,7 @@ function toConfig(env: Env) {
     nodeEnv: env.NODE_ENV,
     port: env.PORT,
     databaseUrl: env.DATABASE_URL,
+    appUrl: (env.APP_URL ?? `http://localhost:${String(env.PORT)}`).replace(/\/+$/, ""),
     rules: {
       visitMinNoticeHours: env.VISIT_MIN_NOTICE_HOURS,
       visitResponseDeadlineHours: env.VISIT_RESPONSE_DEADLINE_HOURS,

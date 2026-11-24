@@ -1,0 +1,123 @@
+import { getConfig } from "../config.js";
+import { getPool } from "../db/pool.js";
+import { withTransaction } from "../db/transaction.js";
+import { BadRequestError } from "../errors.js";
+import { insertAdopter } from "../models/adopters.js";
+import { provinceExists } from "../models/provinces.js";
+import { claimExistingAccountNotice, insertUserIfEmailFree } from "../models/users.js";
+import { createEmailToken } from "./email-tokens.js";
+import { sendEmail, type Email } from "./email.js";
+import { hashPassword } from "./passwords.js";
+
+/** Age of majority in Spain (RN-25). A legal fact, not a configurable parameter of §16. */
+const ADULT_AGE = 18;
+
+/**
+ * RN-25: whether someone born on `birthDate` is an adult on `today` (both `YYYY-MM-DD`).
+ * Someone born on 29 February becomes an adult on 1 March in non-leap years.
+ */
+export function isAdult(birthDate: string, today: string): boolean {
+  const [birthYear, birthMonth, birthDay] = birthDate.split("-").map(Number) as [number, number, number];
+  const adultFrom = new Date(Date.UTC(birthYear + ADULT_AGE, birthMonth - 1, birthDay));
+  // Date.UTC rolls 29 February over to 1 March when the year is not a leap year.
+  return adultFrom.toISOString().slice(0, 10) <= today;
+}
+
+const madridDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" });
+
+/** Today's date in Spain, as `YYYY-MM-DD`. */
+function madridToday(): string {
+  return madridDate.format(new Date());
+}
+
+export interface AdopterRegistration {
+  /** Already trimmed and lower-cased by the controller. */
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  birthDate: string;
+  provinceId: number;
+  locality: string;
+  acceptTerms: boolean;
+}
+
+function verificationEmail(to: string, token: string): Email {
+  const link = `${getConfig().appUrl}/verificar-email?token=${token}`;
+  return {
+    to,
+    subject: "Verifica tu email",
+    text: [
+      "¡Gracias por registrarte!",
+      "",
+      "Para activar tu cuenta, verifica tu email con este enlace:",
+      link,
+      "",
+      `El enlace caduca en ${String(getConfig().rules.emailVerificationValidityHours)} horas.`,
+    ].join("\n"),
+  };
+}
+
+/** RN-182: notice to the owner of an email someone tried to sign up with. */
+function existingAccountEmail(to: string): Email {
+  return {
+    to,
+    subject: "Alguien ha intentado registrarse con tu email",
+    text: [
+      "Alguien ha intentado registrarse con tu email, pero ya tienes una cuenta.",
+      "",
+      "Si has sido tú y no recuerdas la contraseña, puedes recuperarla aquí:",
+      `${getConfig().appUrl}/recuperar-contrasena`,
+      "",
+      "Si no has sido tú, puedes ignorar este mensaje: tu cuenta no ha cambiado.",
+    ].join("\n"),
+  };
+}
+
+/**
+ * CU-01: signs up an adopter. The account stays unverified until the email link is used (RN-07).
+ * The emails go out after the commit, so no link is sent for an account that was not saved.
+ */
+export async function registerAdopter(input: AdopterRegistration): Promise<void> {
+  const { rules } = getConfig();
+
+  // RN-186: accepting the terms of use and the privacy policy is mandatory.
+  if (!input.acceptTerms) {
+    throw new BadRequestError("Tienes que aceptar los términos de uso y la política de privacidad.");
+  }
+  // RN-25: adopters must be adults, counting in Spanish time.
+  if (!isAdult(input.birthDate, madridToday())) {
+    throw new BadRequestError("Tienes que ser mayor de edad para registrarte.");
+  }
+  if (!(await provinceExists(getPool(), input.provinceId))) {
+    throw new BadRequestError("La provincia no existe.");
+  }
+
+  // Hashed before knowing whether the email is free, so the response time does not reveal it (RN-182).
+  const passwordHash = await hashPassword(input.password);
+
+  const emails = await withTransaction(async (client) => {
+    const user = await insertUserIfEmailFree(client, { email: input.email, passwordHash, role: "ADOPTER" });
+    if (!user) {
+      // RN-182: the email already has an account. Same answer as a new email; the owner is told instead.
+      const owner = await claimExistingAccountNotice(client, input.email, rules.existingAccountNoticeWaitMinutes);
+      return owner ? [existingAccountEmail(owner.email)] : [];
+    }
+
+    await insertAdopter(client, {
+      userId: user.id,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phone: input.phone,
+      birthDate: input.birthDate,
+      provinceId: input.provinceId,
+      locality: input.locality,
+    });
+    // RN-177: the verification link expires after the configured hours.
+    const token = await createEmailToken(client, user.id, "VERIFY_EMAIL", rules.emailVerificationValidityHours * 3600);
+    return [verificationEmail(input.email, token)];
+  });
+
+  for (const email of emails) await sendEmail(email);
+}
