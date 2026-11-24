@@ -1,10 +1,12 @@
 import { Router } from "express";
 import {
   getMe,
+  postForgotPassword,
   postLogin,
   postLogout,
   postRegisterAdopter,
   postRegisterShelter,
+  postResetPassword,
   postResendVerification,
   postVerifyEmail,
 } from "../controllers/auth.js";
@@ -21,6 +23,8 @@ export function createAuthRouter(): Router {
   router.post("/resend-verification", postResendVerification);
   router.post("/login", loginRateLimit(), postLogin);
   router.post("/logout", postLogout);
+  router.post("/forgot-password", postForgotPassword);
+  router.post("/reset-password", postResetPassword);
   router.get("/me", requireAuth, getMe);
 
   return router;

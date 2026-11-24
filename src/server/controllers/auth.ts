@@ -4,6 +4,7 @@ import type { MessageResponse, SessionResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { clearSessionCookie, readSessionToken, setSessionCookie } from "../middlewares/session.js";
 import { resendVerification, verifyEmail } from "../services/email-verification.js";
+import { requestPasswordReset, resetPassword } from "../services/password-reset.js";
 import { registerAdopter, registerShelter } from "../services/registration.js";
 import { logIn, logOut } from "../services/sessions.js";
 
@@ -151,5 +152,33 @@ export const postLogout: RequestHandler = async (req, res) => {
 export const getMe: RequestHandler = (req, res) => {
   if (!req.user) throw new UnauthorizedError();
   const body: SessionResponse = { user: req.user };
+  res.json(body);
+};
+
+const forgotPasswordSchema = z.object({ email: emailSchema });
+
+/** Same answer whether the email has an account or not. */
+const RESET_SENT: MessageResponse = {
+  message: "Si ese email tiene una cuenta, te hemos enviado un enlace para restablecer la contraseña. Revisa tu correo.",
+};
+
+/** CU-05 · POST /api/auth/forgot-password */
+export const postForgotPassword: RequestHandler = async (req, res) => {
+  const { email } = forgotPasswordSchema.parse(req.body ?? {});
+  await requestPasswordReset(email);
+  res.status(202).json(RESET_SENT);
+};
+
+const MISSING_RESET_TOKEN = "Falta el enlace para restablecer la contraseña.";
+const resetPasswordSchema = z.object({
+  token: z.string({ error: MISSING_RESET_TOKEN }).min(1, { error: MISSING_RESET_TOKEN }),
+  password: passwordSchema,
+});
+
+/** CU-05 · POST /api/auth/reset-password */
+export const postResetPassword: RequestHandler = async (req, res) => {
+  const { token, password } = resetPasswordSchema.parse(req.body ?? {});
+  await resetPassword(token, password, req.ip);
+  const body: MessageResponse = { message: "Tu contraseña se ha cambiado. Ya puedes iniciar sesión." };
   res.json(body);
 };

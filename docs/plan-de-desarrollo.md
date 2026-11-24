@@ -87,7 +87,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 
 > El desarrollador añade aquí sus dudas, con la fecha y la tarea. El responsable responde debajo de cada una. No se borran: quedan como registro.
 
-*(Sin preguntas por ahora.)*
+**25/11/2026 · T-08 (no bloquea).** Al restablecer la contraseña (CU-05), ¿se cierran las sesiones abiertas de esa cuenta? Es lo habitual por seguridad (si alguien robó la contraseña, pierde el acceso), pero ninguna RN lo dice, así que de momento **no** se cierran. Si la respuesta es sí, se hará en una tarea aparte con tests nuevos.
 
 ---
 
@@ -114,7 +114,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | T-05 | Registro de protectora (solo API). | CU-02; RN-14, 17, 182, 186 | T-04 | EN_REVISION |
 | T-06 | Verificar el email y reenviar el enlace (solo API). | CU-03; RN-07, 177, 180 | T-04 | EN_REVISION |
 | T-07 | Iniciar y cerrar sesión: sesiones en base de datos, cookie, middleware de sesión y de rol, y límite de intentos (solo API). | CU-04; RN-10, 176, 179 | T-06 | EN_REVISION |
-| T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | PENDIENTE |
+| T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | EN_REVISION |
 | T-09 | **Frontend base y pantallas de acceso:** `index.html`, router con History API, layout con barra lateral, tokens CSS del sistema de diseño y cliente de la API. Pantallas de inicio de sesión, tipo de cuenta, registros, verificación y recuperación. | Mockups `docs/ux-ui/acceso`; especificaciones §5 | T-08 | PENDIENTE |
 | T-10 | **`db/seed.sql` mínimo:** administrador, una protectora validada, un adoptante y 4 mascotas sin fotos. Incluye un script que genera los hashes Argon2id de las contraseñas de demo, documentadas en el propio seed. | Especificaciones §5 | T-07 | PENDIENTE |
 

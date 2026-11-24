@@ -64,6 +64,18 @@ export interface SessionResponse {
   user: { id: number; email: string; role: Role };
 }
 
+/** CU-05 · POST /api/auth/forgot-password */
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+/** CU-05 · POST /api/auth/reset-password */
+export interface ResetPasswordRequest {
+  token: string;
+  /** RN-175: 12 to 256 characters. */
+  password: string;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

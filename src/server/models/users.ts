@@ -89,3 +89,29 @@ export async function findLoginCandidate(db: Db, email: string): Promise<LoginCa
   );
   return rows[0] ?? null;
 }
+
+/**
+ * RN-183: the account with this email that can get a password reset link (verified or
+ * not, but neither deleted nor suspended), locked so two requests for it are handled
+ * one after the other (RN-181).
+ */
+export async function findResettableUserForUpdate(db: Db, email: string): Promise<{ id: number; email: string } | null> {
+  const { rows } = await db.query<{ id: number; email: string }>(
+    `SELECT u.id, u.email FROM "App_user" u
+      WHERE lower(u.email) = lower($1) AND u.deleted_at IS NULL
+        AND NOT EXISTS (SELECT 1 FROM "Suspension" s WHERE s.user_id = u.id AND s.ended_at IS NULL)
+        FOR UPDATE OF u`,
+    [email],
+  );
+  return rows[0] ?? null;
+}
+
+/** Sets a new password. RN-183: it also verifies the email, if it was not verified yet. */
+export async function updatePasswordAndVerify(db: Db, userId: number, passwordHash: string): Promise<void> {
+  await db.query(
+    `UPDATE "App_user"
+        SET password_hash = $2, email_verified_at = coalesce(email_verified_at, now()), updated_at = now()
+      WHERE id = $1`,
+    [userId, passwordHash],
+  );
+}

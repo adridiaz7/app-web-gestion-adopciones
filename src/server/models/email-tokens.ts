@@ -25,6 +25,8 @@ export interface FoundEmailToken {
   usable: boolean;
   userVerified: boolean;
   userDeleted: boolean;
+  /** RN-10: the account has a suspension without an end date. */
+  userSuspended: boolean;
 }
 
 /** Finds a token by its hash and purpose, locking it so it cannot be used twice at once. */
@@ -37,7 +39,8 @@ export async function findEmailTokenForUpdate(
     `SELECT t.id, t.user_id AS "userId",
             (t.used_at IS NULL AND t.revoked_at IS NULL AND t.expires_at > now()) AS usable,
             u.email_verified_at IS NOT NULL AS "userVerified",
-            u.deleted_at IS NOT NULL AS "userDeleted"
+            u.deleted_at IS NOT NULL AS "userDeleted",
+            EXISTS (SELECT 1 FROM "Suspension" s WHERE s.user_id = u.id AND s.ended_at IS NULL) AS "userSuspended"
        FROM "Email_token" t
        JOIN "App_user" u ON u.id = t.user_id
       WHERE t.token_hash = $1 AND t.purpose = $2
