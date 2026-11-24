@@ -1,4 +1,50 @@
 {
-  "files": {},
+  "files": {
+    "tests/integration/audit.test.ts": {
+      "feature": "T-03 Piezas transversales",
+      "sha256": "9c3f112564610f0d319474d25e193774b5155ce4c1d98128e4119f97af69b00b",
+      "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/integration/db-transaction.test.ts": {
+      "feature": "T-02 Base de datos",
+      "sha256": "dd8f768d7ea3349ba2a8639ac72baf60744580a6f40a143e57767bc561971249",
+      "lockedAt": "2026-11-24T23:12:50.666Z"
+    },
+    "tests/integration/error-handler.test.ts": {
+      "feature": "T-03 Piezas transversales",
+      "sha256": "a07f9afd9ea4d431a624713b29d4a70a771e32f09d1b046aae3ae6b9a8938a28",
+      "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/integration/health.test.ts": {
+      "feature": "T-01 Esqueleto",
+      "sha256": "d898898a1ad60d932dc832e6c3b301a5ff76cab7bdcece54db56a32fecb7fb71",
+      "lockedAt": "2026-11-24T23:12:50.521Z"
+    },
+    "tests/integration/notifications.test.ts": {
+      "feature": "T-03 Piezas transversales",
+      "sha256": "9490064d0ba836fdddc293fb40474c9062a765b2d74752aa417f12e09d6ea01a",
+      "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/integration/test-helpers.test.ts": {
+      "feature": "T-02 Base de datos",
+      "sha256": "1c682e64194c8e176a9243e8a95d48955e09b34439df70fd282149b7495f1129",
+      "lockedAt": "2026-11-24T23:12:50.666Z"
+    },
+    "tests/unit/config.test.ts": {
+      "feature": "T-01 Esqueleto",
+      "sha256": "e67ae09bd3022306dd5bc430d71f313b6f75287b7bbc94eca004af88557e1927",
+      "lockedAt": "2026-11-24T23:12:50.521Z"
+    },
+    "tests/unit/email.test.ts": {
+      "feature": "T-03 Piezas transversales",
+      "sha256": "9ca27cee8edf02de33e4060cf5b62e784023d734fb03632df2aa6798f27d5009",
+      "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/unit/notification-templates.test.ts": {
+      "feature": "T-03 Piezas transversales",
+      "sha256": "03c2356003195a397d470577856ab9b825f4725f893df59510c40258baa8e80b",
+      "lockedAt": "2026-11-24T23:12:50.812Z"
+    }
+  },
   "history": []
 }

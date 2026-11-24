@@ -37,7 +37,12 @@ const adopterRegistrationSchema = z.object({
   lastName: requiredText(100),
   phone: phoneSchema,
   birthDate: z.iso.date({ error: "La fecha de nacimiento no es válida." }),
-  provinceId: z.number({ error: "Elige una provincia." }).int({ error: "Elige una provincia." }),
+  // "Province".id is a smallint: a larger value would reach PostgreSQL and fail as a 500.
+  provinceId: z
+    .number({ error: "Elige una provincia." })
+    .int({ error: "Elige una provincia." })
+    .positive({ error: "Elige una provincia." })
+    .max(32767, { error: "Elige una provincia." }),
   locality: requiredText(100),
   acceptTerms: z.boolean({ error: REQUIRED }),
 });
@@ -47,7 +52,8 @@ const REGISTERED: MessageResponse = { message: "Te hemos enviado un email con un
 
 /** CU-01 · POST /api/auth/register/adopter */
 export const postRegisterAdopter: RequestHandler = async (req, res) => {
-  const input = adopterRegistrationSchema.parse(req.body);
+  // Express 5 leaves req.body undefined when there is no JSON body: validate it field by field.
+  const input = adopterRegistrationSchema.parse(req.body ?? {});
   await registerAdopter(input);
   res.status(202).json(REGISTERED);
 };

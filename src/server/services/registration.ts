@@ -17,7 +17,9 @@ const ADULT_AGE = 18;
  * Someone born on 29 February becomes an adult on 1 March in non-leap years.
  */
 export function isAdult(birthDate: string, today: string): boolean {
-  const [birthYear, birthMonth, birthDay] = birthDate.split("-").map(Number) as [number, number, number];
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birthDate);
+  if (!match) throw new Error(`Invalid date: ${birthDate}`);
+  const [birthYear, birthMonth, birthDay] = [Number(match[1]), Number(match[2]), Number(match[3])];
   const adultFrom = new Date(Date.UTC(birthYear + ADULT_AGE, birthMonth - 1, birthDay));
   // Date.UTC rolls 29 February over to 1 March when the year is not a leap year.
   return adultFrom.toISOString().slice(0, 10) <= today;

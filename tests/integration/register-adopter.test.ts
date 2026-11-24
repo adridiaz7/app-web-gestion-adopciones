@@ -228,6 +228,30 @@ describe("T-04 CU-01 POST /api/auth/register/adopter with missing or malformed d
     expect((await register({ ...validBody, email: "otra@example.test", password: "a".repeat(256) })).status).toBe(202);
     expect(await countRows("Adopter")).toBe(2);
   });
+
+  it("CU-01: rejects a province id out of range", async () => {
+    await expectInvalid({ ...validBody, provinceId: 99999 }, "provinceId", "Elige una provincia.");
+    await expectInvalid({ ...validBody, provinceId: -40000 }, "provinceId", "Elige una provincia.");
+    await expectInvalid({ ...validBody, provinceId: 0 }, "provinceId", "Elige una provincia.");
+  });
+
+  it("CU-01: answers in Spanish, field by field, when the request has no JSON body", async () => {
+    const res = await request(createApp()).post(ENDPOINT);
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Los datos enviados no son válidos.");
+    expect(res.body.fields).toMatchObject({ email: "Este campo es obligatorio.", provinceId: "Elige una provincia." });
+    expect(await countRows("App_user")).toBe(0);
+  });
+
+  it("CU-01: answers in Spanish when the JSON body is not an object", async () => {
+    const res = await register([validBody]);
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Los datos enviados no son válidos.");
+    expect(JSON.stringify(res.body.fields)).not.toMatch(/Invalid|expected|received/);
+    expect(await countRows("App_user")).toBe(0);
+  });
 });
 
 describe("T-04 CU-01 POST /api/auth/register/adopter with an email that already has an account", () => {
