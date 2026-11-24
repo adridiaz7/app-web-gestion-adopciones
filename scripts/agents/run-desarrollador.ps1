@@ -30,7 +30,7 @@ try {
     Push-Location $AgentWorktree
     $claudeArgs = @('-p', '--agent', 'desarrollador', '--permission-mode', 'acceptEdits',
                     '--allowedTools') + $allowedTools + @('--disallowedTools') + $deniedTools + @('--', $prompt)
-    $output = & (Get-ClaudeExe) @claudeArgs 2>&1 | Out-String
+    $output = & (Get-ClaudeExe) @claudeArgs 2>&1 | ConvertTo-PlainText
     $exit = $LASTEXITCODE
     Pop-Location
     Write-RunLog ("Agent finished (exit {0}). Report:`n{1}" -f $exit, $output.TrimEnd())

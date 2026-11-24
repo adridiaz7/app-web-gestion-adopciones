@@ -29,9 +29,18 @@ function Write-RunLog([string]$message) {
     Write-Host $line
 }
 
+# Windows PowerShell 5.1 turns every stderr line of a native command (git, npm, claude) into an
+# error record, which prints as a noisy "NativeCommandError". Convert everything to plain text.
+function ConvertTo-PlainText {
+    $lines = @($input | ForEach-Object {
+        if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.Exception.Message } else { "$_" }
+    })
+    return ($lines -join [Environment]::NewLine)
+}
+
 # Runs git in the agents worktree; logs the output and returns $true on success.
 function Invoke-Git([string[]]$GitArgs, [string]$Dir = $script:AgentWorktree) {
-    $output = & git -C $Dir @GitArgs 2>&1 | Out-String
+    $output = & git -C $Dir @GitArgs 2>&1 | ConvertTo-PlainText
     $ok = ($LASTEXITCODE -eq 0)
     if ($output.Trim()) { Write-RunLog ("git {0}`n{1}" -f ($GitArgs -join ' '), $output.TrimEnd()) }
     if (-not $ok) { Write-RunLog ("git {0} FAILED (exit {1})" -f ($GitArgs -join ' '), $LASTEXITCODE) }
@@ -135,12 +144,20 @@ function Initialize-AgentWorktree {
         }
     }
 
+    # While develop has no commits of its own, bring in the owner's latest changes from master.
+    $headSha   = Get-GitValue @('rev-parse', 'HEAD')
+    $masterSha = Get-GitValue @('rev-parse', 'master')
+    if ($headSha -ne $masterSha) {
+        & git -C $AgentWorktree merge-base --is-ancestor HEAD master 2>$null
+        if ($LASTEXITCODE -eq 0) { Invoke-Git @('merge', '--ff-only', 'master') | Out-Null }
+    }
+
     # Dependencies: install them if the project has a package.json but no node_modules yet.
     $pkg = Join-Path $AgentWorktree 'package.json'
     if ((Test-Path $pkg) -and -not (Test-Path (Join-Path $AgentWorktree 'node_modules'))) {
         Write-RunLog 'Installing npm dependencies in the agents worktree.'
         Push-Location $AgentWorktree
-        & npm install 2>&1 | Out-String | ForEach-Object { Write-RunLog $_.TrimEnd() }
+        & npm install 2>&1 | ConvertTo-PlainText | ForEach-Object { Write-RunLog $_.TrimEnd() }
         Pop-Location
     }
 }
@@ -157,7 +174,7 @@ function Save-LeftoverWork([string]$reason) {
 
 function Test-TestLock {
     Push-Location $AgentWorktree
-    $output = & node scripts/test-lock.ts check 2>&1 | Out-String
+    $output = & node scripts/test-lock.ts check 2>&1 | ConvertTo-PlainText
     $ok = ($LASTEXITCODE -eq 0)
     Pop-Location
     Write-RunLog ("test-lock check: {0}" -f $output.Trim())

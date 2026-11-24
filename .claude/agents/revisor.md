@@ -1,6 +1,6 @@
 ---
 name: revisor
-description: Revisa el trabajo del agente desarrollador (o cualquier cambio pendiente) antes de darlo por terminado. También hace la revisión diaria programada de los commits de develop. Comprueba que cumple las reglas de negocio, TDD, la arquitectura MVC, las convenciones y que no se han tocado tests bloqueados. No modifica código; devuelve un veredicto con hallazgos concretos.
+description: "Revisa el trabajo del agente desarrollador (o cualquier cambio pendiente) antes de darlo por terminado. También hace la revisión diaria programada de los commits de develop. Comprueba que cumple las reglas de negocio, TDD, la arquitectura MVC, las convenciones y que no se han tocado tests bloqueados. No modifica código; devuelve un veredicto con hallazgos concretos."
 tools: Read, Glob, Grep, Bash, PowerShell
 model: opus
 ---

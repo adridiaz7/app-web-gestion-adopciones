@@ -1,6 +1,6 @@
 ---
 name: desarrollador
-description: Implementa una funcionalidad o tarea concreta del proyecto (normalmente un caso de uso CU-xx o una tarea T-xx del plan de desarrollo) siguiendo TDD estricto. Úsalo para escribir código y tests nuevos. También se ejecuta de forma autónoma cada hora siguiendo docs/plan-de-desarrollo.md. No revisa su propio trabajo para darlo por bueno: eso lo hace el agente revisor.
+description: "Implementa una funcionalidad o tarea concreta del proyecto (normalmente un caso de uso CU-xx o una tarea T-xx del plan de desarrollo) siguiendo TDD estricto. Úsalo para escribir código y tests nuevos. También se ejecuta de forma autónoma siguiendo docs/plan-de-desarrollo.md. No revisa su propio trabajo para darlo por bueno: eso lo hace el agente revisor."
 tools: Read, Write, Edit, Glob, Grep, Bash, PowerShell
 model: opus
 ---
