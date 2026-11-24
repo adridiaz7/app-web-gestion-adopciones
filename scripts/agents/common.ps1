@@ -85,9 +85,17 @@ function Enter-AgentLock([string]$owner, [int]$waitMinutes) {
     $deadline = (Get-Date).AddMinutes($waitMinutes)
     while ($true) {
         if (Test-Path $LockFile) {
+            $content = (Get-Content $LockFile -Raw -ErrorAction SilentlyContinue)
             $age = (Get-Date) - (Get-Item $LockFile).LastWriteTime
-            if ($age.TotalMinutes -ge $StaleLockMinutes) {
-                Write-RunLog ("Removing stale lock ({0} min old): {1}" -f [int]$age.TotalMinutes, (Get-Content $LockFile -Raw))
+            # The lock is abandoned if its process no longer exists (e.g. the PC was shut down
+            # mid-run) or if it is older than the execution limit of the scheduled tasks.
+            $ownerAlive = $true
+            if ($content -match 'pid=(\d+)') {
+                $proc = Get-Process -Id ([int]$Matches[1]) -ErrorAction SilentlyContinue
+                $ownerAlive = ($null -ne $proc) -and ($proc.ProcessName -match 'powershell|pwsh') -and ($proc.StartTime -le (Get-Item $LockFile).LastWriteTime)
+            }
+            if (-not $ownerAlive -or $age.TotalMinutes -ge $StaleLockMinutes) {
+                Write-RunLog ("Removing abandoned lock ({0} min old): {1}" -f [int]$age.TotalMinutes, $content)
                 Remove-Item $LockFile -Force
             }
         }
