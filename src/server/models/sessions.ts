@@ -48,3 +48,7 @@ export async function useSession(
 export async function deleteSession(db: Db, tokenHash: string): Promise<void> {
   await db.query(`DELETE FROM "Session" WHERE token_hash = $1`, [tokenHash]);
 }
+
+export async function deleteUserSessions(db: Db, userId: number): Promise<void> {
+  await db.query(`DELETE FROM "Session" WHERE user_id = $1`, [userId]);
+}

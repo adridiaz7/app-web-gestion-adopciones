@@ -7,6 +7,7 @@ import {
   markEmailTokenUsed,
   revokeUnusedEmailTokens,
 } from "../models/email-tokens.js";
+import { deleteUserSessions } from "../models/sessions.js";
 import { findResettableUserForUpdate, updatePasswordAndVerify } from "../models/users.js";
 import { audit } from "./audit.js";
 import { createEmailToken, hashToken } from "./email-tokens.js";
@@ -57,7 +58,8 @@ const INVALID_LINK = "El enlace no es válido o ha caducado. Puedes pedir uno nu
 
 /**
  * CU-05: sets a new password with a reset link. RN-178: the link works once. RN-183: it
- * also verifies the email. RN-208: the reset is recorded in the audit log.
+ * also verifies the email. RN-208: the reset is recorded in the audit log. T-44 (owner's
+ * decision of 25/11/2026): every open session of the account is closed.
  */
 export async function resetPassword(token: string, password: string, ip: string | undefined): Promise<void> {
   const passwordHash = await hashPassword(password);
@@ -68,6 +70,7 @@ export async function resetPassword(token: string, password: string, ip: string 
 
     await markEmailTokenUsed(client, found.id);
     await updatePasswordAndVerify(client, found.userId, passwordHash);
+    await deleteUserSessions(client, found.userId);
     await audit(client, {
       actorUserId: found.userId,
       action: "PASSWORD_RESET",

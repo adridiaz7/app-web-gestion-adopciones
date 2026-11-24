@@ -127,7 +127,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | EN_REVISION |
 | T-09 | **Frontend base y pantallas de acceso:** `index.html`, router con History API, layout con barra lateral, tokens CSS del sistema de diseño y cliente de la API. Pantallas de inicio de sesión, tipo de cuenta, registros, verificación y recuperación. | Mockups `docs/ux-ui/acceso`; especificaciones §5 | T-08 | EN_REVISION |
 | T-10 | **`db/seed.sql` mínimo:** administrador, una protectora validada, un adoptante y 4 mascotas sin fotos. Incluye un script que genera los hashes Argon2id de las contraseñas de demo, documentadas en el propio seed. | Especificaciones §5 | T-07 | EN_REVISION |
-| T-44 | Al restablecer la contraseña se cierran **todas las sesiones abiertas** de esa cuenta (solo API). Tests nuevos; no se modifican los de T-08. | CU-05; decisión del responsable del 25/11/2026 (sección 4) | T-08 | PENDIENTE |
+| T-44 | Al restablecer la contraseña se cierran **todas las sesiones abiertas** de esa cuenta (solo API). Tests nuevos; no se modifican los de T-08. | CU-05; decisión del responsable del 25/11/2026 (sección 4) | T-08 | EN_REVISION |
 
 ### Fase 2 · Mascotas, galería y ficha
 
