@@ -91,6 +91,8 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 
 **25/11/2026 · T-11 (no bloquea).** RN-23 dice que las mascotas de una protectora con la validación revocada no se ven "hasta que vuelva a estar validada", pero CU-39 solo permite validar una protectora **pendiente**, y al revocar pasa a `REJECTED`. ¿Cómo vuelve una protectora rechazada o revocada a estar validada? Opciones: (a) el administrador puede validar también desde `REJECTED`; (b) la protectora pide una nueva revisión y vuelve a `PENDING`. De momento se ha implementado lo que dice CU-39: solo se valida desde `PENDING`.
 
+**25/11/2026 · T-13 (no bloquea).** La decisión sobre multer dice "tamaño máximo limitado", pero no da el valor. Si no se indica otro, se usará **5 MB por foto**, configurable con una variable de entorno (`MAX_PHOTO_SIZE_MB`). Irá fuera de `config.rules`, porque no es un parámetro de la §16 de las reglas y el test bloqueado de T-01 compara `rules` completo. Formatos aceptados: JPEG, PNG y WebP, comprobando el contenido del archivo.
+
 ---
 
 ## 5. Tareas
