@@ -66,3 +66,26 @@ export async function findUnverifiedUserForUpdate(db: Db, email: string): Promis
   );
   return rows[0] ?? null;
 }
+
+export interface LoginCandidate {
+  id: number;
+  email: string;
+  role: Role;
+  passwordHash: string;
+  verified: boolean;
+  /** RN-10: has a suspension without an end date. */
+  suspended: boolean;
+}
+
+/** The account that can try to log in with this email: not deleted (RN-11). */
+export async function findLoginCandidate(db: Db, email: string): Promise<LoginCandidate | null> {
+  const { rows } = await db.query<LoginCandidate>(
+    `SELECT u.id, u.email, u.role, u.password_hash AS "passwordHash",
+            u.email_verified_at IS NOT NULL AS verified,
+            EXISTS (SELECT 1 FROM "Suspension" s WHERE s.user_id = u.id AND s.ended_at IS NULL) AS suspended
+       FROM "App_user" u
+      WHERE lower(u.email) = lower($1) AND u.deleted_at IS NULL`,
+    [email],
+  );
+  return rows[0] ?? null;
+}

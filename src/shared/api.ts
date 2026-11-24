@@ -51,6 +51,19 @@ export interface ResendVerificationRequest {
   email: string;
 }
 
+/** CU-04 · POST /api/auth/login */
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export type Role = "ADOPTER" | "SHELTER" | "ADMIN";
+
+/** The logged-in user: answer of POST /api/auth/login and GET /api/auth/me. */
+export interface SessionResponse {
+  user: { id: number; email: string; role: Role };
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

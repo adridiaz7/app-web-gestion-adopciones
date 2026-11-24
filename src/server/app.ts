@@ -3,7 +3,8 @@ import { z } from "zod";
 import type { HealthResponse } from "../shared/api.js";
 import { NotFoundError } from "./errors.js";
 import { errorHandler } from "./middlewares/error-handler.js";
-import { authRouter } from "./routes/auth.js";
+import { loadSession } from "./middlewares/session.js";
+import { createAuthRouter } from "./routes/auth.js";
 
 // Default Zod messages in Spanish: they can reach the user (UI texts are in Spanish).
 z.config(z.locales.es());
@@ -21,7 +22,8 @@ export function createApp(): express.Express {
     res.json(body);
   });
 
-  api.use("/auth", authRouter);
+  api.use(loadSession);
+  api.use("/auth", createAuthRouter());
 
   api.use(() => {
     throw new NotFoundError();

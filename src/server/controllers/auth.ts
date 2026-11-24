@@ -1,8 +1,11 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
-import type { MessageResponse } from "../../shared/api.js";
+import type { MessageResponse, SessionResponse } from "../../shared/api.js";
+import { UnauthorizedError } from "../errors.js";
+import { clearSessionCookie, readSessionToken, setSessionCookie } from "../middlewares/session.js";
 import { resendVerification, verifyEmail } from "../services/email-verification.js";
 import { registerAdopter, registerShelter } from "../services/registration.js";
+import { logIn, logOut } from "../services/sessions.js";
 
 const REQUIRED = "Este campo es obligatorio.";
 
@@ -119,4 +122,34 @@ export const postResendVerification: RequestHandler = async (req, res) => {
   const { email } = resendVerificationSchema.parse(req.body ?? {});
   await resendVerification(email);
   res.status(202).json(RESENT);
+};
+
+const loginSchema = z.object({
+  email: z.string({ error: REQUIRED }).trim().min(1, { error: REQUIRED }),
+  // The RN-175 maximum also keeps huge inputs away from the password hash.
+  password: z.string({ error: REQUIRED }).min(1, { error: REQUIRED }).max(256, { error: "La contraseña no es válida." }),
+});
+
+/** CU-04 · POST /api/auth/login */
+export const postLogin: RequestHandler = async (req, res) => {
+  const { email, password } = loginSchema.parse(req.body ?? {});
+  const { token, user } = await logIn(email, password, req.ip);
+  setSessionCookie(res, token);
+  const body: SessionResponse = { user };
+  res.json(body);
+};
+
+/** CU-04 · POST /api/auth/logout. Without a session there is nothing to close, and that is not an error. */
+export const postLogout: RequestHandler = async (req, res) => {
+  const token = readSessionToken(req);
+  if (token) await logOut(token);
+  clearSessionCookie(res);
+  res.status(204).end();
+};
+
+/** GET /api/auth/me: the logged-in user, so the client knows who it is and what to show. */
+export const getMe: RequestHandler = (req, res) => {
+  if (!req.user) throw new UnauthorizedError();
+  const body: SessionResponse = { user: req.user };
+  res.json(body);
 };

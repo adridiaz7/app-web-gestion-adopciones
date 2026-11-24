@@ -1,14 +1,27 @@
 import { Router } from "express";
 import {
+  getMe,
+  postLogin,
+  postLogout,
   postRegisterAdopter,
   postRegisterShelter,
   postResendVerification,
   postVerifyEmail,
 } from "../controllers/auth.js";
+import { loginRateLimit } from "../middlewares/login-rate-limit.js";
+import { requireAuth } from "../middlewares/session.js";
 
-export const authRouter = Router();
+/** Built per app, so the login rate limit (RN-179) is not shared between app instances. */
+export function createAuthRouter(): Router {
+  const router = Router();
 
-authRouter.post("/register/adopter", postRegisterAdopter);
-authRouter.post("/register/shelter", postRegisterShelter);
-authRouter.post("/verify-email", postVerifyEmail);
-authRouter.post("/resend-verification", postResendVerification);
+  router.post("/register/adopter", postRegisterAdopter);
+  router.post("/register/shelter", postRegisterShelter);
+  router.post("/verify-email", postVerifyEmail);
+  router.post("/resend-verification", postResendVerification);
+  router.post("/login", loginRateLimit(), postLogin);
+  router.post("/logout", postLogout);
+  router.get("/me", requireAuth, getMe);
+
+  return router;
+}
