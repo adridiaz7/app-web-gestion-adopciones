@@ -111,7 +111,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-04 | Registro de adoptante (solo API; las pantallas van en T-09). | CU-01; RN-06–08, 25, 175, 182, 186 | T-03 | EN_REVISION |
-| T-05 | Registro de protectora (solo API). | CU-02; RN-14, 17, 182, 186 | T-04 | PENDIENTE |
+| T-05 | Registro de protectora (solo API). | CU-02; RN-14, 17, 182, 186 | T-04 | EN_REVISION |
 | T-06 | Verificar el email y reenviar el enlace (solo API). | CU-03; RN-07, 177, 180 | T-04 | PENDIENTE |
 | T-07 | Iniciar y cerrar sesión: sesiones en base de datos, cookie, middleware de sesión y de rol, y límite de intentos (solo API). | CU-04; RN-10, 176, 179 | T-06 | PENDIENTE |
 | T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | PENDIENTE |

@@ -64,6 +64,7 @@ export async function createAdopter(options: AdopterOptions = {}): Promise<Creat
 
 export interface ShelterOptions extends UserOptions {
   name?: string;
+  cif?: string;
   validationStatus?: "PENDING" | "VALIDATED" | "REJECTED";
   provinceId?: number;
 }
@@ -79,7 +80,7 @@ export async function createShelter(options: ShelterOptions = {}): Promise<Creat
     [
       user.id,
       options.name ?? `Protectora ${String(n)}`,
-      `G${String(n).padStart(8, "0")}`,
+      options.cif ?? `G${String(n).padStart(8, "0")}`,
       "Calle Falsa 1",
       options.provinceId ?? DEFAULT_PROVINCE_ID,
       "Donostia",

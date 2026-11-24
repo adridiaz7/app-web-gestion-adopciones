@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
 import type { MessageResponse } from "../../shared/api.js";
-import { registerAdopter } from "../services/registration.js";
+import { registerAdopter, registerShelter } from "../services/registration.js";
 
 const REQUIRED = "Este campo es obligatorio.";
 
@@ -30,6 +30,28 @@ export const phoneSchema = z
   .transform((phone) => phone.replace(/[\s-]/g, ""))
   .pipe(z.string().regex(/^(\+34)?[6-9]\d{8}$/, { error: "El teléfono no tiene un formato válido." }));
 
+const PROVINCE = "Elige una provincia.";
+// "Province".id is a smallint: a larger value would reach PostgreSQL and fail as a 500.
+const provinceIdSchema = z
+  .number({ error: PROVINCE })
+  .int({ error: PROVINCE })
+  .positive({ error: PROVINCE })
+  .max(32767, { error: PROVINCE });
+
+/**
+ * Spanish CIF: an organisation-type letter, 7 digits and a control character.
+ * Spaces and hyphens are ignored and it is stored upper-cased, so RN-17 compares like with like.
+ */
+export const cifSchema = z
+  .string({ error: REQUIRED })
+  .transform((cif) => cif.replace(/[\s-]/g, "").toUpperCase())
+  .pipe(
+    z
+      .string()
+      .min(1, { error: REQUIRED })
+      .regex(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/, { error: "El CIF no tiene un formato válido." }),
+  );
+
 const adopterRegistrationSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
@@ -37,13 +59,20 @@ const adopterRegistrationSchema = z.object({
   lastName: requiredText(100),
   phone: phoneSchema,
   birthDate: z.iso.date({ error: "La fecha de nacimiento no es válida." }),
-  // "Province".id is a smallint: a larger value would reach PostgreSQL and fail as a 500.
-  provinceId: z
-    .number({ error: "Elige una provincia." })
-    .int({ error: "Elige una provincia." })
-    .positive({ error: "Elige una provincia." })
-    .max(32767, { error: "Elige una provincia." }),
+  provinceId: provinceIdSchema,
   locality: requiredText(100),
+  acceptTerms: z.boolean({ error: REQUIRED }),
+});
+
+const shelterRegistrationSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+  name: requiredText(150),
+  cif: cifSchema,
+  address: requiredText(200),
+  provinceId: provinceIdSchema,
+  locality: requiredText(100),
+  phone: phoneSchema,
   acceptTerms: z.boolean({ error: REQUIRED }),
 });
 
@@ -55,5 +84,12 @@ export const postRegisterAdopter: RequestHandler = async (req, res) => {
   // Express 5 leaves req.body undefined when there is no JSON body: validate it field by field.
   const input = adopterRegistrationSchema.parse(req.body ?? {});
   await registerAdopter(input);
+  res.status(202).json(REGISTERED);
+};
+
+/** CU-02 · POST /api/auth/register/shelter */
+export const postRegisterShelter: RequestHandler = async (req, res) => {
+  const input = shelterRegistrationSchema.parse(req.body ?? {});
+  await registerShelter(input);
   res.status(202).json(REGISTERED);
 };

@@ -1,9 +1,10 @@
 import { getConfig } from "../config.js";
 import { getPool } from "../db/pool.js";
-import { withTransaction } from "../db/transaction.js";
-import { BadRequestError } from "../errors.js";
+import { withTransaction, type Db } from "../db/transaction.js";
+import { BadRequestError, ConflictError } from "../errors.js";
 import { insertAdopter } from "../models/adopters.js";
 import { provinceExists } from "../models/provinces.js";
+import { cifExists, insertShelterIfCifFree } from "../models/shelters.js";
 import { claimExistingAccountNotice, insertUserIfEmailFree } from "../models/users.js";
 import { createEmailToken } from "./email-tokens.js";
 import { sendEmail, type Email } from "./email.js";
@@ -32,17 +33,12 @@ function madridToday(): string {
   return madridDate.format(new Date());
 }
 
-export interface AdopterRegistration {
-  /** Already trimmed and lower-cased by the controller. */
-  email: string;
-  password: string;
+export interface AdopterRegistration extends AccountRegistration {
   firstName: string;
   lastName: string;
   phone: string;
   birthDate: string;
-  provinceId: number;
   locality: string;
-  acceptTerms: boolean;
 }
 
 function verificationEmail(to: string, token: string): Email {
@@ -77,20 +73,31 @@ function existingAccountEmail(to: string): Email {
   };
 }
 
+/** Data that every sign-up has, whatever the role. */
+interface AccountRegistration {
+  /** Already trimmed and lower-cased by the controller. */
+  email: string;
+  password: string;
+  provinceId: number;
+  acceptTerms: boolean;
+}
+
 /**
- * CU-01: signs up an adopter. The account stays unverified until the email link is used (RN-07).
- * The emails go out after the commit, so no link is sent for an account that was not saved.
+ * Common part of CU-01 and CU-02. Checks the terms and the province, then creates the
+ * account and its profile (`insertProfile`) in one transaction. The account stays
+ * unverified until the email link is used (RN-07). The emails go out after the commit,
+ * so no link is sent for an account that was not saved.
  */
-export async function registerAdopter(input: AdopterRegistration): Promise<void> {
+async function registerAccount(
+  input: AccountRegistration,
+  role: "ADOPTER" | "SHELTER",
+  insertProfile: (client: Db, userId: number) => Promise<void>,
+): Promise<void> {
   const { rules } = getConfig();
 
   // RN-186: accepting the terms of use and the privacy policy is mandatory.
   if (!input.acceptTerms) {
     throw new BadRequestError("Tienes que aceptar los términos de uso y la política de privacidad.");
-  }
-  // RN-25: adopters must be adults, counting in Spanish time.
-  if (!isAdult(input.birthDate, madridToday())) {
-    throw new BadRequestError("Tienes que ser mayor de edad para registrarte.");
   }
   if (!(await provinceExists(getPool(), input.provinceId))) {
     throw new BadRequestError("La provincia no existe.");
@@ -100,26 +107,72 @@ export async function registerAdopter(input: AdopterRegistration): Promise<void>
   const passwordHash = await hashPassword(input.password);
 
   const emails = await withTransaction(async (client) => {
-    const user = await insertUserIfEmailFree(client, { email: input.email, passwordHash, role: "ADOPTER" });
+    const user = await insertUserIfEmailFree(client, { email: input.email, passwordHash, role });
     if (!user) {
       // RN-182: the email already has an account. Same answer as a new email; the owner is told instead.
       const owner = await claimExistingAccountNotice(client, input.email, rules.existingAccountNoticeWaitMinutes);
       return owner ? [existingAccountEmail(owner.email)] : [];
     }
 
-    await insertAdopter(client, {
-      userId: user.id,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      phone: input.phone,
-      birthDate: input.birthDate,
-      provinceId: input.provinceId,
-      locality: input.locality,
-    });
+    await insertProfile(client, user.id);
     // RN-177: the verification link expires after the configured hours.
     const token = await createEmailToken(client, user.id, "VERIFY_EMAIL", rules.emailVerificationValidityHours * 3600);
     return [verificationEmail(input.email, token)];
   });
 
   for (const email of emails) await sendEmail(email);
+}
+
+/** CU-01: signs up an adopter. */
+export async function registerAdopter(input: AdopterRegistration): Promise<void> {
+  // RN-25: adopters must be adults, counting in Spanish time.
+  if (!isAdult(input.birthDate, madridToday())) {
+    throw new BadRequestError("Tienes que ser mayor de edad para registrarte.");
+  }
+
+  await registerAccount(input, "ADOPTER", (client, userId) =>
+    insertAdopter(client, {
+      userId,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      phone: input.phone,
+      birthDate: input.birthDate,
+      provinceId: input.provinceId,
+      locality: input.locality,
+    }),
+  );
+}
+
+export interface ShelterRegistration extends AccountRegistration {
+  name: string;
+  /** Already normalised by the controller (upper case, no spaces or hyphens). */
+  cif: string;
+  address: string;
+  locality: string;
+  phone: string;
+}
+
+const CIF_TAKEN = "Ya hay una protectora registrada con ese CIF.";
+
+/**
+ * CU-02: signs up a shelter, pending validation by the administrator (RN-14).
+ * RN-17: a CIF already registered is rejected before looking at the email, so the
+ * answer is the same whether the email has an account or not (RN-182).
+ */
+export async function registerShelter(input: ShelterRegistration): Promise<void> {
+  if (await cifExists(getPool(), input.cif)) throw new ConflictError(CIF_TAKEN);
+
+  await registerAccount(input, "SHELTER", async (client, userId) => {
+    const inserted = await insertShelterIfCifFree(client, {
+      userId,
+      name: input.name,
+      cif: input.cif,
+      address: input.address,
+      provinceId: input.provinceId,
+      locality: input.locality,
+      phone: input.phone,
+    });
+    // Another sign-up took the CIF meanwhile: the transaction rolls back the new account.
+    if (!inserted) throw new ConflictError(CIF_TAKEN);
+  });
 }
