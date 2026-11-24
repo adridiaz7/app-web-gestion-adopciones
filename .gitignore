@@ -1,0 +1,16 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# User uploads (photos) and scheduled agent logs
+uploads/
+logs/
+
+# Claude Code personal settings
+.claude/settings.local.json

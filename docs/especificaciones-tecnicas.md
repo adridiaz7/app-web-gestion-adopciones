@@ -95,6 +95,7 @@ Muestra "Solicitud enviada"
 - **Zod**: validación del formato de los datos de entrada.
 - **@node-rs/argon2**: hash de contraseñas con Argon2id (RN-08).
 - **express-rate-limit**: límite de intentos de inicio de sesión (RN-179).
+- **multer**: subida de fotos (mascotas y chat) con `multipart/form-data`.
 
 ### Base de datos
 
@@ -171,7 +172,7 @@ lagun-app-adopciones/
 | Chat | El navegador pide los mensajes nuevos cada pocos segundos (*polling*) mientras la conversación está abierta. Sin WebSockets. Es la opción con menos piezas que puedan fallar. |
 | Contador de notificaciones | Mismo mecanismo de *polling*, con un intervalo más largo. |
 | Fechas y horas | Se guardan con zona horaria (`timestamptz`) y se muestran en la hora de España (`Europe/Madrid`). |
-| Imágenes | No se guardan en la base de datos, solo su ruta (RN-52). Dónde se almacenan está pendiente (ver [sección 9](#9-decisiones-pendientes)). |
+| Imágenes | Se suben con **multer** y se guardan en disco, en `uploads/` (fuera de git), con un **nombre aleatorio** (nunca el original). Solo se aceptan imágenes, comprobando el contenido real y no solo la extensión, y con tamaño máximo limitado. En la base de datos se guarda solo la ruta (RN-52). Express sirve `/uploads` como archivos estáticos. Las fotos de la demo van en el repositorio y el seed las copia a `uploads/`. |
 
 ---
 
@@ -252,7 +253,7 @@ lagun-app-adopciones/
 
 | Tema | Propuesta actual | Estado |
 |---|---|---|
-| Almacenamiento de las fotos y entorno de la demo | La demo se hará en un equipo distinto al de desarrollo. Propuesta: instalar Node y PostgreSQL en ese equipo y prepararlo con `npm run db:reset` (schema + seed), con las fotos subidas en una carpeta `uploads/` fuera de git. Alternativas: Docker, despliegue en internet o usar el portátil de desarrollo. | Pendiente de decidir |
+| Entorno de la demo | La demo se hará en un portátil distinto al equipo de desarrollo. Propuesta: instalar Node y PostgreSQL en el portátil, clonar el repositorio y prepararlo con `npm run db:reset` (schema + seed). Las fotos ya están decididas (multer, sección 5). | Pendiente de decidir |
 | Prioridad de los casos de uso para la demo | Propuesta: registro e inicio de sesión → galería y ficha → descubrir y favoritos → turnos y visitas → chat. | Pendiente de decidir |
 | Envío de emails | Se decidirá más adelante. Mientras tanto, en desarrollo los enlaces de verificación y de recuperación de contraseña se escriben en la consola del servidor, para que esos flujos se puedan probar. | Aplazado |
 | Base de datos de los tests | Una base de datos aparte para los tests de integración. | Pendiente de confirmar |

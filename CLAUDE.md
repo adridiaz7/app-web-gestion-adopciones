@@ -54,6 +54,26 @@ To inspect locks, use `node scripts/test-lock.ts list` or `check`, never `cat` o
 
 Name tests after the rule they verify, e.g. `it("RN-87: rejects a visit requested less than 48 h ahead")`.
 
+## Agents workflow
+
+Project subagents live in `.claude/agents/`. Both run on Opus.
+
+**Interactive use** (the main session delegates a task):
+1. **`desarrollador`** implements one task with TDD. It never edits locked tests and does not commit.
+2. **`revisor`** reviews the result read-only and returns `APROBADO` or `CAMBIOS NECESARIOS` with concrete findings. Fixes go back to `desarrollador`.
+3. After `APROBADO`, the main session locks that feature's tests (`test-lock.ts lock`). Commits are made only when the owner asks.
+
+**Autonomous mode** (Windows Task Scheduler, scripts in `scripts/agents/`, full rules in `docs/plan-de-desarrollo.md`):
+- **Where it runs:** both agents work in a separate git worktree (`../lagun-app-adopciones-agentes`) on branch `develop`. They never touch the owner's checkout or `master`.
+- **`desarrollador`, hourly from 06:00 to 23:00:**
+  - follows the task list in `docs/plan-de-desarrollo.md`, fixing first what the latest review asked for;
+  - commits green work to `develop`, and the script pushes it;
+  - leaves unfinished work in the stash `wip-desarrollador`;
+  - may only run `lock`, and only for tasks the reviewer approved.
+- **`revisor`, daily at 00:00:** reviews the new `develop` commits. The script saves its report to `docs/revisiones/YYYY-MM-DD.md`, with one verdict per task and the exact test files to lock.
+- **Headless requirement:** runs need `CLAUDE_CODE_GIT_BASH_PATH`, because Git is in `C:\Git`. Without it, every hook fails closed and the agent can do nothing. `common.ps1` sets it.
+- **Passing the prompt:** put it after `--`, because `--allowedTools` and `--disallowedTools` take several values and would swallow it.
+
 ## Commands
 
 Node 24 runs `.ts` files directly (type stripping), so scripts need no build step.
