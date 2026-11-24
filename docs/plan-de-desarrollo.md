@@ -99,6 +99,12 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 
 > **Respuesta del responsable (25/11/2026):** De acuerdo: 5 MB por foto, configurable con `MAX_PHOTO_SIZE_MB`, y formatos JPEG, PNG y WebP.
 
+**25/11/2026 · T-45 (bloquea T-45).** T-45 pide que `POST /api/admin/shelters/:id/validate` acepte también una protectora `REJECTED`, y que no se modifiquen los tests de T-11. Pero el test de T-11 `"CU-39: rejects validating a shelter that is not pending"` (`tests/integration/admin-shelters.test.ts`, línea 97) comprueba justo lo contrario: que validar una protectora `REJECTED` responde 409 "La protectora no está pendiente de validación.". Las dos cosas no pueden cumplirse a la vez con el mismo endpoint. Opciones:
+- **(a)** Autorizar el cambio de ese test de T-11: quitar `rejected` del bucle (sigue comprobando el 409 para una `VALIDATED`). Todavía no está bloqueado, pero el plan dice que no se toque.
+- **(b)** Mantener `/validate` solo para `PENDING` y añadir un endpoint aparte, por ejemplo `POST /api/admin/shelters/:id/revalidate`, solo para `REJECTED`, con su propia acción de auditoría (`SHELTER_REVALIDATED`) y un botón "Volver a validar" en la pestaña de rechazadas.
+
+Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLOQUEADA`.
+
 ---
 
 ## 5. Tareas
@@ -134,7 +140,7 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | EN_REVISION |
-| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos; no se modifican los de T-11. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | PENDIENTE |
+| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos; no se modifican los de T-11. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | BLOQUEADA (choca con un test de T-11, ver sección 4) |
 | T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_REVISION |
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | PENDIENTE |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | PENDIENTE |
