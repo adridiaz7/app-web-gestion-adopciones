@@ -75,6 +75,7 @@
 | RN-181 | Se puede pedir un **enlace para restablecer la contraseña como máximo cada 5 minutos** por cuenta. Al crearlo, los enlaces de restablecimiento anteriores sin usar dejan de valer. |
 | RN-182 | Si alguien intenta registrarse con un email que ya tiene cuenta, se envía al dueño de la cuenta (si no está eliminada ni suspendida) un **aviso** ("alguien ha intentado registrarse con tu email") con el enlace para recuperar la contraseña, como máximo **uno cada 5 minutos** por cuenta. La respuesta del registro es la misma que con un email nuevo. |
 | RN-183 | El enlace para restablecer la contraseña se envía también a cuentas **sin verificar** (no eliminadas ni suspendidas). Fijar la contraseña con ese enlace **verifica el email**, porque demuestra que el email es de quien lo usa. Así, si alguien registra el email de otra persona y no lo verifica, la dueña real puede recuperar la cuenta y la contraseña del intruso deja de valer. |
+| RN-211 | Al **restablecer la contraseña** se **cierran todas las sesiones abiertas** de esa cuenta: si alguien conocía la contraseña anterior, pierde el acceso. |
 
 ### Eliminación de cuenta
 
@@ -96,6 +97,7 @@
 | RN-17 | El CIF es único: no puede haber dos protectoras con el mismo CIF. |
 | RN-18 | El administrador puede rechazar una solicitud de validación (`RECHAZADA`) indicando el motivo. |
 | RN-19 | El administrador puede **revocar** la validación de una protectora ya validada (vuelve a `RECHAZADA`, con motivo). |
+| RN-212 | El administrador puede **validar también una protectora `RECHAZADA`** (rechazada o con la validación revocada), por ejemplo tras comprobar que ya cumple los requisitos. Sus mascotas vuelven a ser visibles (RN-23). Que la propia protectora pida una nueva revisión queda para el final, si hay tiempo. |
 | RN-20 | La protectora puede indicar un **email de contacto** público, opcional y distinto del email de acceso. |
 | RN-21 | La ubicación de la protectora se guarda con una **provincia** (catálogo) y la localidad en texto. |
 | RN-22 | Antes de ser validada, la protectora **puede crear fichas de mascotas y turnos de visita**, pero sus mascotas no son visibles para los adoptantes hasta la validación. |
