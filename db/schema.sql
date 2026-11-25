@@ -100,7 +100,7 @@ CREATE TABLE "Adopter" (
   -- Household data: optional at sign-up, required to apply for an adoption (RN-27)
   housing_type           text        CHECK (housing_type IN ('APARTMENT', 'HOUSE', 'OTHER')),
   has_outdoor_space      boolean,
-  housing_tenure         text        CHECK (housing_tenure IN ('OWNED', 'RENTED')),
+  housing_tenure         text        CHECK (housing_tenure IN ('OWNED', 'RENTED', 'RENT_TO_OWN')),
   household_members      smallint    CHECK (household_members >= 1),
   has_children           boolean,
   has_other_pets         boolean,

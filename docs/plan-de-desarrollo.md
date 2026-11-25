@@ -77,7 +77,7 @@ Las reglas de `CLAUDE.md` se aplican igual en modo autónomo. En las ejecuciones
 | Decisión | Tareas afectadas | Estado |
 |---|---|---|
 | **Subida de archivos.** ¿Se añade la librería `multer` al stack y se guardan las fotos en `uploads/`, fuera de git? | T-13 (fotos de mascotas), la parte de fotos de T-29 (chat) y las fotos de T-42 (seed de la demo) | **Decidido (24/11/2026): sí, multer.** Fotos en `uploads/`, fuera de git, con nombre aleatorio; solo imágenes (comprobando el contenido, no solo la extensión) y tamaño máximo limitado. En la base de datos se guarda solo la ruta (RN-52). Express sirve `/uploads` como archivos estáticos. |
-| **Preguntas del cuestionario de adopción** (RN-207). | T-30 | **Decidido (25/11/2026):** ocho preguntas, todas opcionales; ver RN-207. |
+| **Preguntas del cuestionario de adopción** (RN-207). | T-30 | **Decidido (25/11/2026):** el formulario muestra los datos del hogar del perfil ya rellenados; siguen siendo obligatorios (RN-117) y se pueden corregir allí mismo. Además hay dos preguntas opcionales (motivo y gastos). Se añade `RENT_TO_OWN` a `housing_tenure`. Ver RN-27 y RN-207. |
 
 Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el desarrollador desbloqueará las tareas en su siguiente ejecución.
 
@@ -195,7 +195,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-30 | Solicitar una adopción con el cuestionario de adopción (preguntas en RN-207, todas opcionales). | CU-27; RN-113–120, 207 | T-25 | PENDIENTE |
+| T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | PENDIENTE |
 | T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | PENDIENTE |
 | T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | PENDIENTE |
 | T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | PENDIENTE |

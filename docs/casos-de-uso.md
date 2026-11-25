@@ -442,13 +442,12 @@
 
 **Actor:** Adoptante
 
-**Objetivo:** Pedir la adopción de una mascota que ha visitado, rellenando un breve cuestionario de adopción (preguntas por definir). La solicitud queda pendiente y puede competir con las de otros adoptantes. El contrato y las posibles tasas se gestionan fuera de la app.
+**Objetivo:** Pedir la adopción de una mascota que ha visitado, revisando sus datos del hogar y respondiendo un breve cuestionario de adopción opcional (RN-207). La solicitud queda pendiente y puede competir con las de otros adoptantes. El contrato y las posibles tasas se gestionan fuera de la app.
 
 **Excepciones:**
 - No tiene una visita realizada a esa mascota.
 - La visita se realizó hace más de 1 mes.
 - No ha completado los datos del hogar.
-- No ha respondido al cuestionario de adopción.
 - Tiene una visita no asistida en esa protectora.
 - La protectora le ha bloqueado.
 - Ya tiene una solicitud abierta para esa mascota.

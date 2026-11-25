@@ -211,7 +211,7 @@ Una fila por cuenta, con independencia del rol (RN-04). El administrador no tien
 | `locality` | `text` | NN | |
 | `housing_type` | `text` | CHECK `APARTMENT`, `HOUSE`, `OTHER` | **Datos del hogar** (RN-27): todos opcionales al registrarse y obligatorios para solicitar una adopción. |
 | `has_outdoor_space` | `boolean` | | Jardín o terraza. |
-| `housing_tenure` | `text` | CHECK `OWNED`, `RENTED` | |
+| `housing_tenure` | `text` | CHECK `OWNED`, `RENTED`, `RENT_TO_OWN` | En propiedad, de alquiler o de alquiler con opción a compra. |
 | `household_members` | `smallint` | CHECK ≥ 1 | Personas que conviven, incluido el adoptante. |
 | `has_children` | `boolean` | | |
 | `has_other_pets` | `boolean` | | |
