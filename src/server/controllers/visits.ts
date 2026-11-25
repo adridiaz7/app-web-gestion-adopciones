@@ -17,6 +17,7 @@ import {
   listAvailableSlots,
   rejectVisit,
   requestVisit,
+  rescheduleVisit,
   type InboxVisit,
   type VisitStatusResult,
 } from "../services/visits.js";
@@ -94,6 +95,17 @@ export const postShelterCancelVisit: RequestHandler = async (req, res) => {
 export const postAdopterCancelVisit: RequestHandler = async (req, res) => {
   const { id: visitId } = visitParamsSchema.parse(req.params);
   res.json(statusBody(await cancelVisitByAdopter(userId(req.user), visitId)));
+};
+
+const rescheduleSchema = z.object({ slotId: strictId(INVALID_SLOT) });
+
+/** CU-51 · POST /api/adopter/visits/:id/reschedule */
+export const postRescheduleVisit: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  const { slotId } = rescheduleSchema.parse(req.body ?? {});
+  const visit = await rescheduleVisit(userId(req.user), visitId, slotId);
+  const body: VisitRequestResponse = { visit: { ...visit, startsAt: visit.startsAt.toISOString(), endsAt: visit.endsAt.toISOString() } };
+  res.status(201).json(body);
 };
 
 /** CU-21 · GET /api/adopter/visits */

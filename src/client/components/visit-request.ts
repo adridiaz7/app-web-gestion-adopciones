@@ -1,6 +1,6 @@
-import type { AvailableSlot, PetProfile } from "../../shared/api.js";
+import type { AdopterVisit, AvailableSlot, PetProfile } from "../../shared/api.js";
 import { ApiError } from "../api/client.js";
-import { getAvailableSlots, requestVisit } from "../api/visits.js";
+import { getAvailableSlots, requestVisit, rescheduleVisit } from "../api/visits.js";
 import { h } from "../dom.js";
 import { madridDate, madridTime } from "../madrid-time.js";
 import { notice } from "./notice.js";
@@ -118,4 +118,70 @@ export function visitRequestButton(pet: PetProfile): HTMLElement {
   });
 
   return h("div", { class: "visit-request__trigger" }, open, dialog);
+}
+
+/**
+ * CU-51 · "Reprogramar" on the adopter's visit list: a dialog with the slots available for the
+ * same pet (RN-194). On success the original is cancelled and a new request awaits the shelter
+ * (RN-196); if the new slot is not valid, the original visit is kept and the error is shown.
+ */
+export function openRescheduleDialog(visit: AdopterVisit, onDone: () => void): void {
+  const body = h("div", { class: "visit-request__body" });
+  const close = h("button", { type: "button", class: "button button--secondary" }, "Cancelar");
+  const dialog = h(
+    "dialog",
+    { class: "card dialog visit-request" },
+    h("p", { class: "overline" }, "Reprogramar visita"),
+    h("h2", {}, visit.petName),
+    h("p", { class: "muted" }, `${visit.shelterName} · ahora el ${DAY.format(new Date(visit.startsAt))} a las ${madridTime(visit.startsAt)}`),
+    body,
+  );
+  close.addEventListener("click", () => dialog.close());
+  dialog.addEventListener("close", () => dialog.remove());
+
+  const showSlots = (slots: AvailableSlot[]): void => {
+    if (slots.length === 0) {
+      body.replaceChildren(
+        notice("info", "No hay otras franjas disponibles", "La protectora no tiene otros turnos libres con la antelación mínima. Tu visita actual se mantiene."),
+        h("div", { class: "dialog__actions" }, close),
+      );
+      return;
+    }
+    const message = h("div", {});
+    const send = h("button", { type: "submit", class: "button button--primary" }, "Reprogramar");
+    const form = h(
+      "form",
+      { class: "visit-request__form" },
+      slotChoices(slots),
+      notice("info", "Tu visita actual se cancelará y se enviará una solicitud nueva.", "La nueva visita queda pendiente de que la protectora la confirme."),
+      message,
+      h("div", { class: "dialog__actions" }, close, send),
+    );
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const checked = form.querySelector<HTMLInputElement>('input[name="slot"]:checked');
+      if (!checked) return;
+      send.disabled = true;
+      rescheduleVisit(visit.id, { slotId: Number(checked.value) }).then(
+        () => {
+          dialog.close();
+          onDone();
+        },
+        (error: unknown) => {
+          send.disabled = false;
+          message.replaceChildren(notice("error", errorText(error, "No se ha podido reprogramar la visita. Tu visita actual se mantiene.")));
+        },
+      );
+    });
+    body.replaceChildren(form);
+  };
+
+  body.replaceChildren(h("p", { class: "muted" }, "Cargando franjas…"));
+  document.body.append(dialog);
+  dialog.showModal();
+  getAvailableSlots(visit.petId).then(({ slots }) => {
+    showSlots(slots);
+  }, (error: unknown) => {
+    body.replaceChildren(notice("error", errorText(error, "No se han podido cargar las franjas.")), h("div", { class: "dialog__actions" }, close));
+  });
 }

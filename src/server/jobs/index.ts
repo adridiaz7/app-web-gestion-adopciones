@@ -1,4 +1,5 @@
 import { completePastVisits, expireUnansweredVisits } from "../services/visit-attendance.js";
+import { sendVisitReminders } from "../services/visit-reminders.js";
 
 /** How often the scheduled jobs run. Every job is idempotent, so running it often is safe. */
 const INTERVAL_MS = 60 * 1000;
@@ -6,6 +7,7 @@ const INTERVAL_MS = 60 * 1000;
 const jobs: { name: string; run: () => Promise<number> }[] = [
   { name: "caducar visitas sin respuesta (CU-45)", run: expireUnansweredVisits },
   { name: "marcar visitas realizadas (CU-46)", run: completePastVisits },
+  { name: "recordar visitas próximas (CU-53)", run: sendVisitReminders },
 ];
 
 async function runAll(): Promise<void> {

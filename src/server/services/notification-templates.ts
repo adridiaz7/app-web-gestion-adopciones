@@ -83,6 +83,28 @@ export const notificationTemplates = {
     body: `El adoptante ha cancelado la visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}. La plaza del turno queda libre.`,
   }),
 
+  /** RN-197, CU-53: reminder of a confirmed visit; `cancelUntil` is null when it can no longer be cancelled (RN-98). */
+  VISIT_REMINDER: (p: {
+    petName: string;
+    startsAt: Date;
+    shelterName: string;
+    shelterAddress: string;
+    cancelUntil: Date | null;
+  }): RenderedNotification => ({
+    title: "Recordatorio de visita",
+    body:
+      `Tienes una visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} en ${p.shelterName}, ${p.shelterAddress}. ` +
+      (p.cancelUntil ? `Puedes cancelarla hasta el ${formatDateTime(p.cancelUntil)}.` : "Ya no se puede cancelar."),
+  }),
+
+  /** CU-51, RN-196: the adopter moved a visit to another slot; the new request awaits the shelter's answer. */
+  VISIT_RESCHEDULED: (p: { petName: string; previousStartsAt: Date; startsAt: Date }): RenderedNotification => ({
+    title: "Visita reprogramada por el adoptante",
+    body:
+      `El adoptante ha cambiado su visita para conocer a ${p.petName} del ${formatDateTime(p.previousStartsAt)} ` +
+      `al ${formatDateTime(p.startsAt)}. La nueva solicitud está pendiente de tu respuesta.`,
+  }),
+
   /** RN-111: the shelter changed or deleted the slot; the adopter is invited to choose another one. */
   VISIT_VOIDED_SLOT_CANCELLED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
     title: "Visita anulada por cambio de turno",

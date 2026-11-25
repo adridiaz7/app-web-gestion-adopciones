@@ -31,6 +31,7 @@ import {
 } from "../models/visits.js";
 import { audit } from "./audit.js";
 import { createNotification } from "./notifications.js";
+import { remindDueVisits } from "./visit-reminders.js";
 
 export type { AdopterVisit, AvailableSlot, InboxVisit, RequestedVisit };
 
@@ -52,59 +53,109 @@ export async function listAvailableSlots(adopterId: number, petId: number): Prom
  * transaction (RN-171), audited (RN-208).
  */
 export async function requestVisit(adopterId: number, petId: number, slotId: number): Promise<RequestedVisit> {
+  return withTransaction(async (client) => insertCheckedRequest(client, adopterId, petId, slotId, null));
+}
+
+/**
+ * Checks every rule of a visit request (CU-23) and creates it PENDING, inside the caller's
+ * transaction. Also used by a reschedule (RN-196), with the visit it replaces.
+ */
+async function insertCheckedRequest(
+  client: Db,
+  adopterId: number,
+  petId: number,
+  slotId: number,
+  replacesVisitId: number | null,
+): Promise<RequestedVisit> {
   const rules = getConfig().rules;
+  const pet = await lockPetForRequest(client, petId);
+  if (!pet?.shelterVisible) throw new NotFoundError(PET_NOT_AVAILABLE);
+
+  // RN-88: same neutral text as the notice on the shelter's profile (RN-149).
+  const block = await selectActiveBlock(client, pet.shelterId, adopterId);
+  if (block) {
+    const until = block.endsAt ? ` hasta el ${madridDay.format(block.endsAt)}` : "";
+    throw new ForbiddenError(`La protectora ${pet.shelterName} ha restringido tu acceso a sus mascotas${until}.`);
+  }
+  // RN-86
+  if (pet.status !== "AVAILABLE") throw new ConflictError(PET_NOT_AVAILABLE);
+  // RN-89, RN-102
+  if (await hasNoShow(client, adopterId, pet.shelterId)) {
+    throw new ForbiddenError("No puedes solicitar más visitas en esta protectora porque no acudiste a una visita confirmada.");
+  }
+
+  // RN-83: the slot is one of the pet's shelter. Locked, so two requests cannot take the last place.
+  const slot = await lockShelterSlot(client, pet.shelterId, slotId);
+  if (!slot) throw new NotFoundError("El turno no existe.");
+  // RN-87
+  if (slot.startsAt.getTime() < Date.now() + rules.visitMinNoticeHours * HOUR) {
+    throw new ConflictError(`La visita se tiene que solicitar con al menos ${String(rules.visitMinNoticeHours)} horas de antelación.`);
+  }
+  // RN-82
+  if ((await countOccupied(client, slotId)) >= slot.capacity) throw new ConflictError("Este turno ya no tiene plazas libres.");
+  // RN-81
+  if (await petHasActiveVisit(client, petId, slotId)) throw new ConflictError("Esta mascota ya tiene una visita en este turno. Elige otro.");
+
+  // RN-90, RN-91, RN-92; RN-93: tell when the next place frees up.
+  const counted = await selectQuotaVisitEnds(client, adopterId, pet.shelterId, rules.visitQuotaWindowMonths);
+  if (counted.length >= rules.visitQuotaPerShelter) {
+    const freedBy = counted[counted.length - rules.visitQuotaPerShelter];
+    const from = freedBy ? ` Podrás solicitar otra a partir del ${madridDay.format(freedBy)}.` : "";
+    throw new ConflictError(
+      `Ya tienes ${String(rules.visitQuotaPerShelter)} visitas confirmadas o realizadas en esta protectora en los últimos ${String(rules.visitQuotaWindowMonths)} meses.${from}`,
+    );
+  }
+
+  const visitId = await insertVisit(client, adopterId, pet.shelterId, petId, slotId, replacesVisitId);
+  await ensureConversation(client, adopterId, pet.shelterId);
+  await audit(client, {
+    actorUserId: adopterId,
+    action: "VISIT_REQUESTED",
+    entityType: "Visit",
+    entityId: visitId,
+    details: { after: replacesVisitId === null ? { status: "PENDING" } : { status: "PENDING", replacesVisitId } },
+  });
+
+  const visit = await selectRequestedVisit(client, visitId);
+  if (!visit) throw new Error("visit not found after creating it");
+  return visit;
+}
+
+/**
+ * CU-51, RN-195, RN-196: the adopter moves a pending or confirmed visit, with the same notice
+ * as a cancellation (RN-97), to another slot of the shelter for the same pet. In one
+ * transaction (RN-171) the original is cancelled by the adopter and a new PENDING request is
+ * made with every rule of CU-23; if the new request is not valid, everything rolls back and
+ * the original is left as it was. The shelter is notified.
+ */
+export async function rescheduleVisit(adopterId: number, visitId: number, slotId: number): Promise<RequestedVisit> {
   return withTransaction(async (client) => {
-    const pet = await lockPetForRequest(client, petId);
-    if (!pet?.shelterVisible) throw new NotFoundError(PET_NOT_AVAILABLE);
-
-    // RN-88: same neutral text as the notice on the shelter's profile (RN-149).
-    const block = await selectActiveBlock(client, pet.shelterId, adopterId);
-    if (block) {
-      const until = block.endsAt ? ` hasta el ${madridDay.format(block.endsAt)}` : "";
-      throw new ForbiddenError(`La protectora ${pet.shelterName} ha restringido tu acceso a sus mascotas${until}.`);
+    const visit = await lockVisit(client, visitId, { adopterId });
+    if (!visit) throw new NotFoundError(VISIT_NOT_FOUND);
+    if (visit.status !== "PENDING" && visit.status !== "CONFIRMED") throw new ConflictError(CLOSED);
+    const noticeHours = getConfig().rules.visitCancelMinNoticeHours;
+    if (visit.startsAt.getTime() < Date.now() + noticeHours * HOUR) {
+      throw new ConflictError(`Faltan menos de ${String(noticeHours)} horas para la visita: ya no se puede reprogramar.`);
     }
-    // RN-86
-    if (pet.status !== "AVAILABLE") throw new ConflictError(PET_NOT_AVAILABLE);
-    // RN-89, RN-102
-    if (await hasNoShow(client, adopterId, pet.shelterId)) {
-      throw new ForbiddenError("No puedes solicitar más visitas en esta protectora porque no acudiste a una visita confirmada.");
-    }
+    if (visit.slotId === slotId) throw new ConflictError("Elige un turno distinto al de la visita actual.");
 
-    // RN-83: the slot is one of the pet's shelter. Locked, so two requests cannot take the last place.
-    const slot = await lockShelterSlot(client, pet.shelterId, slotId);
-    if (!slot) throw new NotFoundError("El turno no existe.");
-    // RN-87
-    if (slot.startsAt.getTime() < Date.now() + rules.visitMinNoticeHours * HOUR) {
-      throw new ConflictError(`La visita se tiene que solicitar con al menos ${String(rules.visitMinNoticeHours)} horas de antelación.`);
-    }
-    // RN-82
-    if ((await countOccupied(client, slotId)) >= slot.capacity) throw new ConflictError("Este turno ya no tiene plazas libres.");
-    // RN-81
-    if (await petHasActiveVisit(client, petId, slotId)) throw new ConflictError("Esta mascota ya tiene una visita en este turno. Elige otro.");
-
-    // RN-90, RN-91, RN-92; RN-93: tell when the next place frees up.
-    const counted = await selectQuotaVisitEnds(client, adopterId, pet.shelterId, rules.visitQuotaWindowMonths);
-    if (counted.length >= rules.visitQuotaPerShelter) {
-      const freedBy = counted[counted.length - rules.visitQuotaPerShelter];
-      const from = freedBy ? ` Podrás solicitar otra a partir del ${madridDay.format(freedBy)}.` : "";
-      throw new ConflictError(
-        `Ya tienes ${String(rules.visitQuotaPerShelter)} visitas confirmadas o realizadas en esta protectora en los últimos ${String(rules.visitQuotaWindowMonths)} meses.${from}`,
-      );
-    }
-
-    const visitId = await insertVisit(client, adopterId, pet.shelterId, petId, slotId);
-    await ensureConversation(client, adopterId, pet.shelterId);
+    await markVisitCancelled(client, visitId, "ADOPTER");
     await audit(client, {
       actorUserId: adopterId,
-      action: "VISIT_REQUESTED",
+      action: "VISIT_CANCELLED",
       entityType: "Visit",
       entityId: visitId,
-      details: { after: { status: "PENDING" } },
+      details: { before: { status: visit.status }, after: { status: "CANCELLED", cancelledBy: "ADOPTER", rescheduled: true } },
     });
 
-    const visit = await selectRequestedVisit(client, visitId);
-    if (!visit) throw new Error("visit not found after creating it");
-    return visit;
+    const requested = await insertCheckedRequest(client, adopterId, visit.petId, slotId, visitId);
+    await createNotification(client, {
+      userId: visit.shelterId,
+      type: "VISIT_RESCHEDULED",
+      params: { petName: visit.petName, previousStartsAt: visit.startsAt, startsAt: requested.startsAt },
+      link: { visitId: requested.id },
+    });
+    return requested;
   });
 }
 
@@ -162,6 +213,8 @@ export async function confirmVisit(shelterId: number, visitId: number): Promise<
       params: { petName: visit.petName, startsAt: visit.startsAt },
       link: { visitId },
     });
+    // RN-197: if less than the reminder notice is left, the reminder goes out at once.
+    await remindDueVisits(client, visitId);
     return { status: "CONFIRMED" };
   });
 }

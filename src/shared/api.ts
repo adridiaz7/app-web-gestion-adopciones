@@ -422,6 +422,11 @@ export interface VisitRequestResponse {
   visit: RequestedVisit;
 }
 
+/** CU-51 · body of POST /api/adopter/visits/:id/reschedule */
+export interface RescheduleVisitRequest {
+  slotId: number;
+}
+
 /** CU-24, CU-25 · body of POST /api/shelter/visits/:id/reject (RN-96: optional reason). */
 export interface RejectVisitRequest {
   reason?: string;

@@ -2,6 +2,7 @@ import type {
   AdopterVisitsResponse,
   AvailableSlotsResponse,
   RejectVisitRequest,
+  RescheduleVisitRequest,
   ShelterInboxResponse,
   VisitRequest,
   VisitRequestResponse,
@@ -35,3 +36,7 @@ export const getInbox = () => apiRequest<ShelterInboxResponse>("GET", "/shelter/
 
 /** CU-26: the adopter did not come to a confirmed visit. */
 export const registerNoShow = (id: number) => apiRequest<VisitStatusResponse>("POST", `/shelter/visits/${String(id)}/no-show`);
+
+/** CU-51, RN-195, RN-196: the adopter moves a visit to another slot; returns the new request. */
+export const rescheduleVisit = (id: number, body: RescheduleVisitRequest) =>
+  apiRequest<VisitRequestResponse>("POST", `/adopter/visits/${String(id)}/reschedule`, body);

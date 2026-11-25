@@ -59,10 +59,18 @@ export async function selectQuotaVisitEnds(db: Db, adopterId: number, shelterId:
   return rows.map((row) => row.countsUntil);
 }
 
-export async function insertVisit(db: Db, adopterId: number, shelterId: number, petId: number, slotId: number): Promise<number> {
+/** RN-196: `replacesVisitId` is the visit a rescheduled request replaces. */
+export async function insertVisit(
+  db: Db,
+  adopterId: number,
+  shelterId: number,
+  petId: number,
+  slotId: number,
+  replacesVisitId: number | null = null,
+): Promise<number> {
   const { rows } = await db.query<{ id: number }>(
-    `INSERT INTO "Visit" (adopter_id, shelter_id, pet_id, slot_id) VALUES ($1, $2, $3, $4) RETURNING id`,
-    [adopterId, shelterId, petId, slotId],
+    `INSERT INTO "Visit" (adopter_id, shelter_id, pet_id, slot_id, replaces_visit_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+    [adopterId, shelterId, petId, slotId, replacesVisitId],
   );
   const row = rows[0];
   if (!row) throw new Error("insertVisit: no row returned");
@@ -144,6 +152,8 @@ export interface VisitForChange {
   shelterId: number;
   status: VisitStatus;
   createdAt: Date;
+  petId: number;
+  slotId: number;
   petName: string;
   startsAt: Date;
   endsAt: Date;
@@ -154,7 +164,7 @@ export async function lockVisit(db: Db, visitId: number, owner: { adopterId: num
   const [column, ownerId] = "adopterId" in owner ? ["adopter_id", owner.adopterId] : ["shelter_id", owner.shelterId];
   const { rows } = await db.query<VisitForChange>(
     `SELECT v.id, v.adopter_id AS "adopterId", v.shelter_id AS "shelterId", v.status, v.created_at AS "createdAt",
-            p.name AS "petName", vs.starts_at AS "startsAt", vs.ends_at AS "endsAt"
+            v.pet_id AS "petId", v.slot_id AS "slotId", p.name AS "petName", vs.starts_at AS "startsAt", vs.ends_at AS "endsAt"
        FROM "Visit" v
        JOIN "Pet" p ON p.id = v.pet_id
        JOIN "Visit_slot" vs ON vs.id = v.slot_id
@@ -351,6 +361,39 @@ export async function voidOpenVisits(db: Db, adopterId: number, shelterId: numbe
       WHERE v.id = open.id AND p.id = v.pet_id AND vs.id = v.slot_id
      RETURNING v.id, v.adopter_id AS "adopterId", p.name AS "petName", vs.starts_at AS "startsAt", open.status AS "previousStatus"`,
     [adopterId, shelterId, reason],
+  );
+  return rows.sort((a, b) => a.id - b.id);
+}
+
+/** A confirmed visit whose reminder has just been marked as sent (RN-197). */
+export interface RemindedVisit {
+  id: number;
+  adopterId: number;
+  petName: string;
+  startsAt: Date;
+  shelterName: string;
+  shelterAddress: string;
+}
+
+/**
+ * RN-197, CU-53: CONFIRMED visits starting within `noticeHours` that have not been reminded
+ * yet are marked as reminded and returned. Only that visit if `visitId` is given.
+ */
+export async function markDueReminders(db: Db, noticeHours: number, visitId: number | null = null): Promise<RemindedVisit[]> {
+  const { rows } = await db.query<RemindedVisit>(
+    `WITH due AS (
+       SELECT v.id FROM "Visit" v JOIN "Visit_slot" vs ON vs.id = v.slot_id
+        WHERE v.status = 'CONFIRMED' AND v.reminder_sent_at IS NULL
+          AND vs.starts_at > now() AND vs.starts_at <= now() + make_interval(hours => $1)
+          AND ($2::bigint IS NULL OR v.id = $2)
+          FOR UPDATE OF v SKIP LOCKED
+     )
+     UPDATE "Visit" v SET reminder_sent_at = now()
+       FROM due, "Pet" p, "Visit_slot" vs, "Shelter" s, "Province" pv
+      WHERE v.id = due.id AND p.id = v.pet_id AND vs.id = v.slot_id AND s.user_id = v.shelter_id AND pv.id = s.province_id
+     RETURNING v.id, v.adopter_id AS "adopterId", p.name AS "petName", vs.starts_at AS "startsAt", s.name AS "shelterName",
+               s.address || ', ' || s.locality || ' (' || pv.name || ')' AS "shelterAddress"`,
+    [noticeHours, visitId],
   );
   return rows.sort((a, b) => a.id - b.id);
 }

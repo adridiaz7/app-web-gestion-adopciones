@@ -5,6 +5,7 @@ import { cancelVisit, listMyVisits } from "../api/visits.js";
 import { appLayout } from "../components/app-layout.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
+import { openRescheduleDialog } from "../components/visit-request.js";
 import { h, mount, queryParam } from "../dom.js";
 import { madridTime } from "../madrid-time.js";
 import { navigate } from "../router.js";
@@ -78,19 +79,23 @@ function closedText(visit: AdopterVisit): string {
   }
 }
 
-function visitRow(visit: AdopterVisit, onCancel: (visit: AdopterVisit) => void): HTMLElement {
+function visitRow(visit: AdopterVisit, onCancel: (visit: AdopterVisit) => void, onReschedule: (visit: AdopterVisit) => void): HTMLElement {
   const side = h("div", { class: "visit-row__side" });
   if (visit.status === "PENDING") side.append(h("span", { class: "muted" }, "Pendiente de respuesta de la protectora"));
   if (isUpcoming(visit)) {
-    // RN-97, RN-98: the server says whether there is still enough notice to cancel.
+    // RN-97, RN-98, RN-195: the server says whether there is still enough notice to cancel or reschedule.
     if (visit.canCancel) {
+      const reschedule = h("button", { type: "button", class: "button button--secondary button--small" }, "Reprogramar");
+      reschedule.addEventListener("click", () => {
+        onReschedule(visit);
+      });
       const cancel = h("button", { type: "button", class: "button button--secondary button--small" }, "Cancelar");
       cancel.addEventListener("click", () => {
         onCancel(visit);
       });
-      side.append(cancel);
+      side.append(reschedule, cancel);
     } else {
-      side.append(h("span", { class: "muted" }, "Ya no se puede cancelar"));
+      side.append(h("span", { class: "muted" }, "Ya no se puede cancelar ni reprogramar"));
     }
   } else {
     side.append(h("span", { class: "muted" }, closedText(visit)));
@@ -135,6 +140,9 @@ export async function renderVisits(root: HTMLElement): Promise<void> {
         (error: unknown) => message.replaceChildren(notice("error", error instanceof ApiError ? error.message : "No se ha podido cancelar la visita.")),
       );
     };
+    const onReschedule = (visit: AdopterVisit): void => {
+      openRescheduleDialog(visit, () => void renderVisits(root));
+    };
     const tab = (label: string, count: number, href: string, current: boolean) =>
       h("a", { class: "tabs__tab", href, "aria-current": current ? "page" : undefined }, `${label} (${String(count)})`);
     content = [
@@ -143,7 +151,7 @@ export async function renderVisits(root: HTMLElement): Promise<void> {
       message,
       shown.length === 0
         ? notice("info", history ? "Todavía no tienes visitas pasadas." : "No tienes visitas próximas.", "Solicita una visita desde la ficha de una mascota.")
-        : h("div", { class: "visit-list" }, ...shown.map((visit) => visitRow(visit, onCancel))),
+        : h("div", { class: "visit-list" }, ...shown.map((visit) => visitRow(visit, onCancel, onReschedule))),
     ].filter((node): node is HTMLElement => node !== null);
   } catch (error) {
     content = [notice("error", error instanceof ApiError ? error.message : "No se han podido cargar tus visitas.")];
