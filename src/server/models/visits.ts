@@ -3,6 +3,7 @@ import { visibleShelterCondition } from "./gallery.js";
 
 /** The pet a visit is requested for, with what CU-23 needs to check about it and its shelter. */
 export interface PetForRequest {
+  petName: string;
   shelterId: number;
   shelterName: string;
   status: string;
@@ -13,7 +14,7 @@ export interface PetForRequest {
 /** The pet, locked so its status does not change while the visit is requested, or null. */
 export async function lockPetForRequest(db: Db, petId: number): Promise<PetForRequest | null> {
   const { rows } = await db.query<PetForRequest>(
-    `SELECT p.shelter_id AS "shelterId", s.name AS "shelterName", p.status,
+    `SELECT p.name AS "petName", p.shelter_id AS "shelterId", s.name AS "shelterName", p.status,
             (${visibleShelterCondition("NULL")}) AS "shelterVisible"
        FROM "Pet" p
        JOIN "Shelter"  s  ON s.user_id = p.shelter_id

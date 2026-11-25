@@ -1771,3 +1771,10 @@ textarea {
 .chat-thread__form input[type="text"] {
   flex: 1;
 }
+
+/* CU-27: adoption request form */
+.adoption-form {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 720px;
+}

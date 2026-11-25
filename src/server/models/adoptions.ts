@@ -82,3 +82,36 @@ export async function selectAdoptersVoidedByUnlisting(db: Db, petId: number, unl
   );
   return rows.map((row) => row.adopterId);
 }
+
+/** RN-119: whether the adopter has an open (PENDING or APPROVED) adoption of the pet. */
+export async function hasOpenAdoption(db: Db, adopterId: number, petId: number): Promise<boolean> {
+  const { rows } = await db.query(
+    `SELECT 1 FROM "Adoption" WHERE adopter_id = $1 AND pet_id = $2 AND status IN ('PENDING', 'APPROVED') LIMIT 1`,
+    [adopterId, petId],
+  );
+  return rows.length > 0;
+}
+
+/** RN-113, RN-116: the adopter's most recent COMPLETED visit to the pet, with the slot's start. */
+export async function selectLatestCompletedVisit(db: Db, adopterId: number, petId: number): Promise<{ id: number; startsAt: Date } | null> {
+  const { rows } = await db.query<{ id: number; startsAt: Date }>(
+    `SELECT v.id, vs.starts_at AS "startsAt"
+       FROM "Visit" v JOIN "Visit_slot" vs ON vs.id = v.slot_id
+      WHERE v.adopter_id = $1 AND v.pet_id = $2 AND v.status = 'COMPLETED'
+      ORDER BY vs.starts_at DESC, v.id DESC
+      LIMIT 1`,
+    [adopterId, petId],
+  );
+  return rows[0] ?? null;
+}
+
+/** RN-114, RN-207: a PENDING adoption linked to the visit that enables it, with the answers. */
+export async function insertAdoption(db: Db, adopterId: number, petId: number, visitId: number, answers: object): Promise<number> {
+  const { rows } = await db.query<{ id: number }>(
+    `INSERT INTO "Adoption" (adopter_id, pet_id, visit_id, questionnaire_answers) VALUES ($1, $2, $3, $4) RETURNING id`,
+    [adopterId, petId, visitId, JSON.stringify(answers)],
+  );
+  const row = rows[0];
+  if (!row) throw new Error("insertAdoption: no row returned");
+  return row.id;
+}

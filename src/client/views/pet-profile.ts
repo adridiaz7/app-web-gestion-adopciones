@@ -97,6 +97,8 @@ function profileContent(pet: PetProfile, favorite: boolean | null): Node[] {
         h("p", {}, h("span", { class: "badge badge--available" }, "Disponible"), ` ${pet.shelter.locality} (${pet.shelter.provinceName})`),
         // CU-23: only adopters request visits.
         favorite === null ? null : visitRequestButton(pet),
+        // CU-27: the server checks the completed visit and the other conditions.
+        favorite === null ? null : h("a", { class: "button button--secondary", href: `/mascotas/${String(pet.id)}/adoptar` }, "Solicitar adopción"),
         // RN-73: the same favourite as in the gallery and discover mode.
         favorite === null ? null : favoriteButton(pet.id, favorite, (text) => message.replaceChildren(notice("error", text)), true),
         message,

@@ -1,0 +1,70 @@
+import type { Request, RequestHandler } from "express";
+import { z } from "zod";
+import type { AdoptionRequestResponse, HouseholdResponse } from "../../shared/api.js";
+import { UnauthorizedError } from "../errors.js";
+import { getHousehold, requestAdoption, type AdoptionAnswers } from "../services/adoption-requests.js";
+
+const CHOOSE = "Elige una opción.";
+const yesNo = z.boolean({ error: CHOOSE });
+
+/** RN-27, RN-117: every household field is required to request an adoption (the description of other pets is optional). */
+const householdSchema = z.object(
+  {
+    housingType: z.enum(["APARTMENT", "HOUSE", "OTHER"], { error: CHOOSE }),
+    hasOutdoorSpace: yesNo,
+    housingTenure: z.enum(["OWNED", "RENTED", "RENT_TO_OWN"], { error: CHOOSE }),
+    householdMembers: z.number({ error: "Indica cuántas personas viven en casa." }).int().min(1, { error: "Al menos 1 persona." }).max(50, { error: "Como mucho 50." }),
+    hasChildren: yesNo,
+    hasOtherPets: yesNo,
+    otherPetsDescription: z
+      .string()
+      .trim()
+      .max(500, { error: "No puede tener más de 500 caracteres." })
+      .nullish()
+      .transform((text) => (text ? text : null)),
+    hasPetExperience: yesNo,
+    hoursAlonePerDay: z.number({ error: "Indica cuántas horas estaría sola." }).int().min(0, { error: "Entre 0 y 24 horas." }).max(24, { error: "Entre 0 y 24 horas." }),
+  },
+  { error: "Completa los datos del hogar." },
+);
+
+/** RN-207: two optional questions. */
+const answersSchema = z
+  .object({
+    reason: z
+      .string()
+      .trim()
+      .max(2000, { error: "No puede tener más de 2000 caracteres." })
+      .optional()
+      .transform((text) => (text ? text : undefined)),
+    canAffordCosts: z.boolean({ error: CHOOSE }).optional(),
+  })
+  .optional();
+
+const INVALID_PET = "La mascota no es válida.";
+const adoptionSchema = z.object({
+  petId: z.number({ error: INVALID_PET }).int({ error: INVALID_PET }).positive({ error: INVALID_PET }).max(Number.MAX_SAFE_INTEGER, { error: INVALID_PET }),
+  household: householdSchema,
+  answers: answersSchema,
+});
+
+function userId(user: Request["user"]): number {
+  if (!user) throw new UnauthorizedError();
+  return user.id;
+}
+
+/** RN-207 · GET /api/adopter/household */
+export const getMyHousehold: RequestHandler = async (req, res) => {
+  const body: HouseholdResponse = { household: await getHousehold(userId(req.user)) };
+  res.json(body);
+};
+
+/** CU-27 · POST /api/adopter/adoptions */
+export const postAdoption: RequestHandler = async (req, res) => {
+  const { petId, household, answers } = adoptionSchema.parse(req.body ?? {});
+  const stored: AdoptionAnswers = {};
+  if (answers?.reason !== undefined) stored.reason = answers.reason;
+  if (answers?.canAffordCosts !== undefined) stored.canAffordCosts = answers.canAffordCosts;
+  const body: AdoptionRequestResponse = { adoption: await requestAdoption(userId(req.user), petId, household, stored) };
+  res.status(201).json(body);
+};

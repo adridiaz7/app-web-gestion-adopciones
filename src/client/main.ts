@@ -18,6 +18,7 @@ import { renderShelterSlots } from "./views/shelter-slots.js";
 import { renderVisits } from "./views/visits.js";
 import { renderNotifications } from "./views/notifications.js";
 import { renderMessages } from "./views/messages.js";
+import { renderAdoptionRequest } from "./views/adoption-request.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
 
 const routes: Route[] = [
@@ -34,6 +35,7 @@ const routes: Route[] = [
   { path: "/descubrir", render: renderDiscover },
   { path: "/mascotas", render: renderGallery },
   { path: "/mascotas/:id", render: renderPetProfile },
+  { path: "/mascotas/:id/adoptar", render: renderAdoptionRequest },
   { path: "/protectoras", render: renderShelterSearch },
   { path: "/protectoras/:id", render: renderShelterProfile },
   { path: "/perfil/preferencias", render: renderPreferences },

@@ -594,3 +594,33 @@ export interface ChatMessageResponse {
 export interface SendMessageRequest {
   body: string;
 }
+
+/** RN-27 · the household data of the adopter's profile (null until filled in). */
+export interface Household {
+  housingType: "APARTMENT" | "HOUSE" | "OTHER" | null;
+  hasOutdoorSpace: boolean | null;
+  housingTenure: "OWNED" | "RENTED" | "RENT_TO_OWN" | null;
+  householdMembers: number | null;
+  hasChildren: boolean | null;
+  hasOtherPets: boolean | null;
+  otherPetsDescription: string | null;
+  hasPetExperience: boolean | null;
+  hoursAlonePerDay: number | null;
+}
+
+/** RN-207 · GET /api/adopter/household */
+export interface HouseholdResponse {
+  household: Household;
+}
+
+/** CU-27 · body of POST /api/adopter/adoptions (RN-117: complete household; RN-207: optional answers). */
+export interface AdoptionRequest {
+  petId: number;
+  household: { [K in keyof Household]: K extends "otherPetsDescription" ? string | null : NonNullable<Household[K]> };
+  answers: { reason?: string; canAffordCosts?: boolean };
+}
+
+/** CU-27 · the adoption just requested. */
+export interface AdoptionRequestResponse {
+  adoption: { id: number; status: "PENDING"; petId: number; petName: string };
+}
