@@ -543,3 +543,54 @@ export interface NotificationsResponse {
 export interface UnreadCountResponse {
   unread: number;
 }
+
+/** CU-33 · a conversation in the list (ISO instant). */
+export interface ConversationSummary {
+  id: number;
+  /** RN-13: "Usuario eliminado" if the other party deleted their account. */
+  otherName: string;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+  unread: number;
+  /** RN-136, RN-13 */
+  canWrite: boolean;
+}
+
+/** CU-33 · GET /api/conversations */
+export interface ConversationsResponse {
+  conversations: ConversationSummary[];
+}
+
+/** CU-33 · a chat message (ISO instant). */
+export interface ChatMessage {
+  id: number;
+  mine: boolean;
+  senderName: string;
+  body: string | null;
+  photoUrl: string | null;
+  /** RN-138 */
+  read: boolean;
+  createdAt: string;
+}
+
+/** CU-33 · GET /api/conversations/:id/messages */
+export interface ConversationMessagesResponse {
+  conversation: {
+    id: number;
+    otherName: string;
+    canWrite: boolean;
+    /** RN-198, RN-13: fixed notice, or null. */
+    notice: string | null;
+  };
+  messages: ChatMessage[];
+}
+
+/** CU-33 · POST /api/conversations/:id/messages and /photos */
+export interface ChatMessageResponse {
+  message: ChatMessage;
+}
+
+/** CU-33 · body of POST /api/conversations/:id/messages */
+export interface SendMessageRequest {
+  body: string;
+}
