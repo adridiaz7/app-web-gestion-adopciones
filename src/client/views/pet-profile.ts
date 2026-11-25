@@ -9,6 +9,7 @@ import { authPage } from "../components/auth-layout.js";
 import { favoriteButton } from "../components/favorite-button.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
+import { visitRequestButton } from "../components/visit-request.js";
 import { h, mount } from "../dom.js";
 import type { RouteParams } from "../router.js";
 
@@ -94,6 +95,8 @@ function profileContent(pet: PetProfile, favorite: boolean | null): Node[] {
         h("h1", { class: "display" }, pet.name),
         h("p", { class: "muted" }, `${pet.breedName} · ${ageLabel(pet.birthDate)} · ${SEX_LABELS[pet.sex]} · ${SIZE_LABELS[pet.size]}`),
         h("p", {}, h("span", { class: "badge badge--available" }, "Disponible"), ` ${pet.shelter.locality} (${pet.shelter.provinceName})`),
+        // CU-23: only adopters request visits.
+        favorite === null ? null : visitRequestButton(pet),
         // RN-73: the same favourite as in the gallery and discover mode.
         favorite === null ? null : favoriteButton(pet.id, favorite, (text) => message.replaceChildren(notice("error", text)), true),
         message,

@@ -122,6 +122,13 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 **25/11/2026 · T-46 (bloquea T-46).** La carpeta `db/seed-photos/` no existe en `develop`, así que, como indica la propia tarea, T-46 queda `BLOQUEADA` hasta que se suban las fotos (y `CREDITOS.md`). Cuando estén en `develop`, basta con pasarla a `PENDIENTE`.
 
+**25/11/2026 · T-22 (no bloquea).** CU-23 y RN-111 dicen que la visita que **sustituye** a otra anulada porque la protectora modificó o eliminó el turno no necesita las 48 h y queda confirmada directamente, "porque la protectora ya había confirmado la visita original". Pero al modificar o eliminar un turno se anulan también las visitas que aún estaban **pendientes** (T-20, RN-111). No está claro:
+- **(a)** si la sustitución directa vale solo cuando la visita anulada estaba **confirmada** (se sabe por `responded_at`), o también cuando estaba pendiente (y entonces, ¿la nueva queda pendiente o confirmada?);
+- **(b)** si tiene que ser para **la misma mascota**, si hay un **plazo** para pedirla y si solo se puede sustituir **una vez** (`replaces_visit_id`);
+- **(c)** si sigue aplicando el cupo (RN-90) y las demás comprobaciones (bloqueo, ausencia, plazas).
+
+Propuesta: solo para visitas anuladas con motivo `SLOT_CANCELLED` que estaban confirmadas, para la misma mascota, una sola vez, sin la antelación de 48 h pero con el resto de reglas (plazas, bloqueo, ausencia y cupo, que no cambia porque la original anulada deja de contar). De momento **T-22 no incluye la sustitución**: toda solicitud cumple las 48 h y queda pendiente. Cuando se responda, se puede hacer en una tarea aparte con tests nuevos.
+
 ---
 
 ## 5. Tareas
@@ -179,7 +186,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 |---|---|---|---|---|
 | T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_REVISION |
 | T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | EN_REVISION |
-| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | PENDIENTE |
+| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | EN_REVISION |
 | T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | PENDIENTE |
 | T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | PENDIENTE |
 | T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | PENDIENTE |

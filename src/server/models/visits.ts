@@ -1,0 +1,136 @@
+import type { Db } from "../db/transaction.js";
+import { visibleShelterCondition } from "./gallery.js";
+
+/** The pet a visit is requested for, with what CU-23 needs to check about it and its shelter. */
+export interface PetForRequest {
+  shelterId: number;
+  shelterName: string;
+  status: string;
+  /** RN-23: validated, not suspended and not deleted (the block is checked apart, RN-88). */
+  shelterVisible: boolean;
+}
+
+/** The pet, locked so its status does not change while the visit is requested, or null. */
+export async function lockPetForRequest(db: Db, petId: number): Promise<PetForRequest | null> {
+  const { rows } = await db.query<PetForRequest>(
+    `SELECT p.shelter_id AS "shelterId", s.name AS "shelterName", p.status,
+            (${visibleShelterCondition("NULL")}) AS "shelterVisible"
+       FROM "Pet" p
+       JOIN "Shelter"  s  ON s.user_id = p.shelter_id
+       JOIN "App_user" su ON su.id = s.user_id
+      WHERE p.id = $1
+        FOR SHARE OF p`,
+    [petId],
+  );
+  return rows[0] ?? null;
+}
+
+/** RN-89: whether the adopter has a NO_SHOW visit at the shelter. */
+export async function hasNoShow(db: Db, adopterId: number, shelterId: number): Promise<boolean> {
+  const { rows } = await db.query(
+    `SELECT 1 FROM "Visit" WHERE adopter_id = $1 AND shelter_id = $2 AND status = 'NO_SHOW' LIMIT 1`,
+    [adopterId, shelterId],
+  );
+  return rows.length > 0;
+}
+
+/** RN-81: whether the pet already has an active (PENDING or CONFIRMED) visit in the slot. */
+export async function petHasActiveVisit(db: Db, petId: number, slotId: number): Promise<boolean> {
+  const { rows } = await db.query(
+    `SELECT 1 FROM "Visit" WHERE pet_id = $1 AND slot_id = $2 AND status IN ('PENDING', 'CONFIRMED') LIMIT 1`,
+    [petId, slotId],
+  );
+  return rows.length > 0;
+}
+
+/**
+ * RN-90, RN-91, RN-92: when each of the adopter's CONFIRMED and COMPLETED visits at the shelter
+ * that still count for the quota (slot less than `windowMonths` ago) stops counting, soonest first.
+ */
+export async function selectQuotaVisitEnds(db: Db, adopterId: number, shelterId: number, windowMonths: number): Promise<Date[]> {
+  const { rows } = await db.query<{ countsUntil: Date }>(
+    `SELECT vs.starts_at + make_interval(months => $3) AS "countsUntil"
+       FROM "Visit" v JOIN "Visit_slot" vs ON vs.id = v.slot_id
+      WHERE v.adopter_id = $1 AND v.shelter_id = $2 AND v.status IN ('CONFIRMED', 'COMPLETED')
+        AND vs.starts_at > now() - make_interval(months => $3)
+      ORDER BY vs.starts_at`,
+    [adopterId, shelterId, windowMonths],
+  );
+  return rows.map((row) => row.countsUntil);
+}
+
+export async function insertVisit(db: Db, adopterId: number, shelterId: number, petId: number, slotId: number): Promise<number> {
+  const { rows } = await db.query<{ id: number }>(
+    `INSERT INTO "Visit" (adopter_id, shelter_id, pet_id, slot_id) VALUES ($1, $2, $3, $4) RETURNING id`,
+    [adopterId, shelterId, petId, slotId],
+  );
+  const row = rows[0];
+  if (!row) throw new Error("insertVisit: no row returned");
+  return row.id;
+}
+
+/** RN-133, RN-134: opens the pair's conversation if it does not exist yet. */
+export async function ensureConversation(db: Db, adopterId: number, shelterId: number): Promise<void> {
+  await db.query(
+    `INSERT INTO "Conversation" (adopter_id, shelter_id) VALUES ($1, $2) ON CONFLICT (adopter_id, shelter_id) DO NOTHING`,
+    [adopterId, shelterId],
+  );
+}
+
+/** A visit as the adopter sees it after requesting it. RN-193: it takes place at the shelter's address. */
+export interface RequestedVisit {
+  id: number;
+  status: string;
+  petId: number;
+  petName: string;
+  slotId: number;
+  startsAt: Date;
+  endsAt: Date;
+  shelterName: string;
+  shelterAddress: string;
+}
+
+export async function selectRequestedVisit(db: Db, visitId: number): Promise<RequestedVisit | null> {
+  const { rows } = await db.query<RequestedVisit>(
+    `SELECT v.id, v.status, v.pet_id AS "petId", p.name AS "petName", v.slot_id AS "slotId",
+            vs.starts_at AS "startsAt", vs.ends_at AS "endsAt", s.name AS "shelterName",
+            s.address || ', ' || s.locality || ' (' || pv.name || ')' AS "shelterAddress"
+       FROM "Visit" v
+       JOIN "Pet"        p  ON p.id = v.pet_id
+       JOIN "Visit_slot" vs ON vs.id = v.slot_id
+       JOIN "Shelter"    s  ON s.user_id = v.shelter_id
+       JOIN "Province"   pv ON pv.id = s.province_id
+      WHERE v.id = $1`,
+    [visitId],
+  );
+  return rows[0] ?? null;
+}
+
+/** A slot the adopter can choose (RN-194). */
+export interface AvailableSlot {
+  id: number;
+  startsAt: Date;
+  endsAt: Date;
+  freePlaces: number;
+}
+
+/**
+ * RN-194: the shelter's slots, not cancelled, starting `minNoticeHours` or more from now, with
+ * free places (RN-82) and with no active visit of the pet (RN-81), in time order.
+ */
+export async function selectAvailableSlots(db: Db, shelterId: number, petId: number, minNoticeHours: number): Promise<AvailableSlot[]> {
+  const { rows } = await db.query<AvailableSlot>(
+    `SELECT vs.id, vs.starts_at AS "startsAt", vs.ends_at AS "endsAt", vs.capacity - occ.n AS "freePlaces"
+       FROM "Visit_slot" vs
+       CROSS JOIN LATERAL (SELECT count(*)::int AS n FROM "Visit" v
+                            WHERE v.slot_id = vs.id AND v.status IN ('PENDING', 'CONFIRMED')) occ
+      WHERE vs.shelter_id = $1 AND vs.cancelled_at IS NULL
+        AND vs.starts_at >= now() + make_interval(hours => $3)
+        AND occ.n < vs.capacity
+        AND NOT EXISTS (SELECT 1 FROM "Visit" v
+                         WHERE v.slot_id = vs.id AND v.pet_id = $2 AND v.status IN ('PENDING', 'CONFIRMED'))
+      ORDER BY vs.starts_at, vs.id`,
+    [shelterId, petId, minNoticeHours],
+  );
+  return rows;
+}

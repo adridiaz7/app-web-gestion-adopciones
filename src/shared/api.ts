@@ -386,6 +386,42 @@ export interface RecurringSlotsResponse {
   skipped: { startsAt: string; endsAt: string }[];
 }
 
+/** RN-194 · a slot the adopter can choose for a pet (ISO instants). */
+export interface AvailableSlot {
+  id: number;
+  startsAt: string;
+  endsAt: string;
+  freePlaces: number;
+}
+
+/** RN-194 · GET /api/adopter/pets/:id/slots */
+export interface AvailableSlotsResponse {
+  slots: AvailableSlot[];
+}
+
+/** CU-23 · body of POST /api/adopter/visits */
+export interface VisitRequest {
+  petId: number;
+  slotId: number;
+}
+
+/** CU-23 · the visit just requested. RN-193: it takes place at the shelter's address. */
+export interface RequestedVisit {
+  id: number;
+  status: string;
+  petId: number;
+  petName: string;
+  slotId: number;
+  startsAt: string;
+  endsAt: string;
+  shelterName: string;
+  shelterAddress: string;
+}
+
+export interface VisitRequestResponse {
+  visit: RequestedVisit;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

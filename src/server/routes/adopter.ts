@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getDiscover, postDiscard, postFavorite, postUndo } from "../controllers/discover.js";
 import { deleteDiscard, deleteFavorite, getDiscards, getFavorites, putFavorite } from "../controllers/favorites.js";
 import { getMyPreferences, putMyPreferences } from "../controllers/preferences.js";
+import { getAvailableSlots, postVisit } from "../controllers/visits.js";
 import { requireRole } from "../middlewares/session.js";
 
 /** Routes of the adopter's own area: every one needs the ADOPTER role. */
@@ -22,6 +23,9 @@ export function createAdopterRouter(): Router {
   router.delete("/favorites/:petId", deleteFavorite);
   router.get("/discards", getDiscards);
   router.delete("/discards/:petId", deleteDiscard);
+
+  router.get("/pets/:id/slots", getAvailableSlots);
+  router.post("/visits", postVisit);
 
   return router;
 }
