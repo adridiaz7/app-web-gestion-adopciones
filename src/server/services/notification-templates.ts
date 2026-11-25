@@ -35,6 +35,40 @@ export const notificationTemplates = {
       (p.reason ? ` Motivo: ${p.reason}` : ""),
   }),
 
+  /** CU-45, RN-95: the shelter did not answer in time. */
+  VISIT_EXPIRED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Solicitud de visita caducada",
+    body:
+      `La protectora no ha respondido a tiempo a tu solicitud de visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}. ` +
+      "Puedes solicitar otra.",
+  }),
+
+  /** RN-103, RN-110: voided because the adopter did not show up at another visit of the shelter. */
+  VISIT_VOIDED_NO_SHOW: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Visita anulada",
+    body:
+      `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado porque la protectora ha registrado ` +
+      "que no acudiste a una visita confirmada.",
+  }),
+
+  /** RN-103: pending adoption voided for a no-show. */
+  ADOPTION_VOIDED_NO_SHOW: (p: { petName: string }): RenderedNotification => ({
+    title: "Solicitud de adopción anulada",
+    body: `Tu solicitud para adoptar a ${p.petName} se ha anulado porque la protectora ha registrado que no acudiste a una visita confirmada.`,
+  }),
+
+  /** RN-103: approved adoption cancelled by the system for a no-show. */
+  ADOPTION_CANCELLED_NO_SHOW: (p: { petName: string }): RenderedNotification => ({
+    title: "Adopción cancelada",
+    body: `Tu adopción aprobada de ${p.petName} se ha cancelado porque la protectora ha registrado que no acudiste a una visita confirmada.`,
+  }),
+
+  /** RN-103, RN-144: the pet is available again; for the adopters who were not selected. */
+  PET_AVAILABLE_AGAIN: (p: { petName: string }): RenderedNotification => ({
+    title: "Mascota disponible de nuevo",
+    body: `${p.petName} vuelve a estar disponible para adopción.`,
+  }),
+
   /** RN-100: the shelter cancelled a confirmed visit; it does not count for the quota. */
   VISIT_CANCELLED_BY_SHELTER: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
     title: "Visita cancelada por la protectora",

@@ -20,6 +20,7 @@ import {
   type InboxVisit,
   type VisitStatusResult,
 } from "../services/visits.js";
+import { registerNoShow } from "../services/visit-attendance.js";
 
 const id = (message: string) =>
   z.coerce.number({ error: message }).int({ error: message }).positive({ error: message }).max(Number.MAX_SAFE_INTEGER, { error: message });
@@ -117,4 +118,10 @@ export const getInbox: RequestHandler = async (req, res) => {
   const { pending, upcoming } = await getShelterInbox(userId(req.user));
   const body: ShelterInboxResponse = { pending: pending.map(inboxVisit), upcoming: upcoming.map(inboxVisit) };
   res.json(body);
+};
+
+/** CU-26 · POST /api/shelter/visits/:id/no-show */
+export const postNoShow: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  res.json(statusBody(await registerNoShow(userId(req.user), visitId)));
 };

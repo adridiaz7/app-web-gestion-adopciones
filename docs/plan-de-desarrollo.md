@@ -135,6 +135,8 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 **25/11/2026 · T-24 (no bloquea).** CU-21 y CU-22 incluyen también las **adopciones** (solicitudes, aprobadas pendientes de entrega), que todavía no existen: T-24 cubre solo las visitas, y las adopciones se añadirán a estas mismas pantallas en T-30–T-32. Además, CU-22 dice que la bandeja da "acceso al perfil de cada adoptante", pero ningún caso de uso ni RN dice qué datos del adoptante puede ver la protectora (¿nombre, provincia, datos del hogar de RN-27, historial de visitas con ella?). De momento la bandeja muestra solo el nombre. ¿Qué datos debe ver, y en qué tarea va?
 
+**25/11/2026 · T-25 (no bloquea).** RN-105 y RN-106 cuentan las 48 h "desde la visita", y CU-26 dice que no se puede marcar una ausencia si la visita "todavía no ha tenido lugar". Se ha tomado como referencia el **fin del turno**: la ausencia se puede registrar desde que termina el turno y hasta 48 h después, y a las 48 h del fin el sistema la marca como realizada. ¿Es correcto, o debe contarse desde el **inicio** del turno?
+
 ---
 
 ## 5. Tareas
@@ -195,7 +197,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 | T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | EN_REVISION |
 | T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | EN_REVISION |
 | T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | EN_REVISION |
-| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | PENDIENTE |
+| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | EN_REVISION |
 | T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | PENDIENTE |
 | T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | PENDIENTE |
 

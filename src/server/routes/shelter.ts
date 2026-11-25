@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { deletePhoto, getPhotos, postPhoto, putPhotoOrder, receivePhoto } from "../controllers/pet-photos.js";
 import { getPet, getPets, postPet, putPet } from "../controllers/shelter-pets.js";
-import { getInbox, postConfirmVisit, postRejectVisit, postShelterCancelVisit } from "../controllers/visits.js";
+import { getInbox, postConfirmVisit, postNoShow, postRejectVisit, postShelterCancelVisit } from "../controllers/visits.js";
 import { deleteSlotHandler, getSlots, postRecurringSlots, postSlot, putSlot } from "../controllers/visit-slots.js";
 import { requireRole } from "../middlewares/session.js";
 
@@ -30,6 +30,7 @@ export function createShelterRouter(): Router {
   router.post("/visits/:id/confirm", postConfirmVisit);
   router.post("/visits/:id/reject", postRejectVisit);
   router.post("/visits/:id/cancel", postShelterCancelVisit);
+  router.post("/visits/:id/no-show", postNoShow);
 
   return router;
 }

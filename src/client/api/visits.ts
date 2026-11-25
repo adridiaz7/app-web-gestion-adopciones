@@ -32,3 +32,6 @@ export const listMyVisits = () => apiRequest<AdopterVisitsResponse>("GET", "/ado
 
 /** CU-22: the shelter's inbox. */
 export const getInbox = () => apiRequest<ShelterInboxResponse>("GET", "/shelter/inbox");
+
+/** CU-26: the adopter did not come to a confirmed visit. */
+export const registerNoShow = (id: number) => apiRequest<VisitStatusResponse>("POST", `/shelter/visits/${String(id)}/no-show`);

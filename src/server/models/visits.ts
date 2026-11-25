@@ -146,6 +146,7 @@ export interface VisitForChange {
   createdAt: Date;
   petName: string;
   startsAt: Date;
+  endsAt: Date;
 }
 
 /** The visit of that adopter or shelter (`owner`), locked, or null if it is not theirs. */
@@ -153,7 +154,7 @@ export async function lockVisit(db: Db, visitId: number, owner: { adopterId: num
   const [column, ownerId] = "adopterId" in owner ? ["adopter_id", owner.adopterId] : ["shelter_id", owner.shelterId];
   const { rows } = await db.query<VisitForChange>(
     `SELECT v.id, v.adopter_id AS "adopterId", v.shelter_id AS "shelterId", v.status, v.created_at AS "createdAt",
-            p.name AS "petName", vs.starts_at AS "startsAt"
+            p.name AS "petName", vs.starts_at AS "startsAt", vs.ends_at AS "endsAt"
        FROM "Visit" v
        JOIN "Pet" p ON p.id = v.pet_id
        JOIN "Visit_slot" vs ON vs.id = v.slot_id
@@ -284,4 +285,72 @@ export async function selectUpcomingVisits(db: Db, shelterId: number): Promise<I
     [shelterId],
   );
   return rows;
+}
+
+/** A visit whose status the system or a cascade has just changed. */
+export interface ChangedVisit {
+  id: number;
+  adopterId: number;
+  petName: string;
+  startsAt: Date;
+  previousStatus: VisitStatus;
+}
+
+/** CU-45, RN-95: PENDING requests not answered within the deadline become EXPIRED. */
+export async function expirePendingVisits(db: Db, deadlineHours: number): Promise<ChangedVisit[]> {
+  const { rows } = await db.query<ChangedVisit>(
+    `WITH due AS (
+       SELECT id, status FROM "Visit"
+        WHERE status = 'PENDING' AND created_at + make_interval(hours => $1) <= now()
+          FOR UPDATE SKIP LOCKED
+     )
+     UPDATE "Visit" v SET status = 'EXPIRED'
+       FROM due, "Pet" p, "Visit_slot" vs
+      WHERE v.id = due.id AND p.id = v.pet_id AND vs.id = v.slot_id
+     RETURNING v.id, v.adopter_id AS "adopterId", p.name AS "petName", vs.starts_at AS "startsAt", due.status AS "previousStatus"`,
+    [deadlineHours],
+  );
+  return rows.sort((a, b) => a.id - b.id);
+}
+
+/** CU-46, RN-106, RN-107: CONFIRMED visits that ended `hours` ago or more become COMPLETED, marked by the system. */
+export async function completeConfirmedVisits(db: Db, hours: number): Promise<ChangedVisit[]> {
+  const { rows } = await db.query<ChangedVisit>(
+    `WITH due AS (
+       SELECT v.id, v.status FROM "Visit" v JOIN "Visit_slot" vs ON vs.id = v.slot_id
+        WHERE v.status = 'CONFIRMED' AND vs.ends_at + make_interval(hours => $1) <= now()
+          FOR UPDATE OF v SKIP LOCKED
+     )
+     UPDATE "Visit" v SET status = 'COMPLETED', attendance_marked_by = 'SYSTEM', attendance_marked_at = now()
+       FROM due, "Pet" p, "Visit_slot" vs
+      WHERE v.id = due.id AND p.id = v.pet_id AND vs.id = v.slot_id
+     RETURNING v.id, v.adopter_id AS "adopterId", p.name AS "petName", vs.starts_at AS "startsAt", due.status AS "previousStatus"`,
+    [hours],
+  );
+  return rows.sort((a, b) => a.id - b.id);
+}
+
+/** CU-26, RN-104, RN-107: the shelter marks the no-show. */
+export async function markVisitNoShow(db: Db, visitId: number): Promise<void> {
+  await db.query(
+    `UPDATE "Visit" SET status = 'NO_SHOW', attendance_marked_by = 'SHELTER', attendance_marked_at = now() WHERE id = $1`,
+    [visitId],
+  );
+}
+
+/** RN-103, RN-109: the adopter's open (PENDING or CONFIRMED) visits at the shelter become VOIDED with that reason. */
+export async function voidOpenVisits(db: Db, adopterId: number, shelterId: number, reason: "NO_SHOW"): Promise<ChangedVisit[]> {
+  const { rows } = await db.query<ChangedVisit>(
+    `WITH open AS (
+       SELECT id, status FROM "Visit"
+        WHERE adopter_id = $1 AND shelter_id = $2 AND status IN ('PENDING', 'CONFIRMED')
+          FOR UPDATE
+     )
+     UPDATE "Visit" v SET status = 'VOIDED', void_reason = $3, voided_at = now()
+       FROM open, "Pet" p, "Visit_slot" vs
+      WHERE v.id = open.id AND p.id = v.pet_id AND vs.id = v.slot_id
+     RETURNING v.id, v.adopter_id AS "adopterId", p.name AS "petName", vs.starts_at AS "startsAt", open.status AS "previousStatus"`,
+    [adopterId, shelterId, reason],
+  );
+  return rows.sort((a, b) => a.id - b.id);
 }
