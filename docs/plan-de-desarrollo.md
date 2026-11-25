@@ -78,6 +78,8 @@ Las reglas de `CLAUDE.md` se aplican igual en modo autónomo. En las ejecuciones
 |---|---|---|
 | **Subida de archivos.** ¿Se añade la librería `multer` al stack y se guardan las fotos en `uploads/`, fuera de git? | T-13 (fotos de mascotas), la parte de fotos de T-29 (chat) y las fotos de T-42 (seed de la demo) | **Decidido (24/11/2026): sí, multer.** Fotos en `uploads/`, fuera de git, con nombre aleatorio; solo imágenes (comprobando el contenido, no solo la extensión) y tamaño máximo limitado. En la base de datos se guarda solo la ruta (RN-52). Express sirve `/uploads` como archivos estáticos. |
 | **Preguntas del cuestionario de adopción** (RN-207). | T-30 | **Decidido (25/11/2026):** el formulario muestra los datos del hogar del perfil ya rellenados; siguen siendo obligatorios (RN-117) y se pueden corregir allí mismo. Además hay dos preguntas opcionales (motivo y gastos). Se añade `RENT_TO_OWN` a `housing_tenure`. Ver RN-27 y RN-207. |
+| **Filtros de la galería:** ¿en una línea compacta (maqueta 02) o en un panel lateral con casillas, como en una tienda, que en el móvil se abre con un botón "Filtros"? | T-47, punto 4 | Pendiente del responsable. Mientras tanto, T-47 sigue la maqueta 02. |
+| **Inicio del adoptante** (qué ve nada más iniciar sesión). Propuesta: avisos de lo que le falta (preferencias, datos del hogar), lo que tiene en marcha (próxima visita, solicitudes abiertas, favoritos que han cambiado de estado) y de 4 a 6 mascotas compatibles con un botón a Descubrir. | Nueva tarea cuando se decida | Pendiente del responsable. No se toca la pantalla de inicio actual. |
 
 Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el desarrollador desbloqueará las tareas en su siguiente ejecución.
 
@@ -177,7 +179,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | EN_REVISION |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | EN_REVISION |
 | T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | EN_REVISION |
-| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | BLOQUEADA |
+| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. Si hay logos en `db/seed-photos/logos/`, se asignan a las protectoras (`logo_path`). **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | BLOQUEADA |
 | T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | EN_REVISION |
 
 ### Fase 3 · Descubrir y favoritos
@@ -205,7 +207,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. | CU-34; RN-140–144 | T-23 | PENDIENTE |
+| T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | PENDIENTE |
 | T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | PENDIENTE |
 
 ### Fase 6 · Adopción
@@ -228,7 +230,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-36 | Editar el perfil (datos personales y del hogar, o datos públicos de la protectora). | CU-06; RN-25, 27 | T-07 | PENDIENTE |
+| T-36 | Editar el perfil (datos personales y del hogar, o datos públicos de la protectora, **logo incluido**, subido con multer como las fotos de T-13). Se entra desde una **tarjeta arriba de la barra lateral**, "Hola, {nombre} · Ver mi perfil" (el nombre de la protectora en su caso), como en las maquetas de `docs/ux-ui/app-adoptante`. | CU-06; RN-25, 27 | T-07 | PENDIENTE |
 | T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | PENDIENTE |
 | T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | PENDIENTE |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | PENDIENTE |
@@ -239,6 +241,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
+| T-47 | **Repaso visual según las maquetas** (indicaciones del responsable del 25/11/2026). Para estas pantallas, las maquetas de `docs/ux-ui/app-adoptante` **dejan de ser solo orientativas**: se siguen fielmente, salvo lo que diga esta tarea. Solo front, sin cambios en reglas ni API. Incluye: **(1) Explorar como una sola sección** con **tabs** Mascotas / Protectoras debajo del título, la activa subrayada en naranja; nada de botones. **(2) Interruptor flotante fijo** abajo en el centro, "Descubrir \| Buscador", para pasar del modo descubrir a la galería sin salir de Explorar. Es un rasgo distintivo de la app. **(3) Modo descubrir como la maqueta `01-explorar-modo-descubrir`:** foto grande, información superpuesta con la protectora encima del nombre y botón "Ver ficha"; botones ✕ y ♥ a los lados con su texto; pista "Arrastra la tarjeta"; al soltar, la tarjeta sale hacia el lado elegido. **(4) Filtros de la galería** compactos, en una sola línea y con menos espacio entre chips, como la maqueta `02-explorar-buscador`, salvo que la sección 3 diga otra cosa. **(5) Iconos SVG propios** junto a cada entrada de la barra lateral, para el adoptante y la protectora: brújula para Explorar, corazón para Favoritos, calendario para Visitas, etc. Con los colores del sistema de diseño y sin emojis. **(6) Logo de la protectora** en pequeño junto a su nombre en la ficha de la mascota, o sus iniciales en un círculo si no tiene logo. | Maquetas `docs/ux-ui/app-adoptante`; `docs/ux-ui/design-system.md` | T-41 | PENDIENTE |
 | T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | PENDIENTE |
 
 ### Para el final, si da tiempo
