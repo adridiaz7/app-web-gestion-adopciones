@@ -93,7 +93,7 @@
 
 **Actor:** Adoptante, Protectora, Administrador
 
-**Objetivo:** Establecer una contraseña nueva mediante un enlace enviado al email de la cuenta, cuando el usuario la ha olvidado.
+**Objetivo:** Establecer una contraseña nueva mediante un enlace enviado al email de la cuenta, cuando el usuario la ha olvidado. Al hacerlo, se cierran todas las sesiones abiertas de la cuenta (RN-211).
 
 **Excepciones:**
 - El email no corresponde a ninguna cuenta (o la cuenta está suspendida). Una cuenta sin verificar sí recibe el enlace, y al usarlo queda verificada (RN-183).
@@ -609,9 +609,11 @@ Se registra quién cancela y el motivo. Si la adopción estaba aprobada, la masc
 **Objetivo:**
 - **Validar o rechazar** una protectora recién registrada, tras comprobar su CIF. Una vez validada, sus mascotas pasan a ser visibles.
 - **Revocar** la validación de una protectora que ya no cumple los requisitos. Sus mascotas dejan de ser visibles; sus visitas y adopciones en curso se mantienen.
+- **Volver a validar** una protectora rechazada o con la validación revocada, cuando ya cumple los requisitos. Sus mascotas vuelven a ser visibles (RN-212).
 
 **Excepciones:**
-- Validar o rechazar: la protectora no está pendiente de validación.
+- Validar: la protectora ya está validada.
+- Rechazar: la protectora no está pendiente de validación.
 - Revocar: la protectora no está validada.
 - Se rechaza o se revoca sin indicar el motivo.
 

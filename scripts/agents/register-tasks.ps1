@@ -23,12 +23,19 @@ if ($Remove) {
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $ps = (Get-Command powershell.exe).Source
+$conhost = Join-Path $env:SystemRoot 'System32\conhost.exe'
 
+# Runs without any visible window, so it cannot be closed by mistake (closing the console
+# window kills the agent). "conhost --headless" gives the script a console with no window;
+# if it is not available, fall back to a hidden PowerShell window.
 function New-AgentAction([string]$script) {
     $file = Join-Path $PSScriptRoot $script
-    return New-ScheduledTaskAction -Execute $ps `
-        -Argument ('-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "{0}"' -f $file) `
-        -WorkingDirectory $repoRoot
+    $psArgs = '-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File "{0}"' -f $file
+    if (Test-Path $conhost) {
+        return New-ScheduledTaskAction -Execute $conhost -Argument ('--headless "{0}" {1}' -f $ps, $psArgs) `
+            -WorkingDirectory $repoRoot
+    }
+    return New-ScheduledTaskAction -Execute $ps -Argument $psArgs -WorkingDirectory $repoRoot
 }
 
 # Never start a second copy while one is running; kill a run that exceeds 3 h;
