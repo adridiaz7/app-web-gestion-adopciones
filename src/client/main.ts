@@ -19,6 +19,7 @@ import { renderVisits } from "./views/visits.js";
 import { renderNotifications } from "./views/notifications.js";
 import { renderMessages } from "./views/messages.js";
 import { renderAdoptionRequest } from "./views/adoption-request.js";
+import { renderShelterCandidates } from "./views/shelter-candidates.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
 
 const routes: Route[] = [
@@ -44,6 +45,7 @@ const routes: Route[] = [
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },
   { path: "/protectora/mascotas/:id", render: renderPetForm },
+  { path: "/protectora/mascotas/:id/candidatos", render: renderShelterCandidates },
   { path: "/protectora/turnos", render: renderShelterSlots },
   { path: "/protectora/solicitudes", render: renderShelterInbox },
   { path: "/visitas", render: renderVisits },

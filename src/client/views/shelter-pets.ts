@@ -267,6 +267,8 @@ export async function renderPetForm(root: HTMLElement, params: RouteParams): Pro
     body = pet
       ? [
           h("p", { class: "muted" }, `Estado: ${statusText(pet)} · Alta: ${new Date(pet.createdAt).toLocaleDateString("es-ES")}`),
+          // CU-28: compare the candidates and decide.
+          h("a", { class: "button button--secondary", href: `/protectora/mascotas/${String(pet.id)}/candidatos` }, "Ver solicitudes de adopción"),
           petStatusSection(pet, () => void renderPetForm(root, params)),
           petPhotosSection(pet.id),
           form,
