@@ -96,9 +96,8 @@ describe("T-11 CU-39 POST /api/admin/shelters/:id/validate", () => {
 
   it("CU-39: rejects validating a shelter that is not pending", async () => {
     const validated = await createShelter({ validationStatus: "VALIDATED" });
-    const rejected = await createShelter({ validationStatus: "REJECTED" });
 
-    for (const shelter of [validated, rejected]) {
+    for (const shelter of [validated]) {
       const res = await post(`${base(shelter.id)}/validate`, adminCookie);
       expect(res.status).toBe(409);
       expect(res.body).toEqual({ error: "La protectora no está pendiente de validación." });

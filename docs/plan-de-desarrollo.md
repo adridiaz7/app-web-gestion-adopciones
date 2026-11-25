@@ -155,7 +155,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | EN_REVISION |
-| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos para `REJECTED` → `VALIDATED`. El responsable autoriza un único cambio en T-11: quitar `rejected` del bucle de `"CU-39: rejects validating a shelter that is not pending"` (`tests/integration/admin-shelters.test.ts`). Ningún otro test de T-11 se toca. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | PENDIENTE |
+| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos para `REJECTED` → `VALIDATED`. El responsable autoriza un único cambio en T-11: quitar `rejected` del bucle de `"CU-39: rejects validating a shelter that is not pending"` (`tests/integration/admin-shelters.test.ts`). Ningún otro test de T-11 se toca. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | EN_REVISION |
 | T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_REVISION |
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | EN_REVISION |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | EN_REVISION |

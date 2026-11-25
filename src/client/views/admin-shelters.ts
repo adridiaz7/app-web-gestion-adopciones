@@ -42,21 +42,27 @@ function reasonForm(label: string, buttonLabel: string, send: (reason: string) =
   return form;
 }
 
+/** Button that validates the shelter (CU-39; T-45: also a rejected or revoked one). */
+function validateButton(shelter: AdminShelter, label: string, actions: HTMLElement, reload: () => void): HTMLButtonElement {
+  const validate = h("button", { type: "button", class: "button button--primary button--small" }, label);
+  validate.addEventListener("click", () => {
+    validate.disabled = true;
+    validateShelter(shelter.id)
+      .then(reload)
+      .catch((error: unknown) => {
+        validate.disabled = false;
+        actions.append(notice("error", error instanceof ApiError ? error.message : "No se ha podido validar."));
+      });
+  });
+  return validate;
+}
+
 function shelterCard(shelter: AdminShelter, reload: () => void): HTMLElement {
   const actions = h("div", { class: "shelter-card__actions" });
 
   if (shelter.validationStatus === "PENDING") {
-    const validate = h("button", { type: "button", class: "button button--primary button--small" }, "Validar");
+    const validate = validateButton(shelter, "Validar", actions, reload);
     const reject = h("button", { type: "button", class: "button button--secondary button--small" }, "Rechazar…");
-    validate.addEventListener("click", () => {
-      validate.disabled = true;
-      validateShelter(shelter.id)
-        .then(reload)
-        .catch((error: unknown) => {
-          validate.disabled = false;
-          actions.append(notice("error", error instanceof ApiError ? error.message : "No se ha podido validar."));
-        });
-    });
     reject.addEventListener("click", () => {
       actions.replaceChildren(reasonForm("Motivo del rechazo", "Rechazar protectora", (reason) => rejectShelter(shelter.id, reason), reload));
     });
@@ -69,6 +75,8 @@ function shelterCard(shelter: AdminShelter, reload: () => void): HTMLElement {
       );
     });
     actions.append(revoke);
+  } else {
+    actions.append(validateButton(shelter, "Volver a validar", actions, reload));
   }
 
   return h(
@@ -95,7 +103,7 @@ function shelterCard(shelter: AdminShelter, reload: () => void): HTMLElement {
   );
 }
 
-/** CU-39 · /admin/protectoras: validate, reject and revoke shelters. */
+/** CU-39 · /admin/protectoras: validate (also again, T-45), reject and revoke shelters. */
 export async function renderAdminShelters(root: HTMLElement): Promise<void> {
   const user = await currentUser();
   if (!user) {
