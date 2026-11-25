@@ -13,7 +13,9 @@ import { renderDiscover } from "./views/discover.js";
 import { renderFavorites } from "./views/favorites.js";
 import { renderShelterProfile, renderShelterSearch } from "./views/shelters.js";
 import { renderMyPets, renderPetForm } from "./views/shelter-pets.js";
+import { renderShelterInbox } from "./views/shelter-inbox.js";
 import { renderShelterSlots } from "./views/shelter-slots.js";
+import { renderVisits } from "./views/visits.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
 
 const routes: Route[] = [
@@ -39,6 +41,8 @@ const routes: Route[] = [
   { path: "/protectora/mascotas/nueva", render: renderPetForm },
   { path: "/protectora/mascotas/:id", render: renderPetForm },
   { path: "/protectora/turnos", render: renderShelterSlots },
+  { path: "/protectora/solicitudes", render: renderShelterInbox },
+  { path: "/visitas", render: renderVisits },
 ];
 
 const root = document.getElementById("app");

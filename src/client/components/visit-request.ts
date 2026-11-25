@@ -61,7 +61,7 @@ export function visitRequestButton(pet: PetProfile): HTMLElement {
   const showSlots = (slots: AvailableSlot[]): void => {
     if (slots.length === 0) {
       body.replaceChildren(
-        notice("info", "No hay franjas disponibles", "La protectora no tiene turnos libres con al menos 48 horas de antelación. Vuelve a mirarlo más adelante."),
+        notice("info", "No hay franjas disponibles", "La protectora no tiene turnos libres con la antelación mínima. Vuelve a mirarlo más adelante."),
         h("div", { class: "dialog__actions" }, close),
       );
       return;
@@ -72,7 +72,7 @@ export function visitRequestButton(pet: PetProfile): HTMLElement {
       "form",
       { class: "visit-request__form" },
       slotChoices(slots),
-      notice("info", "Solo aparecen turnos con al menos 48 h de antelación.", "La protectora tiene 24 h para responder; si no lo hace, la solicitud caduca."),
+      notice("info", "Solo aparecen los turnos con la antelación mínima y plazas libres.", "La protectora tiene un plazo para responder; si no lo hace, la solicitud caduca."),
       message,
       h("div", { class: "dialog__actions" }, close, send),
     );

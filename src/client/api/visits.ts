@@ -1,4 +1,12 @@
-import type { AvailableSlotsResponse, RejectVisitRequest, VisitRequest, VisitRequestResponse, VisitStatusResponse } from "../../shared/api.js";
+import type {
+  AdopterVisitsResponse,
+  AvailableSlotsResponse,
+  RejectVisitRequest,
+  ShelterInboxResponse,
+  VisitRequest,
+  VisitRequestResponse,
+  VisitStatusResponse,
+} from "../../shared/api.js";
 import { apiRequest } from "./client.js";
 
 /** RN-194: the slots the adopter can choose for a pet. */
@@ -18,3 +26,9 @@ export const cancelVisitAsShelter = (id: number) => apiRequest<VisitStatusRespon
 
 /** CU-25, RN-97: the adopter cancels with 24 h or more left. */
 export const cancelVisit = (id: number) => apiRequest<VisitStatusResponse>("POST", `/adopter/visits/${String(id)}/cancel`);
+
+/** CU-21: the adopter's visits and quotas. */
+export const listMyVisits = () => apiRequest<AdopterVisitsResponse>("GET", "/adopter/visits");
+
+/** CU-22: the shelter's inbox. */
+export const getInbox = () => apiRequest<ShelterInboxResponse>("GET", "/shelter/inbox");

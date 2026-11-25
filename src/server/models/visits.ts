@@ -177,3 +177,111 @@ export async function markVisitRejected(db: Db, visitId: number, reason: string 
 export async function markVisitCancelled(db: Db, visitId: number, cancelledBy: "ADOPTER" | "SHELTER"): Promise<void> {
   await db.query(`UPDATE "Visit" SET status = 'CANCELLED', cancelled_by = $2, cancelled_at = now() WHERE id = $1`, [visitId, cancelledBy]);
 }
+
+/** CU-21: a visit as the adopter sees it in their list. */
+export interface AdopterVisit {
+  id: number;
+  status: VisitStatus;
+  petId: number;
+  petName: string;
+  photoUrl: string | null;
+  shelterId: number;
+  shelterName: string;
+  startsAt: Date;
+  endsAt: Date;
+  rejectionReason: string | null;
+  cancelledBy: "ADOPTER" | "SHELTER" | null;
+  voidReason: string | null;
+}
+
+/** CU-21: all the adopter's visits, by slot time. */
+export async function selectAdopterVisits(db: Db, adopterId: number): Promise<AdopterVisit[]> {
+  const { rows } = await db.query<AdopterVisit>(
+    `SELECT v.id, v.status, v.pet_id AS "petId", p.name AS "petName",
+            (SELECT ph.path FROM "Pet_photo" ph WHERE ph.pet_id = p.id ORDER BY ph.position LIMIT 1) AS "photoUrl",
+            v.shelter_id AS "shelterId", s.name AS "shelterName", vs.starts_at AS "startsAt", vs.ends_at AS "endsAt",
+            v.rejection_reason AS "rejectionReason", v.cancelled_by AS "cancelledBy", v.void_reason AS "voidReason"
+       FROM "Visit" v
+       JOIN "Pet"        p  ON p.id = v.pet_id
+       JOIN "Visit_slot" vs ON vs.id = v.slot_id
+       JOIN "Shelter"    s  ON s.user_id = v.shelter_id
+      WHERE v.adopter_id = $1
+      ORDER BY vs.starts_at, v.id`,
+    [adopterId],
+  );
+  return rows;
+}
+
+/** CU-21, RN-89 to RN-91: the quota at each shelter where the adopter has visits. */
+export interface ShelterQuotaRow {
+  shelterId: number;
+  shelterName: string;
+  /** When each visit that still counts stops counting, soonest first. */
+  countsUntil: Date[];
+  noShow: boolean;
+}
+
+export async function selectAdopterQuotas(db: Db, adopterId: number, windowMonths: number): Promise<ShelterQuotaRow[]> {
+  const { rows } = await db.query<{ shelterId: number; shelterName: string; countsUntil: string[]; noShow: boolean }>(
+    `SELECT v.shelter_id AS "shelterId", s.name AS "shelterName",
+            coalesce(array_agg(vs.starts_at + make_interval(months => $2) ORDER BY vs.starts_at)
+                       FILTER (WHERE v.status IN ('CONFIRMED', 'COMPLETED')
+                                 AND vs.starts_at > now() - make_interval(months => $2)), '{}') AS "countsUntil",
+            bool_or(v.status = 'NO_SHOW') AS "noShow"
+       FROM "Visit" v
+       JOIN "Visit_slot" vs ON vs.id = v.slot_id
+       JOIN "Shelter"    s  ON s.user_id = v.shelter_id
+      WHERE v.adopter_id = $1
+      GROUP BY v.shelter_id, s.name
+      ORDER BY s.name, v.shelter_id`,
+    [adopterId, windowMonths],
+  );
+  return rows.map((row) => ({ ...row, countsUntil: row.countsUntil.map((value) => new Date(value)) }));
+}
+
+/** CU-22: a visit in the shelter's inbox. */
+export interface InboxVisit {
+  id: number;
+  status: VisitStatus;
+  petId: number;
+  petName: string;
+  adopterId: number;
+  adopterName: string;
+  startsAt: Date;
+  endsAt: Date;
+  /** RN-94: only for pending requests. */
+  respondBy: Date | null;
+}
+
+const INBOX_COLUMNS = `
+  v.id, v.status, v.pet_id AS "petId", p.name AS "petName", v.adopter_id AS "adopterId",
+  a.first_name || ' ' || a.last_name AS "adopterName", vs.starts_at AS "startsAt", vs.ends_at AS "endsAt"`;
+const INBOX_FROM = `
+  FROM "Visit" v
+  JOIN "Pet"        p  ON p.id = v.pet_id
+  JOIN "Visit_slot" vs ON vs.id = v.slot_id
+  JOIN "Adopter"    a  ON a.user_id = v.adopter_id`;
+
+/** CU-22, RN-94: pending requests that can still be answered, the oldest request first. */
+export async function selectPendingRequests(db: Db, shelterId: number, deadlineHours: number): Promise<InboxVisit[]> {
+  const { rows } = await db.query<InboxVisit>(
+    `SELECT ${INBOX_COLUMNS}, v.created_at + make_interval(hours => $2) AS "respondBy"
+       ${INBOX_FROM}
+      WHERE v.shelter_id = $1 AND v.status = 'PENDING' AND v.created_at + make_interval(hours => $2) > now()
+      ORDER BY v.created_at, v.id`,
+    [shelterId, deadlineHours],
+  );
+  return rows;
+}
+
+/** CU-22: confirmed visits that have not started yet, soonest first. */
+export async function selectUpcomingVisits(db: Db, shelterId: number): Promise<InboxVisit[]> {
+  const { rows } = await db.query<InboxVisit>(
+    `SELECT ${INBOX_COLUMNS}, NULL::timestamptz AS "respondBy"
+       ${INBOX_FROM}
+      WHERE v.shelter_id = $1 AND v.status = 'CONFIRMED' AND vs.starts_at > now()
+      ORDER BY vs.starts_at, v.id`,
+    [shelterId],
+  );
+  return rows;
+}

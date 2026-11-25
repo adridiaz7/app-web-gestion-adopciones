@@ -15,10 +15,16 @@ import {
   markVisitConfirmed,
   markVisitRejected,
   petHasActiveVisit,
+  selectAdopterQuotas,
+  selectAdopterVisits,
   selectAvailableSlots,
+  selectPendingRequests,
   selectQuotaVisitEnds,
   selectRequestedVisit,
+  selectUpcomingVisits,
+  type AdopterVisit,
   type AvailableSlot,
+  type InboxVisit,
   type RequestedVisit,
   type VisitForChange,
   type VisitStatus,
@@ -26,7 +32,7 @@ import {
 import { audit } from "./audit.js";
 import { createNotification } from "./notifications.js";
 
-export type { AvailableSlot, RequestedVisit };
+export type { AdopterVisit, AvailableSlot, InboxVisit, RequestedVisit };
 
 const PET_NOT_AVAILABLE = "Esta mascota no está disponible.";
 const HOUR = 60 * 60 * 1000;
@@ -214,4 +220,58 @@ export async function cancelVisitByShelter(shelterId: number, visitId: number): 
     });
     return { status: "CANCELLED", cancelledBy: "SHELTER" };
   });
+}
+
+/** CU-21, RN-89 to RN-91, RN-93: the quota at a shelter. */
+export interface ShelterQuota {
+  shelterId: number;
+  shelterName: string;
+  used: number;
+  limit: number;
+  /** RN-90: months of the moving window. */
+  windowMonths: number;
+  /** When the soonest place frees up, or null if no visit counts. */
+  nextPlaceAt: Date | null;
+  /** RN-89: a no-show there: no more visits at that shelter. */
+  noShow: boolean;
+}
+
+/** CU-21: a visit of the adopter's list; RN-97, RN-98: whether they can still cancel it. */
+export interface AdopterVisitItem extends AdopterVisit {
+  canCancel: boolean;
+}
+
+/** CU-21: the adopter's visits and their quota at each shelter. */
+export async function listAdopterVisits(adopterId: number): Promise<{ visits: AdopterVisitItem[]; quotas: ShelterQuota[] }> {
+  const pool = getPool();
+  const rules = getConfig().rules;
+  const [visits, quotaRows] = await Promise.all([
+    selectAdopterVisits(pool, adopterId),
+    selectAdopterQuotas(pool, adopterId, rules.visitQuotaWindowMonths),
+  ]);
+  const quotas = quotaRows.map((row) => ({
+    shelterId: row.shelterId,
+    shelterName: row.shelterName,
+    used: row.countsUntil.length,
+    limit: rules.visitQuotaPerShelter,
+    windowMonths: rules.visitQuotaWindowMonths,
+    nextPlaceAt: row.countsUntil[0] ?? null,
+    noShow: row.noShow,
+  }));
+  const cancelLimit = Date.now() + rules.visitCancelMinNoticeHours * HOUR;
+  const items = visits.map((visit) => ({
+    ...visit,
+    canCancel: (visit.status === "PENDING" || visit.status === "CONFIRMED") && visit.startsAt.getTime() >= cancelLimit,
+  }));
+  return { visits: items, quotas };
+}
+
+/** CU-22: the shelter's pending requests (RN-94: still within the deadline) and upcoming confirmed visits. */
+export async function getShelterInbox(shelterId: number): Promise<{ pending: InboxVisit[]; upcoming: InboxVisit[] }> {
+  const pool = getPool();
+  const [pending, upcoming] = await Promise.all([
+    selectPendingRequests(pool, shelterId, getConfig().rules.visitResponseDeadlineHours),
+    selectUpcomingVisits(pool, shelterId),
+  ]);
+  return { pending, upcoming };
 }

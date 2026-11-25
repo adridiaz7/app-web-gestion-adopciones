@@ -857,6 +857,75 @@ textarea {
   gap: var(--space-2);
 }
 
+/* Visits of the adopter (CU-21) and inbox of the shelter (CU-22) */
+.quota-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.quota-card__bars {
+  display: flex;
+  gap: var(--space-1);
+  margin: var(--space-2) 0;
+}
+
+.quota-card__bar {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-alt);
+}
+
+.quota-card__bar--used {
+  background: var(--color-primary);
+}
+
+.visit-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.visit-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 2fr) minmax(0, 1fr) auto minmax(0, 2fr);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.visit-row--inbox {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.visit-row__photo {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.visit-row__photo--empty {
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-alt);
+}
+
+.visit-row__side {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.badge--visit-confirmed,
+.badge--visit-completed {
+  background: var(--color-primary-soft);
+}
+
 /* Visit request (CU-23) */
 .visit-request {
   max-width: 520px;

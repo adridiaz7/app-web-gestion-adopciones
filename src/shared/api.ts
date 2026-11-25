@@ -432,6 +432,69 @@ export interface VisitStatusResponse {
   visit: { id: number; status: string };
 }
 
+export type VisitStatus = "PENDING" | "CONFIRMED" | "REJECTED" | "CANCELLED" | "EXPIRED" | "VOIDED" | "COMPLETED" | "NO_SHOW";
+
+/** CU-21 · a visit in the adopter's list (ISO instants). */
+export interface AdopterVisit {
+  id: number;
+  status: VisitStatus;
+  petId: number;
+  petName: string;
+  photoUrl: string | null;
+  shelterId: number;
+  shelterName: string;
+  startsAt: string;
+  endsAt: string;
+  /** RN-96 */
+  rejectionReason: string | null;
+  /** RN-101 */
+  cancelledBy: "ADOPTER" | "SHELTER" | null;
+  /** RN-109 */
+  voidReason: string | null;
+  /** RN-97, RN-98: pending or confirmed, with enough notice left to cancel. */
+  canCancel: boolean;
+}
+
+/** CU-21, RN-89 to RN-93 · the adopter's quota at a shelter. */
+export interface ShelterQuota {
+  shelterId: number;
+  shelterName: string;
+  used: number;
+  limit: number;
+  /** RN-90: months of the moving window. */
+  windowMonths: number;
+  /** When the soonest place frees up (ISO), or null if no visit counts. */
+  nextPlaceAt: string | null;
+  /** RN-89: a no-show there; no more visits at that shelter. */
+  noShow: boolean;
+}
+
+/** CU-21 · GET /api/adopter/visits */
+export interface AdopterVisitsResponse {
+  visits: AdopterVisit[];
+  quotas: ShelterQuota[];
+}
+
+/** CU-22 · a visit in the shelter's inbox (ISO instants). */
+export interface InboxVisit {
+  id: number;
+  status: VisitStatus;
+  petId: number;
+  petName: string;
+  adopterId: number;
+  adopterName: string;
+  startsAt: string;
+  endsAt: string;
+  /** RN-94: deadline to answer a pending request; null for confirmed visits. */
+  respondBy: string | null;
+}
+
+/** CU-22 · GET /api/shelter/inbox */
+export interface ShelterInboxResponse {
+  pending: InboxVisit[];
+  upcoming: InboxVisit[];
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

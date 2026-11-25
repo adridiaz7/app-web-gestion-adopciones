@@ -1,14 +1,23 @@
 import type { Request, RequestHandler } from "express";
 import { z } from "zod";
-import type { AvailableSlotsResponse, VisitRequestResponse, VisitStatusResponse } from "../../shared/api.js";
+import type {
+  AdopterVisitsResponse,
+  AvailableSlotsResponse,
+  ShelterInboxResponse,
+  VisitRequestResponse,
+  VisitStatusResponse,
+} from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import {
   cancelVisitByAdopter,
   cancelVisitByShelter,
   confirmVisit,
+  getShelterInbox,
+  listAdopterVisits,
   listAvailableSlots,
   rejectVisit,
   requestVisit,
+  type InboxVisit,
   type VisitStatusResult,
 } from "../services/visits.js";
 
@@ -84,4 +93,28 @@ export const postShelterCancelVisit: RequestHandler = async (req, res) => {
 export const postAdopterCancelVisit: RequestHandler = async (req, res) => {
   const { id: visitId } = visitParamsSchema.parse(req.params);
   res.json(statusBody(await cancelVisitByAdopter(userId(req.user), visitId)));
+};
+
+/** CU-21 · GET /api/adopter/visits */
+export const getAdopterVisits: RequestHandler = async (req, res) => {
+  const { visits, quotas } = await listAdopterVisits(userId(req.user));
+  const body: AdopterVisitsResponse = {
+    visits: visits.map((visit) => ({ ...visit, startsAt: visit.startsAt.toISOString(), endsAt: visit.endsAt.toISOString() })),
+    quotas: quotas.map((quota) => ({ ...quota, nextPlaceAt: quota.nextPlaceAt?.toISOString() ?? null })),
+  };
+  res.json(body);
+};
+
+const inboxVisit = (visit: InboxVisit): ShelterInboxResponse["pending"][number] => ({
+  ...visit,
+  startsAt: visit.startsAt.toISOString(),
+  endsAt: visit.endsAt.toISOString(),
+  respondBy: visit.respondBy?.toISOString() ?? null,
+});
+
+/** CU-22 · GET /api/shelter/inbox */
+export const getInbox: RequestHandler = async (req, res) => {
+  const { pending, upcoming } = await getShelterInbox(userId(req.user));
+  const body: ShelterInboxResponse = { pending: pending.map(inboxVisit), upcoming: upcoming.map(inboxVisit) };
+  res.json(body);
 };
