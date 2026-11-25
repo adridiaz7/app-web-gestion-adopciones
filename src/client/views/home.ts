@@ -37,7 +37,7 @@ export function renderNotFound(root: HTMLElement): void {
   );
 }
 
-/** /: with a session, the logged-in area; without one, the login (the public gallery arrives in T-14). */
+/** /: with a session, the logged-in area; without one, the public gallery (RN-187). */
 export async function renderRoot(): Promise<void> {
-  navigate((await currentUser()) ? "/inicio" : "/iniciar-sesion", { replace: true });
+  navigate((await currentUser()) ? "/inicio" : "/mascotas", { replace: true });
 }

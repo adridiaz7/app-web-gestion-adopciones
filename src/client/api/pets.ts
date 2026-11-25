@@ -1,5 +1,6 @@
 import type {
   BreedsResponse,
+  GalleryResponse,
   PetDataRequest,
   PetPhotosResponse,
   PhotoOrderRequest,
@@ -9,6 +10,9 @@ import type {
 import { apiRequest } from "./client.js";
 
 export const getBreeds = () => apiRequest<BreedsResponse>("GET", "/breeds");
+
+/** CU-09: `query` comes from galleryQueryString ("" or "?…"). */
+export const getGallery = (query: string) => apiRequest<GalleryResponse>("GET", `/pets${query}`);
 
 export const listMyPets = () => apiRequest<ShelterPetsResponse>("GET", "/shelter/pets");
 

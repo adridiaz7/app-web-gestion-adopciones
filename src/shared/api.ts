@@ -184,6 +184,38 @@ export interface PhotoOrderRequest {
   photoIds: number[];
 }
 
+/** A gallery card (CU-09, RN-187). */
+export interface GalleryPet {
+  id: number;
+  name: string;
+  speciesName: string;
+  breedName: string;
+  /** YYYY-MM-DD; the age is shown from it (RN-205). */
+  birthDate: string;
+  sex: "MALE" | "FEMALE";
+  size: "SMALL" | "MEDIUM" | "LARGE";
+  /** The main photo (RN-51), or null without photos. */
+  photoUrl: string | null;
+  shelterName: string;
+  provinceName: string;
+}
+
+/** CU-09 · GET /api/pets, newest first. */
+export interface GalleryResponse {
+  pets: GalleryPet[];
+}
+
+/** CU-09 · query of GET /api/pets (RN-189, RN-205). All optional; ages in months. */
+export interface GalleryQuery {
+  speciesId?: number;
+  breedId?: number;
+  size?: "SMALL" | "MEDIUM" | "LARGE";
+  sex?: "MALE" | "FEMALE";
+  provinceId?: number;
+  minAgeMonths?: number;
+  maxAgeMonths?: number;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

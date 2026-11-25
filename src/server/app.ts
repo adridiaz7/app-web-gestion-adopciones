@@ -6,6 +6,7 @@ import type { HealthResponse } from "../shared/api.js";
 import { getConfig } from "./config.js";
 import { NotFoundError } from "./errors.js";
 import { getBreeds, getProvinces } from "./controllers/catalogues.js";
+import { getGallery } from "./controllers/gallery.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { loadSession } from "./middlewares/session.js";
 import { createAdminRouter } from "./routes/admin.js";
@@ -38,6 +39,7 @@ export function createApp(): express.Express {
   api.use("/auth", createAuthRouter());
   api.get("/provinces", getProvinces);
   api.get("/breeds", getBreeds);
+  api.get("/pets", getGallery);
   api.use("/admin", createAdminRouter());
   api.use("/shelter", createShelterRouter());
 

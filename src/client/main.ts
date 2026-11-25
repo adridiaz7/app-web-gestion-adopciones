@@ -2,6 +2,7 @@ import { startRouter, type Route } from "./router.js";
 import { renderAccountType } from "./views/account-type.js";
 import { renderAdminShelters } from "./views/admin-shelters.js";
 import { renderCheckEmail } from "./views/check-email.js";
+import { renderGallery } from "./views/gallery.js";
 import { renderHome, renderNotFound, renderRoot } from "./views/home.js";
 import { renderLogin } from "./views/login.js";
 import { renderForgotPassword, renderResetPassword } from "./views/password-recovery.js";
@@ -20,6 +21,7 @@ const routes: Route[] = [
   { path: "/recuperar-contrasena", render: renderForgotPassword },
   { path: "/restablecer-contrasena", render: renderResetPassword },
   { path: "/inicio", render: renderHome },
+  { path: "/mascotas", render: renderGallery },
   { path: "/admin/protectoras", render: renderAdminShelters },
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },
