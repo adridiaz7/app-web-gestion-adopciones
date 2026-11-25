@@ -77,3 +77,53 @@ export async function selectGalleryPets(db: Db, adopterId: number | null, filter
   );
   return rows;
 }
+
+/** The whole profile of a pet (CU-11). */
+export interface PetProfile {
+  id: number;
+  name: string;
+  description: string;
+  speciesName: string;
+  breedName: string;
+  /** YYYY-MM-DD; the age is shown from it (RN-205). */
+  birthDate: string;
+  sex: "MALE" | "FEMALE";
+  size: "SMALL" | "MEDIUM" | "LARGE";
+  activityLevel: "LOW" | "MEDIUM" | "HIGH";
+  goodWithChildren: "YES" | "NO" | "UNKNOWN";
+  /** RN-46: only the species with a record; any other is unknown. */
+  getsAlongWith: { speciesName: string; getsAlong: boolean }[];
+  vaccinated: boolean;
+  dewormed: boolean;
+  sterilized: boolean;
+  microchipped: boolean;
+  specialNeeds: string | null;
+  /** In order; the first is the main one (RN-51). */
+  photos: { id: number; url: string; position: number }[];
+  shelter: { id: number; name: string; locality: string; provinceName: string };
+}
+
+/** CU-11: a pet's profile, or null when it is not visible to this viewer (ERD §6). */
+export async function selectVisiblePet(db: Db, adopterId: number | null, petId: number): Promise<PetProfile | null> {
+  const { rows } = await db.query<PetProfile>(
+    `SELECT p.id, p.name, p.description, sc.name AS "speciesName", br.name AS "breedName",
+            to_char(p.birth_date, 'YYYY-MM-DD') AS "birthDate", p.sex, p.size,
+            p.activity_level AS "activityLevel", p.good_with_children AS "goodWithChildren",
+            coalesce((SELECT json_agg(json_build_object('speciesName', rs.name, 'getsAlong', r.gets_along) ORDER BY rs.name)
+                        FROM pet_species_rel r JOIN "Species" rs ON rs.id = r.species_id
+                       WHERE r.pet_id = p.id), '[]'::json) AS "getsAlongWith",
+            p.vaccinated, p.dewormed, p.sterilized, p.microchipped, p.special_needs AS "specialNeeds",
+            coalesce((SELECT json_agg(json_build_object('id', ph.id, 'url', ph.path, 'position', ph.position) ORDER BY ph.position)
+                        FROM "Pet_photo" ph WHERE ph.pet_id = p.id), '[]'::json) AS photos,
+            json_build_object('id', s.user_id, 'name', s.name, 'locality', s.locality, 'provinceName', pv.name) AS shelter
+       FROM "Pet" p
+       JOIN "Shelter"  s  ON s.user_id = p.shelter_id
+       JOIN "App_user" su ON su.id = s.user_id
+       JOIN "Breed"    br ON br.id = p.breed_id
+       JOIN "Species"  sc ON sc.id = br.species_id
+       JOIN "Province" pv ON pv.id = s.province_id
+      WHERE p.id = $2 AND ${visiblePetCondition("$1")}`,
+    [adopterId, petId],
+  );
+  return rows[0] ?? null;
+}

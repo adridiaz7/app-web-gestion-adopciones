@@ -216,6 +216,35 @@ export interface GalleryQuery {
   maxAgeMonths?: number;
 }
 
+/** CU-11 · GET /api/pets/:id: the whole profile of a visible pet. */
+export interface PetProfile {
+  id: number;
+  name: string;
+  description: string;
+  speciesName: string;
+  breedName: string;
+  /** YYYY-MM-DD; the age is shown from it (RN-205). */
+  birthDate: string;
+  sex: "MALE" | "FEMALE";
+  size: "SMALL" | "MEDIUM" | "LARGE";
+  activityLevel: "LOW" | "MEDIUM" | "HIGH";
+  goodWithChildren: "YES" | "NO" | "UNKNOWN";
+  /** RN-46: only the species with a record; any other is unknown. */
+  getsAlongWith: { speciesName: string; getsAlong: boolean }[];
+  vaccinated: boolean;
+  dewormed: boolean;
+  sterilized: boolean;
+  microchipped: boolean;
+  specialNeeds: string | null;
+  /** In order; the first is the main one (RN-51). */
+  photos: PetPhoto[];
+  shelter: { id: number; name: string; locality: string; provinceName: string };
+}
+
+export interface PetProfileResponse {
+  pet: PetProfile;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

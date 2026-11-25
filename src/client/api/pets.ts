@@ -1,6 +1,7 @@
 import type {
   BreedsResponse,
   GalleryResponse,
+  PetProfileResponse,
   PetDataRequest,
   PetPhotosResponse,
   PhotoOrderRequest,
@@ -13,6 +14,9 @@ export const getBreeds = () => apiRequest<BreedsResponse>("GET", "/breeds");
 
 /** CU-09: `query` comes from galleryQueryString ("" or "?…"). */
 export const getGallery = (query: string) => apiRequest<GalleryResponse>("GET", `/pets${query}`);
+
+/** CU-11: only with a session (RN-188). */
+export const getPetProfile = (id: number) => apiRequest<PetProfileResponse>("GET", `/pets/${String(id)}`);
 
 export const listMyPets = () => apiRequest<ShelterPetsResponse>("GET", "/shelter/pets");
 

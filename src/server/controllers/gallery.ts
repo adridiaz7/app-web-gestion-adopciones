@@ -1,7 +1,8 @@
 import type { RequestHandler } from "express";
 import { z } from "zod";
-import type { GalleryResponse } from "../../shared/api.js";
-import { listGalleryPets } from "../services/gallery.js";
+import type { GalleryResponse, PetProfileResponse } from "../../shared/api.js";
+import { UnauthorizedError } from "../errors.js";
+import { getPetProfile, listGalleryPets } from "../services/gallery.js";
 
 const INVALID = "El filtro no es válido.";
 
@@ -28,5 +29,22 @@ const filtersSchema = z
 export const getGallery: RequestHandler = async (req, res) => {
   const filters = filtersSchema.parse(req.query);
   const body: GalleryResponse = { pets: await listGalleryPets(req.user, filters) };
+  res.json(body);
+};
+
+const INVALID_PET = "La mascota no es válida.";
+const idParamsSchema = z.object({
+  id: z.coerce
+    .number({ error: INVALID_PET })
+    .int({ error: INVALID_PET })
+    .positive({ error: INVALID_PET })
+    .max(Number.MAX_SAFE_INTEGER, { error: INVALID_PET }),
+});
+
+/** CU-11 · GET /api/pets/:id: only with a session (RN-188). */
+export const getPetProfileHandler: RequestHandler = async (req, res) => {
+  if (!req.user) throw new UnauthorizedError();
+  const { id } = idParamsSchema.parse(req.params);
+  const body: PetProfileResponse = { pet: await getPetProfile(req.user, id) };
   res.json(body);
 };

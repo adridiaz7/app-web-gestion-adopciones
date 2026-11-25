@@ -57,6 +57,7 @@ function signUpDialog(): HTMLDialogElement {
   return dialog;
 }
 
+/** With a session the card opens the profile (CU-11); without one, `onOpen` invites to sign up (RN-187). */
 function petCard(pet: GalleryPet, onOpen: (() => void) | null): HTMLElement {
   const photo = pet.photoUrl
     ? h("img", { class: "pet-card__photo", src: pet.photoUrl, alt: `Foto de ${pet.name}`, loading: "lazy" })
@@ -69,7 +70,7 @@ function petCard(pet: GalleryPet, onOpen: (() => void) | null): HTMLElement {
     h("p", { class: "muted" }, `${ageLabel(pet.birthDate)} · ${SEX_LABELS[pet.sex]} · ${SIZE_LABELS[pet.size]}`),
     h("p", { class: "pet-card__place" }, `${pet.provinceName} · ${pet.shelterName}`),
   );
-  if (!onOpen) return h("article", { class: "card pet-card" }, photo, body);
+  if (!onOpen) return h("a", { class: "card pet-card pet-card--button", href: `/mascotas/${String(pet.id)}` }, photo, body);
 
   const card = h("button", { type: "button", class: "card pet-card pet-card--button", "aria-label": `Ver a ${pet.name}` }, photo, body);
   card.addEventListener("click", onOpen);
@@ -114,7 +115,7 @@ function galleryContent(catalogue: BreedsResponse, provinces: ProvincesResponse,
   const count = h("p", { class: "muted" }, "");
   const results = h("div", { class: "pet-grid" });
   const dialog = signUpDialog();
-  // RN-187: visitors get the invitation; the adopter's pet profile arrives with T-15.
+  // RN-187: visitors get the invitation; users with a session open the profile.
   const onOpen = user ? null : () => dialog.showModal();
 
   let request = 0;

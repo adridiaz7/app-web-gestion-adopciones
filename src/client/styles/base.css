@@ -856,3 +856,100 @@ textarea {
   justify-content: flex-end;
   gap: var(--space-2);
 }
+
+/* Pet profile (CU-11) */
+.pet-card--button {
+  text-decoration: none;
+}
+
+.profile {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr);
+  gap: var(--space-6);
+  align-items: start;
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .profile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile__main > .overline {
+  margin-top: var(--space-8);
+}
+
+.profile__description {
+  white-space: pre-line;
+}
+
+.profile-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-xl);
+}
+
+.profile-photo--empty {
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-alt);
+  font-size: 64px;
+}
+
+.profile-thumbs {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.profile-thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-xl);
+  background: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.profile-thumb[aria-pressed="true"] {
+  border-color: var(--color-primary-border);
+}
+
+.profile-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.facts__item {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.facts dt {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.profile__side {
+  position: sticky;
+  top: var(--space-6);
+}

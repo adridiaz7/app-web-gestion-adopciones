@@ -144,7 +144,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 | T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_REVISION |
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | EN_REVISION |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | EN_REVISION |
-| T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | PENDIENTE |
+| T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | EN_REVISION |
 | T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | PENDIENTE |
 
 ### Fase 3 · Descubrir y favoritos
