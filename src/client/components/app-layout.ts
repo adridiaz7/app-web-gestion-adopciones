@@ -2,6 +2,7 @@ import { logout, type SessionUser } from "../api/auth.js";
 import { h } from "../dom.js";
 import { navigate } from "../router.js";
 import { brand } from "./auth-layout.js";
+import { notificationBell } from "./notification-bell.js";
 
 const ROLE_LABELS: Record<SessionUser["role"], string> = {
   ADOPTER: "Adoptante",
@@ -52,6 +53,6 @@ export function appLayout(user: SessionUser, nav: NavItem[], content: Node[]): H
         logoutButton,
       ),
     ),
-    h("main", { class: "app-layout__main" }, ...content),
+    h("main", { class: "app-layout__main" }, h("div", { class: "app-layout__topbar" }, notificationBell(user)), ...content),
   );
 }

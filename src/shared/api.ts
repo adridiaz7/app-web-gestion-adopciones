@@ -518,3 +518,28 @@ export interface ErrorResponse {
   /** Invalid input fields and their messages, when the input format is wrong. */
   fields?: Record<string, string>;
 }
+
+/** RN-142: what a notification opens, if anything. */
+export type NotificationLink = { visitId: number } | { adoptionId: number } | { petId: number } | { incidentId: number };
+
+/** CU-34 · a notification (ISO instant). */
+export interface UserNotification {
+  id: number;
+  type: string;
+  title: string;
+  body: string;
+  link: NotificationLink | null;
+  read: boolean;
+  createdAt: string;
+}
+
+/** CU-34 · GET /api/notifications */
+export interface NotificationsResponse {
+  notifications: UserNotification[];
+  unread: number;
+}
+
+/** CU-34 · GET /api/notifications/unread-count and the mark-as-read endpoints */
+export interface UnreadCountResponse {
+  unread: number;
+}

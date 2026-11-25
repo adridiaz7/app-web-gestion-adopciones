@@ -16,6 +16,7 @@ import { renderMyPets, renderPetForm } from "./views/shelter-pets.js";
 import { renderShelterInbox } from "./views/shelter-inbox.js";
 import { renderShelterSlots } from "./views/shelter-slots.js";
 import { renderVisits } from "./views/visits.js";
+import { renderNotifications } from "./views/notifications.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
 
 const routes: Route[] = [
@@ -43,6 +44,7 @@ const routes: Route[] = [
   { path: "/protectora/turnos", render: renderShelterSlots },
   { path: "/protectora/solicitudes", render: renderShelterInbox },
   { path: "/visitas", render: renderVisits },
+  { path: "/notificaciones", render: renderNotifications },
 ];
 
 const root = document.getElementById("app");

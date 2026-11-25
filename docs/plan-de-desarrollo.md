@@ -207,7 +207,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | PENDIENTE |
+| T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | EN_REVISION |
 | T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | PENDIENTE |
 
 ### Fase 6 · Adopción

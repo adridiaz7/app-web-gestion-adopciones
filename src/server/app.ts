@@ -13,6 +13,7 @@ import { loadSession } from "./middlewares/session.js";
 import { createAdminRouter } from "./routes/admin.js";
 import { createAdopterRouter } from "./routes/adopter.js";
 import { createAuthRouter } from "./routes/auth.js";
+import { createNotificationsRouter } from "./routes/notifications.js";
 import { createShelterRouter } from "./routes/shelter.js";
 
 // Default Zod messages in Spanish: they can reach the user (UI texts are in Spanish).
@@ -48,6 +49,7 @@ export function createApp(): express.Express {
   api.use("/admin", createAdminRouter());
   api.use("/adopter", createAdopterRouter());
   api.use("/shelter", createShelterRouter());
+  api.use("/notifications", createNotificationsRouter());
 
   api.use(() => {
     throw new NotFoundError();
