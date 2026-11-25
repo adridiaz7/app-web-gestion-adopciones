@@ -8,7 +8,7 @@ export function navFor(role: SessionUser["role"]): NavItem[] {
     case "ADMIN":
       return [home, { href: "/admin/protectoras", label: "Protectoras" }];
     case "SHELTER":
-      return [home, { href: "/protectora/mascotas", label: "Mis mascotas" }];
+      return [home, { href: "/protectora/mascotas", label: "Mis mascotas" }, { href: "/protectora/turnos", label: "Turnos" }];
     case "ADOPTER":
       return [
         home,

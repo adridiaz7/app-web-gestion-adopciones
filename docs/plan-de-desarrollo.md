@@ -172,7 +172,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_CURSO |
+| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_REVISION |
 | T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | PENDIENTE |
 | T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | PENDIENTE |
 | T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | PENDIENTE |

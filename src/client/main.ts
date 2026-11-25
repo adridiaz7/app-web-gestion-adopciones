@@ -13,6 +13,7 @@ import { renderDiscover } from "./views/discover.js";
 import { renderFavorites } from "./views/favorites.js";
 import { renderShelterProfile, renderShelterSearch } from "./views/shelters.js";
 import { renderMyPets, renderPetForm } from "./views/shelter-pets.js";
+import { renderShelterSlots } from "./views/shelter-slots.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
 
 const routes: Route[] = [
@@ -37,6 +38,7 @@ const routes: Route[] = [
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },
   { path: "/protectora/mascotas/:id", render: renderPetForm },
+  { path: "/protectora/turnos", render: renderShelterSlots },
 ];
 
 const root = document.getElementById("app");
