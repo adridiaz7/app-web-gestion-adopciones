@@ -35,6 +35,20 @@ export const notificationTemplates = {
       (p.reason ? ` Motivo: ${p.reason}` : ""),
   }),
 
+  /** RN-100: the shelter cancelled a confirmed visit; it does not count for the quota. */
+  VISIT_CANCELLED_BY_SHELTER: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Visita cancelada por la protectora",
+    body:
+      `La protectora ha cancelado tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}. ` +
+      "No te cuenta para el cupo de visitas: puedes solicitar otra.",
+  }),
+
+  /** CU-25: the adopter cancelled; the shelter is told (the other party). */
+  VISIT_CANCELLED_BY_ADOPTER: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Visita cancelada por el adoptante",
+    body: `El adoptante ha cancelado la visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}. La plaza del turno queda libre.`,
+  }),
+
   /** RN-111: the shelter changed or deleted the slot; the adopter is invited to choose another one. */
   VISIT_VOIDED_SLOT_CANCELLED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
     title: "Visita anulada por cambio de turno",

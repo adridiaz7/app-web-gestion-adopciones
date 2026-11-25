@@ -422,6 +422,16 @@ export interface VisitRequestResponse {
   visit: RequestedVisit;
 }
 
+/** CU-24, CU-25 · body of POST /api/shelter/visits/:id/reject (RN-96: optional reason). */
+export interface RejectVisitRequest {
+  reason?: string;
+}
+
+/** CU-24, CU-25 · the visit after confirming, rejecting or cancelling it. */
+export interface VisitStatusResponse {
+  visit: { id: number; status: string };
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

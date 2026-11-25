@@ -1,8 +1,16 @@
 import type { Request, RequestHandler } from "express";
 import { z } from "zod";
-import type { AvailableSlotsResponse, VisitRequestResponse } from "../../shared/api.js";
+import type { AvailableSlotsResponse, VisitRequestResponse, VisitStatusResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
-import { listAvailableSlots, requestVisit } from "../services/visits.js";
+import {
+  cancelVisitByAdopter,
+  cancelVisitByShelter,
+  confirmVisit,
+  listAvailableSlots,
+  rejectVisit,
+  requestVisit,
+  type VisitStatusResult,
+} from "../services/visits.js";
 
 const id = (message: string) =>
   z.coerce.number({ error: message }).int({ error: message }).positive({ error: message }).max(Number.MAX_SAFE_INTEGER, { error: message });
@@ -15,7 +23,8 @@ const INVALID_SLOT = "El turno no es válido.";
 const petParamsSchema = z.object({ id: id(INVALID_PET) });
 const visitRequestSchema = z.object({ petId: strictId(INVALID_PET), slotId: strictId(INVALID_SLOT) });
 
-function adopterId(user: Request["user"]): number {
+/** The signed-in user (the role is checked by the router). */
+function userId(user: Request["user"]): number {
   if (!user) throw new UnauthorizedError();
   return user.id;
 }
@@ -23,7 +32,7 @@ function adopterId(user: Request["user"]): number {
 /** RN-194 · GET /api/adopter/pets/:id/slots */
 export const getAvailableSlots: RequestHandler = async (req, res) => {
   const { id: petId } = petParamsSchema.parse(req.params);
-  const slots = await listAvailableSlots(adopterId(req.user), petId);
+  const slots = await listAvailableSlots(userId(req.user), petId);
   const body: AvailableSlotsResponse = {
     slots: slots.map((slot) => ({ ...slot, startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() })),
   };
@@ -33,7 +42,46 @@ export const getAvailableSlots: RequestHandler = async (req, res) => {
 /** CU-23 · POST /api/adopter/visits */
 export const postVisit: RequestHandler = async (req, res) => {
   const { petId, slotId } = visitRequestSchema.parse(req.body ?? {});
-  const visit = await requestVisit(adopterId(req.user), petId, slotId);
+  const visit = await requestVisit(userId(req.user), petId, slotId);
   const body: VisitRequestResponse = { visit: { ...visit, startsAt: visit.startsAt.toISOString(), endsAt: visit.endsAt.toISOString() } };
   res.status(201).json(body);
+};
+
+const INVALID_VISIT = "La visita no es válida.";
+const visitParamsSchema = z.object({ id: id(INVALID_VISIT) });
+/** RN-96: optional reason; blank means none. */
+const rejectSchema = z.object({
+  reason: z
+    .string({ error: "El motivo no es válido." })
+    .trim()
+    .max(1000, { error: "El motivo no puede tener más de 1000 caracteres." })
+    .optional()
+    .transform((reason) => (reason ? reason : null)),
+});
+
+const statusBody = (result: VisitStatusResult): VisitStatusResponse => ({ visit: result });
+
+/** CU-24 · POST /api/shelter/visits/:id/confirm */
+export const postConfirmVisit: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  res.json(statusBody(await confirmVisit(userId(req.user), visitId)));
+};
+
+/** CU-24 · POST /api/shelter/visits/:id/reject */
+export const postRejectVisit: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  const { reason } = rejectSchema.parse(req.body ?? {});
+  res.json(statusBody(await rejectVisit(userId(req.user), visitId, reason)));
+};
+
+/** CU-25 · POST /api/shelter/visits/:id/cancel */
+export const postShelterCancelVisit: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  res.json(statusBody(await cancelVisitByShelter(userId(req.user), visitId)));
+};
+
+/** CU-25 · POST /api/adopter/visits/:id/cancel */
+export const postAdopterCancelVisit: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  res.json(statusBody(await cancelVisitByAdopter(userId(req.user), visitId)));
 };

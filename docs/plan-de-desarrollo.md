@@ -129,6 +129,10 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 Propuesta: solo para visitas anuladas con motivo `SLOT_CANCELLED` que estaban confirmadas, para la misma mascota, una sola vez, sin la antelación de 48 h pero con el resto de reglas (plazas, bloqueo, ausencia y cupo, que no cambia porque la original anulada deja de contar). De momento **T-22 no incluye la sustitución**: toda solicitud cumple las 48 h y queda pendiente. Cuando se responda, se puede hacer en una tarea aparte con tests nuevos.
 
+**25/11/2026 · T-23 (no bloquea).** El cupo (RN-90) solo cuenta las visitas confirmadas o realizadas, y RN-93 lo comprueba al **solicitar**. Pero las pendientes no cuentan, así que un adoptante puede tener a la vez, por ejemplo, 5 solicitudes pendientes en la misma protectora; si la protectora las confirma todas, superaría las 3 visitas. ¿Hay que comprobar también el cupo al **confirmar** (CU-24), y responder con un error a la protectora si ya está lleno? De momento **no** se comprueba al confirmar, porque ninguna RN ni excepción de CU-24 lo dice.
+
+Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/adopter/visits/:id/cancel`); su botón irá en la pantalla "Mis visitas" de T-24, que aún no existe. Las acciones de la protectora (confirmar, rechazar y cancelar) están en el calendario de turnos.
+
 ---
 
 ## 5. Tareas
@@ -187,7 +191,7 @@ Propuesta: solo para visitas anuladas con motivo `SLOT_CANCELLED` que estaban co
 | T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_REVISION |
 | T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | EN_REVISION |
 | T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | EN_REVISION |
-| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | PENDIENTE |
+| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | EN_REVISION |
 | T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | PENDIENTE |
 | T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | PENDIENTE |
 | T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | PENDIENTE |

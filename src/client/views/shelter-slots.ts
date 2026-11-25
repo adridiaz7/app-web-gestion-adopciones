@@ -2,6 +2,7 @@ import type { ShelterSlot, SlotRequest } from "../../shared/api.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { createRecurringSlots, createSlot, deleteSlot, listSlots, updateSlot } from "../api/slots.js";
+import { cancelVisitAsShelter, confirmVisit, rejectVisit } from "../api/visits.js";
 import { appLayout } from "../components/app-layout.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
@@ -56,6 +57,49 @@ function calendar(initial: ShelterSlot[]): HTMLElement {
     message.replaceChildren(notice("error", error instanceof ApiError ? error.message : "No se ha podido guardar el turno."));
   const sortSlots = (list: ShelterSlot[]) => [...list].sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 
+  /** Reloads the calendar after answering or cancelling a visit. */
+  const refresh = (text: string): void => {
+    listSlots().then((res) => {
+      slots = res.slots;
+      message.replaceChildren(notice("success", text));
+      draw();
+    }, fail);
+  };
+
+  /** CU-24: confirm or reject a pending request; CU-25, RN-100: cancel a confirmed visit. */
+  const visitActions = (v: ShelterSlot["visits"][number]): HTMLElement | null => {
+    const button = (label: string, primary = false) =>
+      h("button", { type: "button", class: `button button--small ${primary ? "button--primary" : "button--secondary"}` }, label);
+    if (v.status === "PENDING") {
+      const confirm = button("Confirmar", true);
+      const reject = button("Rechazar");
+      confirm.addEventListener("click", () => {
+        confirmVisit(v.id).then(() => {
+          refresh("Visita confirmada. Hemos avisado al adoptante.");
+        }, fail);
+      });
+      reject.addEventListener("click", () => {
+        const reason = window.prompt("Motivo del rechazo (opcional):");
+        if (reason === null) return;
+        rejectVisit(v.id, { reason }).then(() => {
+          refresh("Solicitud rechazada. Hemos avisado al adoptante.");
+        }, fail);
+      });
+      return h("span", { class: "slot-card__actions" }, confirm, reject);
+    }
+    if (v.status === "CONFIRMED") {
+      const cancel = button("Cancelar visita");
+      cancel.addEventListener("click", () => {
+        if (!window.confirm(`¿Cancelar la visita de ${v.adopterName} para conocer a ${v.petName}? Le avisaremos y no le contará para el cupo.`)) return;
+        cancelVisitAsShelter(v.id).then(() => {
+          refresh("Visita cancelada. Hemos avisado al adoptante.");
+        }, fail);
+      });
+      return h("span", { class: "slot-card__actions" }, cancel);
+    }
+    return null;
+  };
+
   const slotCard = (slot: ShelterSlot): HTMLElement => {
     const card = h("article", { class: "card slot-card" });
     const showView = (): void => {
@@ -87,7 +131,7 @@ function calendar(initial: ShelterSlot[]): HTMLElement {
           : h(
               "ul",
               { class: "slot-card__visits" },
-              ...slot.visits.map((v) => h("li", {}, `${v.petName} · ${v.adopterName} · ${VISIT_STATUS[v.status] ?? v.status}`)),
+              ...slot.visits.map((v) => h("li", { class: "slot-card__visit" }, `${v.petName} · ${v.adopterName} · ${VISIT_STATUS[v.status] ?? v.status}`, visitActions(v))),
             ),
       );
     };
@@ -213,7 +257,7 @@ function calendar(initial: ShelterSlot[]): HTMLElement {
   return root;
 }
 
-/** CU-18, CU-19, CU-20, CU-50 · /protectora/turnos */
+/** CU-18, CU-19, CU-20, CU-50, CU-24, CU-25 · /protectora/turnos */
 export async function renderShelterSlots(root: HTMLElement): Promise<void> {
   const user = await currentUser();
   if (!user) {

@@ -134,3 +134,46 @@ export async function selectAvailableSlots(db: Db, shelterId: number, petId: num
   );
   return rows;
 }
+
+export type VisitStatus = "PENDING" | "CONFIRMED" | "REJECTED" | "CANCELLED" | "EXPIRED" | "VOIDED" | "COMPLETED" | "NO_SHOW";
+
+/** A visit locked for a change of status, with what CU-24 and CU-25 need. */
+export interface VisitForChange {
+  id: number;
+  adopterId: number;
+  shelterId: number;
+  status: VisitStatus;
+  createdAt: Date;
+  petName: string;
+  startsAt: Date;
+}
+
+/** The visit of that adopter or shelter (`owner`), locked, or null if it is not theirs. */
+export async function lockVisit(db: Db, visitId: number, owner: { adopterId: number } | { shelterId: number }): Promise<VisitForChange | null> {
+  const [column, ownerId] = "adopterId" in owner ? ["adopter_id", owner.adopterId] : ["shelter_id", owner.shelterId];
+  const { rows } = await db.query<VisitForChange>(
+    `SELECT v.id, v.adopter_id AS "adopterId", v.shelter_id AS "shelterId", v.status, v.created_at AS "createdAt",
+            p.name AS "petName", vs.starts_at AS "startsAt"
+       FROM "Visit" v
+       JOIN "Pet" p ON p.id = v.pet_id
+       JOIN "Visit_slot" vs ON vs.id = v.slot_id
+      WHERE v.id = $1 AND v.${column} = $2
+        FOR UPDATE OF v`,
+    [visitId, ownerId],
+  );
+  return rows[0] ?? null;
+}
+
+export async function markVisitConfirmed(db: Db, visitId: number): Promise<void> {
+  await db.query(`UPDATE "Visit" SET status = 'CONFIRMED', responded_at = now() WHERE id = $1`, [visitId]);
+}
+
+/** RN-96: the reason is optional. */
+export async function markVisitRejected(db: Db, visitId: number, reason: string | null): Promise<void> {
+  await db.query(`UPDATE "Visit" SET status = 'REJECTED', responded_at = now(), rejection_reason = $2 WHERE id = $1`, [visitId, reason]);
+}
+
+/** RN-101: who cancels is recorded. */
+export async function markVisitCancelled(db: Db, visitId: number, cancelledBy: "ADOPTER" | "SHELTER"): Promise<void> {
+  await db.query(`UPDATE "Visit" SET status = 'CANCELLED', cancelled_by = $2, cancelled_at = now() WHERE id = $1`, [visitId, cancelledBy]);
+}
