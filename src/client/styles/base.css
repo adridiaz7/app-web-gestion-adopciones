@@ -1155,3 +1155,97 @@ textarea {
 .offer {
   margin-top: var(--space-6);
 }
+
+/* Discover mode (CU-10) */
+.discover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  outline: none;
+}
+
+.discover__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-10);
+}
+
+.discover__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.discover__action {
+  width: 64px;
+  height: 64px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.discover__action:hover,
+.discover__action:focus-visible {
+  border-style: solid;
+  background: var(--color-primary);
+}
+
+.swipe-card {
+  position: relative;
+  width: min(340px, 100%);
+  padding: 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+  transition: transform 0.15s ease-out;
+}
+
+.swipe-card__photo {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  place-items: center;
+}
+
+.swipe-card__info {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  left: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+}
+
+.swipe-card__info p {
+  margin: 0;
+}
+
+.swipe-card__name {
+  margin: var(--space-1) 0;
+  font-size: 26px;
+}
+
+.swipe-card__info .button {
+  margin-top: var(--space-2);
+}
+
+.discover__hint {
+  text-align: center;
+}
+
+.discover__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}

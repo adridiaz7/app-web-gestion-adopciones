@@ -110,7 +110,7 @@ export async function renderShelterSearch(root: HTMLElement): Promise<void> {
       h("p", { class: "overline" }, "Explorar"),
       h("h1", { class: "display" }, "Protectoras"),
       h("p", { class: "muted" }, "Busca protectoras por nombre o provincia y conoce a sus mascotas."),
-      exploreTabs("shelters"),
+      exploreTabs("shelters", user.role),
       ...content,
     ]),
   );

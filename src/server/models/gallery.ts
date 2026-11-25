@@ -44,19 +44,25 @@ export interface GalleryPet {
   provinceName: string;
 }
 
-/** CU-09: the visible pets that match the filters, newest first. */
-export async function selectGalleryPets(db: Db, adopterId: number | null, filters: GalleryFilters): Promise<GalleryPet[]> {
-  const { rows } = await db.query<GalleryPet>(
-    `SELECT p.id, p.name, sc.name AS "speciesName", br.name AS "breedName",
+/** Columns of a pet card (GalleryPet). */
+export const PET_CARD_COLUMNS = `p.id, p.name, sc.name AS "speciesName", br.name AS "breedName",
             to_char(p.birth_date, 'YYYY-MM-DD') AS "birthDate", p.sex, p.size,
-            ph.path AS "photoUrl", s.name AS "shelterName", pv.name AS "provinceName"
+            ph.path AS "photoUrl", s.name AS "shelterName", pv.name AS "provinceName"`;
+
+/** Joins of a pet card, with the aliases used by visiblePetCondition. */
+export const PET_CARD_FROM = `
        FROM "Pet" p
        JOIN "Shelter"  s  ON s.user_id = p.shelter_id
        JOIN "App_user" su ON su.id = s.user_id
        JOIN "Breed"    br ON br.id = p.breed_id
        JOIN "Species"  sc ON sc.id = br.species_id
        JOIN "Province" pv ON pv.id = s.province_id
-       LEFT JOIN "Pet_photo" ph ON ph.pet_id = p.id AND ph.position = 1
+       LEFT JOIN "Pet_photo" ph ON ph.pet_id = p.id AND ph.position = 1`;
+
+/** CU-09: the visible pets that match the filters, newest first. */
+export async function selectGalleryPets(db: Db, adopterId: number | null, filters: GalleryFilters): Promise<GalleryPet[]> {
+  const { rows } = await db.query<GalleryPet>(
+    `SELECT ${PET_CARD_COLUMNS} ${PET_CARD_FROM}
       WHERE ${visiblePetCondition("$1")}
         AND ($2::smallint IS NULL OR br.species_id = $2)
         AND ($3::int      IS NULL OR p.breed_id = $3)

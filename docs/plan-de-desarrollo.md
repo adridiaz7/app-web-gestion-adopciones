@@ -105,6 +105,12 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 
 Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLOQUEADA`.
 
+**25/11/2026 · T-18 (no bloquea).** RN-191 dice que solo se puede deshacer el descarte inmediatamente anterior, "no una cadena de descartes". El modelo de datos define el último descarte como "el `DISCARDED` más reciente". Pero al deshacerlo se borra la fila, y entonces el descarte anterior pasa a ser el más reciente: por la API se podría encadenar. Sin una columna o tabla nueva, el servidor no puede distinguirlo. Se ha implementado así:
+- el servidor solo deshace el `DISCARDED` más reciente (lo que dice el modelo de datos);
+- la pantalla solo ofrece "Deshacer" justo después de descartar y lo oculta tras usarlo, así que desde la interfaz no se puede encadenar.
+
+¿Basta con esto, o hay que impedirlo también en el servidor (por ejemplo, guardando en la sesión la mascota que se puede deshacer)?
+
 ---
 
 ## 5. Tareas
@@ -152,7 +158,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-17 | Cuestionario de preferencias: ofrecerlo tras el registro y editarlo desde el perfil. | CU-08; RN-30–38, 205 | T-07 | EN_REVISION |
-| T-18 | Modo descubrir: deslizar, descarte de 15 días, deshacer el último descarte y mensaje si no hay cuestionario. | CU-10; RN-70–75, 190, 191 | T-17, T-14 | PENDIENTE |
+| T-18 | Modo descubrir: deslizar, descarte de 15 días, deshacer el último descarte y mensaje si no hay cuestionario. | CU-10; RN-70–75, 190, 191 | T-17, T-14 | EN_REVISION |
 | T-19 | Favoritos: lista, quitar y recuperar descartadas. | CU-12; RN-73, 74, 76 | T-18 | PENDIENTE |
 
 ### Fase 4 · Turnos y visitas

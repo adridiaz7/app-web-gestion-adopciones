@@ -10,6 +10,6 @@ export function navFor(role: SessionUser["role"]): NavItem[] {
     case "SHELTER":
       return [home, { href: "/protectora/mascotas", label: "Mis mascotas" }];
     case "ADOPTER":
-      return [home, { href: "/mascotas", label: "Explorar" }, { href: "/perfil/preferencias", label: "Preferencias" }];
+      return [home, { href: "/descubrir", label: "Explorar" }, { href: "/perfil/preferencias", label: "Preferencias" }];
   }
 }

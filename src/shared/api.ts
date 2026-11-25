@@ -306,6 +306,24 @@ export interface PreferencesResponse {
   preferences: Preferences | null;
 }
 
+/**
+ * CU-10 · GET /api/adopter/discover, and the answer of POST …/pets/:id/favorite,
+ * …/pets/:id/discard and …/undo ({ petId }): the next pet to rate.
+ */
+export interface DiscoverResponse {
+  /** null = no compatible pets left (CU-10). */
+  pet: GalleryPet | null;
+  /** Compatible pets left to rate, this one included. */
+  remaining: number;
+  /** RN-190: false = no questionnaire yet. */
+  hasPreferences: boolean;
+}
+
+/** CU-10 · body of POST /api/adopter/discover/undo (RN-191). */
+export interface UndoDiscardRequest {
+  petId: number;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

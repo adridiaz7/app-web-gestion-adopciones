@@ -9,6 +9,7 @@ import { renderForgotPassword, renderResetPassword } from "./views/password-reco
 import { renderRegisterAdopter, renderRegisterShelter } from "./views/register.js";
 import { renderPetProfile } from "./views/pet-profile.js";
 import { renderPreferences } from "./views/preferences.js";
+import { renderDiscover } from "./views/discover.js";
 import { renderShelterProfile, renderShelterSearch } from "./views/shelters.js";
 import { renderMyPets, renderPetForm } from "./views/shelter-pets.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
@@ -24,6 +25,7 @@ const routes: Route[] = [
   { path: "/recuperar-contrasena", render: renderForgotPassword },
   { path: "/restablecer-contrasena", render: renderResetPassword },
   { path: "/inicio", render: renderHome },
+  { path: "/descubrir", render: renderDiscover },
   { path: "/mascotas", render: renderGallery },
   { path: "/mascotas/:id", render: renderPetProfile },
   { path: "/protectoras", render: renderShelterSearch },

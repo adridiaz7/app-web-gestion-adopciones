@@ -153,7 +153,7 @@ export async function renderGallery(root: HTMLElement): Promise<void> {
   ];
 
   if (user) {
-    mount(root, appLayout(user, navFor(user.role), [...heading, exploreTabs("pets"), ...content]));
+    mount(root, appLayout(user, navFor(user.role), [...heading, exploreTabs("pets", user.role), ...content]));
     return;
   }
 
@@ -178,13 +178,14 @@ export async function renderGallery(root: HTMLElement): Promise<void> {
   );
 }
 
-/** Tabs of "Explorar" for users with a session: pets and shelters (CU-09, CU-13). */
-export function exploreTabs(current: "pets" | "shelters"): HTMLElement {
+/** Tabs of "Explorar" for users with a session (CU-10 only for adopters, CU-09, CU-13). */
+export function exploreTabs(current: "discover" | "pets" | "shelters", role: SessionUser["role"]): HTMLElement {
   const tab = (href: string, label: string, active: boolean) =>
     h("a", { class: "tabs__tab", href, "aria-current": active ? "page" : undefined }, label);
   return h(
     "nav",
     { class: "tabs", "aria-label": "Explorar" },
+    role === "ADOPTER" ? tab("/descubrir", "Descubrir", current === "discover") : null,
     tab("/mascotas", "Mascotas", current === "pets"),
     tab("/protectoras", "Protectoras", current === "shelters"),
   );
