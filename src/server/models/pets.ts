@@ -33,6 +33,9 @@ export interface ShelterPet extends PetData {
   speciesName: string;
   breedName: string;
   status: PetStatus;
+  /** RN-62: only for an UNLISTED pet. */
+  unlistReason: UnlistReason | null;
+  unlistedAt: Date | null;
   createdAt: Date;
 }
 
@@ -119,7 +122,7 @@ const SHELTER_PET = `
          p.name, p.description, to_char(p.birth_date, 'YYYY-MM-DD') AS "birthDate", p.sex, p.size,
          p.activity_level AS "activityLevel", p.good_with_children AS "goodWithChildren",
          p.vaccinated, p.dewormed, p.sterilized, p.microchipped, p.special_needs AS "specialNeeds",
-         p.status, p.created_at AS "createdAt",
+         p.status, p.unlist_reason AS "unlistReason", p.unlisted_at AS "unlistedAt", p.created_at AS "createdAt",
          coalesce((SELECT json_agg(json_build_object('speciesId', r.species_id, 'getsAlong', r.gets_along) ORDER BY r.species_id)
                      FROM pet_species_rel r WHERE r.pet_id = p.id), '[]'::json) AS "getsAlongWith"
     FROM "Pet" p
@@ -137,4 +140,17 @@ export async function selectShelterPets(db: Db, shelterId: number): Promise<Shel
 export async function selectShelterPet(db: Db, shelterId: number, petId: number, lock = false): Promise<ShelterPet | null> {
   const { rows } = await db.query<ShelterPet>(`${SHELTER_PET} AND p.id = $2${lock ? " FOR UPDATE OF p" : ""}`, [shelterId, petId]);
   return rows[0] ?? null;
+}
+
+/** RN-62: the reasons a pet can be unlisted with. REMOVED_BY_ADMIN is only for the administrator. */
+export type UnlistReason = "DECEASED" | "TRANSFERRED" | "TREATMENT" | "FOSTER" | "ERROR" | "OTHER" | "REMOVED_BY_ADMIN";
+
+/** RN-60: the pet stays in the database, hidden from adopters. */
+export async function markPetUnlisted(db: Db, petId: number, reason: UnlistReason): Promise<void> {
+  await db.query(`UPDATE "Pet" SET status = 'UNLISTED', unlist_reason = $2, unlisted_at = now(), updated_at = now() WHERE id = $1`, [petId, reason]);
+}
+
+/** RN-63: the pet is available again. */
+export async function markPetReactivated(db: Db, petId: number): Promise<void> {
+  await db.query(`UPDATE "Pet" SET status = 'AVAILABLE', unlist_reason = NULL, unlisted_at = NULL, updated_at = now() WHERE id = $1`, [petId]);
 }

@@ -397,3 +397,18 @@ export async function markDueReminders(db: Db, noticeHours: number, visitId: num
   );
   return rows.sort((a, b) => a.id - b.id);
 }
+
+/** RN-65, RN-109: the pet's open (PENDING or CONFIRMED) visits become VOIDED with that reason. */
+export async function voidPetOpenVisits(db: Db, petId: number, reason: "PET_UNLISTED"): Promise<ChangedVisit[]> {
+  const { rows } = await db.query<ChangedVisit>(
+    `WITH open AS (
+       SELECT id, status FROM "Visit" WHERE pet_id = $1 AND status IN ('PENDING', 'CONFIRMED') FOR UPDATE
+     )
+     UPDATE "Visit" v SET status = 'VOIDED', void_reason = $2, voided_at = now()
+       FROM open, "Pet" p, "Visit_slot" vs
+      WHERE v.id = open.id AND p.id = v.pet_id AND vs.id = v.slot_id
+     RETURNING v.id, v.adopter_id AS "adopterId", p.name AS "petName", vs.starts_at AS "startsAt", open.status AS "previousStatus"`,
+    [petId, reason],
+  );
+  return rows.sort((a, b) => a.id - b.id);
+}

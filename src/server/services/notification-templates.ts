@@ -22,7 +22,42 @@ export interface RenderedNotification {
   body: string;
 }
 
+/** RN-62, RN-66: why a pet was unlisted, as told to the adopter. */
+export type UnlistReasonText = "DECEASED" | "TRANSFERRED" | "TREATMENT" | "FOSTER" | "ERROR" | "OTHER" | "REMOVED_BY_ADMIN";
+
+/** RN-66: one sentence per unlisting reason; the shelter adds no free text. */
+function unlistReasonText(petName: string, reason: UnlistReasonText): string {
+  switch (reason) {
+    case "DECEASED":
+      return `Lamentamos comunicarte que ${petName} ha fallecido.`;
+    case "TRANSFERRED":
+      return `${petName} se ha trasladado a otro centro.`;
+    case "TREATMENT":
+      return `${petName} está en tratamiento veterinario y de momento no se puede visitar ni adoptar. Te avisaremos si vuelve a estar disponible.`;
+    case "FOSTER":
+      return `${petName} se ha ido a una casa de acogida. Te avisaremos si vuelve a estar disponible.`;
+    case "ERROR":
+      return `La ficha de ${petName} se ha retirado porque se publicó por error.`;
+    case "OTHER":
+      return `La protectora ha retirado a ${petName} de la adopción.`;
+    case "REMOVED_BY_ADMIN":
+      return `La ficha de ${petName} ha sido retirada por la administración de la plataforma.`;
+  }
+}
+
 export const notificationTemplates = {
+  /** RN-65, RN-66, RN-110: a visit voided because its pet was unlisted. */
+  VISIT_VOIDED_PET_UNLISTED: (p: { petName: string; startsAt: Date; reason: UnlistReasonText }): RenderedNotification => ({
+    title: "Visita anulada",
+    body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado. ${unlistReasonText(p.petName, p.reason)}`,
+  }),
+
+  /** RN-65, RN-66: a pending adoption voided because its pet was unlisted. */
+  ADOPTION_VOIDED_PET_UNLISTED: (p: { petName: string; reason: UnlistReasonText }): RenderedNotification => ({
+    title: "Solicitud de adopción anulada",
+    body: `Tu solicitud para adoptar a ${p.petName} se ha anulado. ${unlistReasonText(p.petName, p.reason)}`,
+  }),
+
   VISIT_CONFIRMED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
     title: "Visita confirmada",
     body: `La protectora ha confirmado tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}.`,

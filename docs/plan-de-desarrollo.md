@@ -201,7 +201,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 | T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | EN_REVISION |
 | T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | EN_REVISION |
 | T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | EN_REVISION |
-| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | PENDIENTE |
+| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | EN_REVISION |
 
 ### Fase 5 · Notificaciones y chat
 

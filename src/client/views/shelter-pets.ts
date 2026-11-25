@@ -1,8 +1,8 @@
-import type { BreedsResponse, PetDataRequest, PetStatus, ShelterPet } from "../../shared/api.js";
+import type { BreedsResponse, PetDataRequest, PetStatus, ShelterPet, UnlistPetRequest, UnlistReason } from "../../shared/api.js";
 import { currentUser, type SessionUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { ageLabel } from "../age.js";
-import { createPet, getBreeds, getMyPet, listMyPets, updatePet } from "../api/pets.js";
+import { createPet, getBreeds, getMyPet, listMyPets, reactivatePet, unlistPet, updatePet } from "../api/pets.js";
 import { appLayout } from "../components/app-layout.js";
 import { checked, field, onSubmit, selectField, submitButton, textValue } from "../components/form.js";
 import { navFor } from "../components/nav.js";
@@ -17,6 +17,79 @@ const STATUS_LABELS: Record<PetStatus, string> = {
   ADOPTED: "Adoptada",
   UNLISTED: "De baja",
 };
+
+/** RN-62: the reasons for unlisting a pet. */
+const UNLIST_REASONS: Record<UnlistReason, string> = {
+  DECEASED: "Fallecimiento",
+  TRANSFERRED: "Traslado",
+  TREATMENT: "Tratamiento",
+  FOSTER: "Acogida",
+  ERROR: "Error",
+  OTHER: "Otro",
+  REMOVED_BY_ADMIN: "Retirada por el administrador",
+};
+
+const statusText = (pet: ShelterPet): string =>
+  pet.unlistReason ? `${STATUS_LABELS[pet.status]} · ${UNLIST_REASONS[pet.unlistReason]}` : STATUS_LABELS[pet.status];
+
+/**
+ * CU-17: unlist an available pet choosing a reason (RN-61, RN-62), or reactivate an unlisted
+ * one unless the administrator removed it (RN-63, RN-64). `onChange` reloads the page.
+ */
+function petStatusSection(pet: ShelterPet, onChange: () => void): HTMLElement {
+  const message = h("div", {});
+  const section = h("section", { class: "card pet-status" }, h("h2", {}, "Estado de la ficha"));
+  const fail = (error: unknown, fallback: string): void => {
+    message.replaceChildren(notice("error", error instanceof ApiError ? error.message : fallback));
+  };
+
+  if (pet.status === "AVAILABLE") {
+    const reasons = (Object.keys(UNLIST_REASONS) as UnlistReason[]).filter((reason) => reason !== "REMOVED_BY_ADMIN");
+    const select = h(
+      "select",
+      { name: "reason", required: true },
+      h("option", { value: "" }, "Elige el motivo"),
+      ...reasons.map((reason) => h("option", { value: reason }, UNLIST_REASONS[reason])),
+    );
+    const button = h("button", { type: "submit", class: "button button--secondary" }, "Dar de baja");
+    const form = h("form", { class: "pet-status__form" }, h("label", { class: "field" }, "Motivo de la baja", select), button);
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!select.value) return;
+      if (!window.confirm(`¿Dar de baja a ${pet.name}? Sus visitas y solicitudes de adopción abiertas se anularán y se avisará a los adoptantes.`)) return;
+      button.disabled = true;
+      unlistPet(pet.id, { reason: select.value as UnlistPetRequest["reason"] }).then(onChange, (error: unknown) => {
+        button.disabled = false;
+        fail(error, "No se ha podido dar de baja la mascota.");
+      });
+    });
+    section.append(
+      h("p", { class: "muted" }, "La baja oculta la ficha a los adoptantes. Podrás reactivarla más adelante."),
+      form,
+    );
+  } else if (pet.status === "UNLISTED" && pet.unlistReason !== "REMOVED_BY_ADMIN") {
+    const button = h("button", { type: "button", class: "button button--primary" }, "Reactivar");
+    button.addEventListener("click", () => {
+      button.disabled = true;
+      reactivatePet(pet.id).then(onChange, (error: unknown) => {
+        button.disabled = false;
+        fail(error, "No se ha podido reactivar la mascota.");
+      });
+    });
+    section.append(
+      h("p", {}, `De baja por: ${UNLIST_REASONS[pet.unlistReason ?? "OTHER"]}. Al reactivarla volverá a estar disponible y avisaremos a los adoptantes cuyas visitas o solicitudes se anularon.`),
+      button,
+    );
+  } else if (pet.status === "UNLISTED") {
+    section.append(notice("info", "El administrador ha retirado esta mascota.", "No se puede reactivar desde aquí."));
+  } else if (pet.status === "RESERVED") {
+    section.append(h("p", { class: "muted" }, "Está reservada. Para darla de baja, primero cancela la adopción aprobada."));
+  } else {
+    section.append(h("p", { class: "muted" }, "Ya ha sido adoptada."));
+  }
+  section.append(message);
+  return section;
+}
 
 /** Only shelters: anyone else is sent away. Returns the user, or null after redirecting. */
 async function shelterOnly(): Promise<SessionUser | null> {
@@ -46,7 +119,7 @@ export async function renderMyPets(root: HTMLElement): Promise<void> {
                 { class: "card pet-row", href: `/protectora/mascotas/${String(pet.id)}` },
                 h("span", { class: "pet-row__name" }, pet.name),
                 h("span", { class: "muted" }, `${pet.speciesName} · ${pet.breedName} · ${ageLabel(pet.birthDate)}`),
-                h("span", { class: `badge badge--${pet.status.toLowerCase()}` }, STATUS_LABELS[pet.status]),
+                h("span", { class: `badge badge--${pet.status.toLowerCase()}` }, statusText(pet)),
               ),
             ),
           );
@@ -193,7 +266,8 @@ export async function renderPetForm(root: HTMLElement, params: RouteParams): Pro
     });
     body = pet
       ? [
-          h("p", { class: "muted" }, `Estado: ${STATUS_LABELS[pet.status]} · Alta: ${new Date(pet.createdAt).toLocaleDateString("es-ES")}`),
+          h("p", { class: "muted" }, `Estado: ${statusText(pet)} · Alta: ${new Date(pet.createdAt).toLocaleDateString("es-ES")}`),
+          petStatusSection(pet, () => void renderPetForm(root, params)),
           petPhotosSection(pet.id),
           form,
         ]

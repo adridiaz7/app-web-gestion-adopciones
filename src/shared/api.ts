@@ -149,8 +149,20 @@ export interface ShelterPet extends PetDataRequest {
   speciesName: string;
   breedName: string;
   status: PetStatus;
+  /** RN-62: only for an UNLISTED pet. */
+  unlistReason: UnlistReason | null;
+  /** ISO instant, only for an UNLISTED pet. */
+  unlistedAt: string | null;
   /** ISO date (RN-49). */
   createdAt: string;
+}
+
+/** RN-62: why a pet is unlisted. REMOVED_BY_ADMIN is only for the administrator. */
+export type UnlistReason = "DECEASED" | "TRANSFERRED" | "TREATMENT" | "FOSTER" | "ERROR" | "OTHER" | "REMOVED_BY_ADMIN";
+
+/** CU-17 · body of POST /api/shelter/pets/:id/unlist */
+export interface UnlistPetRequest {
+  reason: Exclude<UnlistReason, "REMOVED_BY_ADMIN">;
 }
 
 /** CU-14 · GET /api/shelter/pets */

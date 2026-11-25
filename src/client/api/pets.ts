@@ -7,6 +7,7 @@ import type {
   PhotoOrderRequest,
   ShelterPetResponse,
   ShelterPetsResponse,
+  UnlistPetRequest,
 } from "../../shared/api.js";
 import { apiRequest } from "./client.js";
 
@@ -42,3 +43,10 @@ export const deletePetPhoto = (petId: number, photoId: number) =>
 
 export const reorderPetPhotos = (petId: number, photoIds: number[]) =>
   apiRequest<PetPhotosResponse>("PUT", `${photosPath(petId)}/order`, { photoIds } satisfies PhotoOrderRequest);
+
+/** CU-17, RN-62: unlist an available pet with a reason. */
+export const unlistPet = (id: number, body: UnlistPetRequest) =>
+  apiRequest<ShelterPetResponse>("POST", `/shelter/pets/${String(id)}/unlist`, body);
+
+/** CU-17, RN-63: make an unlisted pet available again. */
+export const reactivatePet = (id: number) => apiRequest<ShelterPetResponse>("POST", `/shelter/pets/${String(id)}/reactivate`);

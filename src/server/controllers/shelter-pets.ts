@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { ShelterPetResponse, ShelterPetsResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { createPet, editPet, getShelterPet, listShelterPets, type ShelterPet } from "../services/pets.js";
+import { reactivatePet, unlistPet } from "../services/pet-unlisting.js";
 
 const REQUIRED = "Este campo es obligatorio.";
 const CHOOSE = "Elige una opción.";
@@ -53,7 +54,7 @@ function shelterId(user: Request["user"]): number {
 }
 
 function toResponse(pet: ShelterPet): ShelterPetResponse["pet"] {
-  return { ...pet, createdAt: pet.createdAt.toISOString() };
+  return { ...pet, unlistedAt: pet.unlistedAt?.toISOString() ?? null, createdAt: pet.createdAt.toISOString() };
 }
 
 /** CU-14 · GET /api/shelter/pets */
@@ -81,5 +82,25 @@ export const putPet: RequestHandler = async (req, res) => {
   const { id } = idParamsSchema.parse(req.params);
   const data = petDataSchema.parse(req.body ?? {});
   const body: ShelterPetResponse = { pet: toResponse(await editPet(shelterId(req.user), id, data)) };
+  res.json(body);
+};
+
+/** RN-62: the shelter must choose one of its reasons; REMOVED_BY_ADMIN is only for the administrator. */
+const unlistSchema = z.object({
+  reason: z.enum(["DECEASED", "TRANSFERRED", "TREATMENT", "FOSTER", "ERROR", "OTHER"], { error: "Elige el motivo de la baja." }),
+});
+
+/** CU-17 · POST /api/shelter/pets/:id/unlist */
+export const postUnlistPet: RequestHandler = async (req, res) => {
+  const { id } = idParamsSchema.parse(req.params);
+  const { reason } = unlistSchema.parse(req.body ?? {});
+  const body: ShelterPetResponse = { pet: toResponse(await unlistPet(shelterId(req.user), id, reason)) };
+  res.json(body);
+};
+
+/** CU-17 · POST /api/shelter/pets/:id/reactivate */
+export const postReactivatePet: RequestHandler = async (req, res) => {
+  const { id } = idParamsSchema.parse(req.params);
+  const body: ShelterPetResponse = { pet: toResponse(await reactivatePet(shelterId(req.user), id)) };
   res.json(body);
 };

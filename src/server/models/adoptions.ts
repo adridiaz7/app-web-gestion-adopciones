@@ -45,3 +45,40 @@ export async function selectNotSelectedAdopters(db: Db, petId: number): Promise<
   );
   return rows.map((row) => row.adopterId);
 }
+
+/** An adoption voided by a cascade, with its adopter. */
+export interface VoidedAdoption extends ChangedAdoption {
+  adopterId: number;
+}
+
+/** RN-65: the pet's PENDING adoptions become VOIDED with that reason. */
+export async function voidPetPendingAdoptions(db: Db, petId: number, reason: "PET_UNLISTED"): Promise<VoidedAdoption[]> {
+  const { rows } = await db.query<VoidedAdoption>(
+    `UPDATE "Adoption" a SET status = 'VOIDED', void_reason = $2, voided_at = now()
+       FROM "Pet" p
+      WHERE p.id = a.pet_id AND a.pet_id = $1 AND a.status = 'PENDING'
+     RETURNING a.id, a.pet_id AS "petId", p.name AS "petName", a.adopter_id AS "adopterId"`,
+    [petId, reason],
+  );
+  return rows.sort((a, b) => a.id - b.id);
+}
+
+/**
+ * RN-67: the adopters whose visits or adoptions of the pet were voided by its current
+ * unlisting (voided for PET_UNLISTED since `unlistedAt`), each once, in order of first void.
+ */
+export async function selectAdoptersVoidedByUnlisting(db: Db, petId: number, unlistedAt: Date): Promise<number[]> {
+  const { rows } = await db.query<{ adopterId: number }>(
+    `SELECT adopter_id AS "adopterId" FROM (
+       SELECT adopter_id, id, 1 AS kind FROM "Visit"
+        WHERE pet_id = $1 AND status = 'VOIDED' AND void_reason = 'PET_UNLISTED' AND voided_at >= $2
+       UNION ALL
+       SELECT adopter_id, id, 2 AS kind FROM "Adoption"
+        WHERE pet_id = $1 AND status = 'VOIDED' AND void_reason = 'PET_UNLISTED' AND voided_at >= $2
+     ) voided
+     GROUP BY adopter_id
+     ORDER BY min(kind), min(id)`,
+    [petId, unlistedAt],
+  );
+  return rows.map((row) => row.adopterId);
+}
