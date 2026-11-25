@@ -2,7 +2,7 @@ import type { BreedsResponse, GalleryPet, ProvincesResponse } from "../../shared
 import { currentUser, getProvinces, type SessionUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { getBreeds, getGallery } from "../api/pets.js";
-import { ageLabel } from "../age.js";
+import { AGE_CHOICES, ageLabel } from "../age.js";
 import { appLayout } from "../components/app-layout.js";
 import { brand } from "../components/auth-layout.js";
 import { navFor } from "../components/nav.js";
@@ -12,18 +12,6 @@ import { galleryQueryString, type GalleryFilterValues } from "../gallery-query.j
 
 const SIZE_LABELS: Record<GalleryPet["size"], string> = { SMALL: "Pequeño", MEDIUM: "Mediano", LARGE: "Grande" };
 const SEX_LABELS: Record<GalleryPet["sex"], string> = { MALE: "Macho", FEMALE: "Hembra" };
-
-/** RN-205: age choices for the minimum and maximum, in months. */
-const AGE_CHOICES: [string, string][] = [
-  ["0", "0 meses"],
-  ["6", "6 meses"],
-  ["12", "1 año"],
-  ["24", "2 años"],
-  ["36", "3 años"],
-  ["60", "5 años"],
-  ["96", "8 años"],
-  ["120", "10 años"],
-];
 
 type Option = [value: string, label: string];
 

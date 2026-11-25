@@ -11,6 +11,7 @@ import { getShelterProfile, getShelters } from "./controllers/shelter-search.js"
 import { errorHandler } from "./middlewares/error-handler.js";
 import { loadSession } from "./middlewares/session.js";
 import { createAdminRouter } from "./routes/admin.js";
+import { createAdopterRouter } from "./routes/adopter.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createShelterRouter } from "./routes/shelter.js";
 
@@ -45,6 +46,7 @@ export function createApp(): express.Express {
   api.get("/shelters", getShelters);
   api.get("/shelters/:id", getShelterProfile);
   api.use("/admin", createAdminRouter());
+  api.use("/adopter", createAdopterRouter());
   api.use("/shelter", createShelterRouter());
 
   api.use(() => {

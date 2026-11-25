@@ -1074,3 +1074,84 @@ textarea {
 .contact-list dd {
   margin: 0;
 }
+
+/* Preferences questionnaire (CU-08) */
+.preferences {
+  max-width: 760px;
+}
+
+.question {
+  margin: 0;
+  padding: var(--space-6) 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.question legend {
+  padding: 0;
+  font-weight: 600;
+}
+
+.question .muted {
+  margin: var(--space-1) 0 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.chip__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip:has(.chip__input:checked) {
+  border-color: var(--color-primary-border);
+  background: var(--color-primary);
+  font-weight: 600;
+}
+
+.chip:has(.chip__input:checked)::before {
+  content: "✓";
+}
+
+.chip:has(.chip__input:focus-visible) {
+  outline: 2px solid var(--color-primary-border);
+  outline-offset: 2px;
+}
+
+.age-range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.age-range__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.preferences > .muted:last-of-type {
+  margin-top: var(--space-6);
+}
+
+.offer {
+  margin-top: var(--space-6);
+}

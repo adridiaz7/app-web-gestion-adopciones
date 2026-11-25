@@ -283,6 +283,29 @@ export interface ShelterPageResponse {
   pets: GalleryPet[];
 }
 
+/**
+ * CU-08 · the preferences questionnaire (RN-32). Empty lists and nulls mean "me da igual"
+ * (RN-34, RN-35). Ages in months (RN-205).
+ */
+export interface Preferences {
+  speciesIds: number[];
+  breedIds: number[];
+  sizes: ("SMALL" | "MEDIUM" | "LARGE")[];
+  sexes: ("MALE" | "FEMALE")[];
+  activityLevels: ("LOW" | "MEDIUM" | "HIGH")[];
+  minAgeMonths: number | null;
+  maxAgeMonths: number | null;
+  /** RN-36. */
+  needsGoodWithChildren: boolean;
+  /** RN-37: the pet must get along with all of them. */
+  mustGetAlongWithSpeciesIds: number[];
+}
+
+/** CU-08 · GET and PUT /api/adopter/preferences (the PUT body is a Preferences). null = never filled in. */
+export interface PreferencesResponse {
+  preferences: Preferences | null;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

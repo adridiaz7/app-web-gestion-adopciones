@@ -151,7 +151,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-17 | Cuestionario de preferencias: ofrecerlo tras el registro y editarlo desde el perfil. | CU-08; RN-30–38, 205 | T-07 | PENDIENTE |
+| T-17 | Cuestionario de preferencias: ofrecerlo tras el registro y editarlo desde el perfil. | CU-08; RN-30–38, 205 | T-07 | EN_REVISION |
 | T-18 | Modo descubrir: deslizar, descarte de 15 días, deshacer el último descarte y mensaje si no hay cuestionario. | CU-10; RN-70–75, 190, 191 | T-17, T-14 | PENDIENTE |
 | T-19 | Favoritos: lista, quitar y recuperar descartadas. | CU-12; RN-73, 74, 76 | T-18 | PENDIENTE |
 
