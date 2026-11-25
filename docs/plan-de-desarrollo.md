@@ -139,6 +139,8 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 **25/11/2026 · T-25 (no bloquea).** RN-105 y RN-106 cuentan las 48 h "desde la visita", y CU-26 dice que no se puede marcar una ausencia si la visita "todavía no ha tenido lugar". Se ha tomado como referencia el **fin del turno**: la ausencia se puede registrar desde que termina el turno y hasta 48 h después, y a las 48 h del fin el sistema la marca como realizada. ¿Es correcto, o debe contarse desde el **inicio** del turno?
 
+**25/11/2026 · T-29 (no bloquea).** RN-198 pide que el aviso fijo del chat diga a las dos partes "que el adoptante está bloqueado", pero RN-149 da al adoptante un texto neutro ("ha restringido tu acceso"). De momento el chat le dice al adoptante "Esta protectora te ha bloqueado hasta el …" y a la protectora "Has bloqueado a este adoptante hasta el …". ¿Se mantiene, o el adoptante debe ver también aquí el texto neutro de RN-149?
+
 ---
 
 ## 5. Tareas
