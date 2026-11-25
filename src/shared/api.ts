@@ -339,6 +339,33 @@ export interface DiscardsResponse {
   discards: GalleryPet[];
 }
 
+/** CU-18 · a slot of the shelter's calendar. Dates are ISO instants. */
+export interface ShelterSlot {
+  id: number;
+  startsAt: string;
+  endsAt: string;
+  capacity: number;
+  /** RN-82: places taken by PENDING and CONFIRMED visits. */
+  occupied: number;
+  visits: { id: number; petName: string; adopterName: string; status: string }[];
+}
+
+/** CU-18 · GET /api/shelter/slots */
+export interface SlotsResponse {
+  slots: ShelterSlot[];
+}
+
+/** CU-19 · body of POST /api/shelter/slots (ISO instants). */
+export interface SlotRequest {
+  startsAt: string;
+  endsAt: string;
+  capacity: number;
+}
+
+export interface SlotResponse {
+  slot: ShelterSlot;
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

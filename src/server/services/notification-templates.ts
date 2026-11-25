@@ -34,6 +34,14 @@ export const notificationTemplates = {
       `La protectora ha rechazado tu solicitud de visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}.` +
       (p.reason ? ` Motivo: ${p.reason}` : ""),
   }),
+
+  /** RN-111: the shelter changed or deleted the slot; the adopter is invited to choose another one. */
+  VISIT_VOIDED_SLOT_CANCELLED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Visita anulada por cambio de turno",
+    body:
+      `La protectora ha cambiado o eliminado el turno de tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)}. ` +
+      "Elige otro turno: la nueva visita quedará confirmada directamente.",
+  }),
 };
 
 export type NotificationType = keyof typeof notificationTemplates;
