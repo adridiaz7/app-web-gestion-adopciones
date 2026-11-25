@@ -624,3 +624,35 @@ export interface AdoptionRequest {
 export interface AdoptionRequestResponse {
   adoption: { id: number; status: "PENDING"; petId: number; petName: string };
 }
+
+/** CU-28 · a candidate for a pet (ISO instants). */
+export interface Candidate {
+  adoptionId: number;
+  adopterId: number;
+  name: string;
+  email: string;
+  phone: string;
+  provinceName: string;
+  locality: string;
+  household: Household;
+  /** RN-207 */
+  answers: { reason?: string; canAffordCosts?: boolean };
+  visitedAt: string;
+  requestedAt: string;
+}
+
+/** CU-28 · GET /api/shelter/pets/:id/candidates */
+export interface CandidatesResponse {
+  pet: { id: number; name: string; status: string };
+  candidates: Candidate[];
+}
+
+/** CU-29 · body of POST /api/shelter/adoptions/:id/reject (RN-123: required reason). */
+export interface RejectAdoptionRequest {
+  reason: string;
+}
+
+/** CU-29 · the adoption after approving or rejecting it. */
+export interface AdoptionStatusResponse {
+  adoption: { id: number; status: string };
+}

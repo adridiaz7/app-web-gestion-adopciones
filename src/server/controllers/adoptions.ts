@@ -1,8 +1,9 @@
 import type { Request, RequestHandler } from "express";
 import { z } from "zod";
-import type { AdoptionRequestResponse, HouseholdResponse } from "../../shared/api.js";
+import type { AdoptionRequestResponse, AdoptionStatusResponse, CandidatesResponse, HouseholdResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { getHousehold, requestAdoption, type AdoptionAnswers } from "../services/adoption-requests.js";
+import { approveAdoption, listCandidates, rejectAdoption } from "../services/adoption-decisions.js";
 
 const CHOOSE = "Elige una opción.";
 const yesNo = z.boolean({ error: CHOOSE });
@@ -67,4 +68,43 @@ export const postAdoption: RequestHandler = async (req, res) => {
   if (answers?.canAffordCosts !== undefined) stored.canAffordCosts = answers.canAffordCosts;
   const body: AdoptionRequestResponse = { adoption: await requestAdoption(userId(req.user), petId, household, stored) };
   res.status(201).json(body);
+};
+
+const ADOPTION_INVALID = "La solicitud no es válida.";
+const adoptionParamsSchema = z.object({
+  id: z.coerce.number({ error: ADOPTION_INVALID }).int({ error: ADOPTION_INVALID }).positive({ error: ADOPTION_INVALID }).max(Number.MAX_SAFE_INTEGER, { error: ADOPTION_INVALID }),
+});
+const petParamsSchema = z.object({
+  id: z.coerce.number({ error: INVALID_PET }).int({ error: INVALID_PET }).positive({ error: INVALID_PET }).max(Number.MAX_SAFE_INTEGER, { error: INVALID_PET }),
+});
+/** RN-123: the reason is required. */
+const REASON = "Indica el motivo del rechazo.";
+const rejectSchema = z.object({
+  reason: z.string({ error: REASON }).trim().min(1, { error: REASON }).max(1000, { error: "El motivo no puede tener más de 1000 caracteres." }),
+});
+
+/** CU-28 · GET /api/shelter/pets/:id/candidates */
+export const getCandidates: RequestHandler = async (req, res) => {
+  const { id } = petParamsSchema.parse(req.params);
+  const { pet, candidates } = await listCandidates(userId(req.user), id);
+  const body: CandidatesResponse = {
+    pet,
+    candidates: candidates.map((c) => ({ ...c, visitedAt: c.visitedAt.toISOString(), requestedAt: c.requestedAt.toISOString() })),
+  };
+  res.json(body);
+};
+
+/** CU-29 · POST /api/shelter/adoptions/:id/approve */
+export const postApproveAdoption: RequestHandler = async (req, res) => {
+  const { id } = adoptionParamsSchema.parse(req.params);
+  const body: AdoptionStatusResponse = { adoption: await approveAdoption(userId(req.user), id) };
+  res.json(body);
+};
+
+/** CU-29 · POST /api/shelter/adoptions/:id/reject */
+export const postRejectAdoption: RequestHandler = async (req, res) => {
+  const { id } = adoptionParamsSchema.parse(req.params);
+  const { reason } = rejectSchema.parse(req.body ?? {});
+  const body: AdoptionStatusResponse = { adoption: await rejectAdoption(userId(req.user), id, reason) };
+  res.json(body);
 };

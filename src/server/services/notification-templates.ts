@@ -52,6 +52,30 @@ export const notificationTemplates = {
     body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado. ${unlistReasonText(p.petName, p.reason)}`,
   }),
 
+  /** CU-29, RN-124: the adopter's request was approved. */
+  ADOPTION_APPROVED: (p: { petName: string }): RenderedNotification => ({
+    title: "Adopción aprobada",
+    body: `¡Enhorabuena! La protectora ha aprobado tu solicitud para adoptar a ${p.petName}. Acordad la entrega por el chat.`,
+  }),
+
+  /** CU-29, RN-124: another candidate was chosen. */
+  ADOPTION_NOT_SELECTED: (p: { petName: string }): RenderedNotification => ({
+    title: "Solicitud de adopción no seleccionada",
+    body: `La protectora ha elegido otro hogar para ${p.petName}. Gracias por tu interés: te avisaremos si vuelve a estar disponible.`,
+  }),
+
+  /** CU-29, RN-123: rejected with a reason. */
+  ADOPTION_REJECTED: (p: { petName: string; reason: string }): RenderedNotification => ({
+    title: "Solicitud de adopción rechazada",
+    body: `La protectora ha rechazado tu solicitud para adoptar a ${p.petName}. Motivo: ${p.reason}`,
+  }),
+
+  /** RN-109, RN-110, RN-124: a visit voided because the pet was reserved for another adopter. */
+  VISIT_VOIDED_PET_RESERVED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Visita anulada",
+    body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado porque ${p.petName} ya está reservada.`,
+  }),
+
   /** RN-65, RN-66: a pending adoption voided because its pet was unlisted. */
   ADOPTION_VOIDED_PET_UNLISTED: (p: { petName: string; reason: UnlistReasonText }): RenderedNotification => ({
     title: "Solicitud de adopción anulada",

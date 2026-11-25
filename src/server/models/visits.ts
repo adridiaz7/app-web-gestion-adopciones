@@ -400,7 +400,7 @@ export async function markDueReminders(db: Db, noticeHours: number, visitId: num
 }
 
 /** RN-65, RN-109: the pet's open (PENDING or CONFIRMED) visits become VOIDED with that reason. */
-export async function voidPetOpenVisits(db: Db, petId: number, reason: "PET_UNLISTED"): Promise<ChangedVisit[]> {
+export async function voidPetOpenVisits(db: Db, petId: number, reason: "PET_UNLISTED" | "PET_RESERVED"): Promise<ChangedVisit[]> {
   const { rows } = await db.query<ChangedVisit>(
     `WITH open AS (
        SELECT id, status FROM "Visit" WHERE pet_id = $1 AND status IN ('PENDING', 'CONFIRMED') FOR UPDATE
