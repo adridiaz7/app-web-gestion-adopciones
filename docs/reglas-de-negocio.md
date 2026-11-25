@@ -382,7 +382,7 @@ PENDIENTE ───────┼──► CANCELADA
 | RN-134 | El chat se abre cuando el adoptante envía su primera **solicitud de visita** a esa protectora, esté o no confirmada (la adopción siempre requiere una visita previa). La protectora **no puede iniciar** conversaciones. |
 | RN-135 | Una vez abierto, el chat **sigue abierto** aunque las solicitudes terminen (rechazadas, caducadas, canceladas…). |
 | RN-136 | Mientras haya un bloqueo activo, **ninguna de las dos partes** puede escribir en el chat. La conversación **se conserva** y ambas partes pueden seguir leyéndola. |
-| RN-198 | Mientras dure el bloqueo, la conversación muestra a las dos partes un **aviso fijo** indicando que el adoptante está bloqueado (y hasta qué fecha, si es temporal). No es un mensaje de ninguna de las partes. Al levantarse el bloqueo, el aviso desaparece y se puede volver a escribir. |
+| RN-198 | Mientras dure el bloqueo, la conversación muestra a las dos partes un **aviso fijo** (y hasta qué fecha, si es temporal): la protectora ve que ha bloqueado al adoptante, y el adoptante ve el texto neutro de RN-149 ("La protectora X ha restringido tu acceso"). No es un mensaje de ninguna de las partes. Al levantarse el bloqueo, el aviso desaparece y se puede volver a escribir. |
 | RN-137 | El chat es solo para la comunicación entre personas. Los avisos automáticos van por notificaciones. |
 | RN-138 | Se registra cuándo se lee cada mensaje. |
 | RN-139 | En el chat se pueden enviar **texto y fotos**. Está pendiente decidir si también se admiten vídeos. |

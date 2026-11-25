@@ -115,12 +115,16 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 ¿Basta con esto, o hay que impedirlo también en el servidor (por ejemplo, guardando en la sesión la mascota que se puede deshacer)?
 
+> **Respuesta del responsable (25/11/2026):** Basta con esto. No se cambia nada.
+
 **25/11/2026 · T-19 (no bloquea).** CU-12 tiene la excepción "la mascota ya no es visible para el adoptante (no disponible, bloqueo o protectora no validada o suspendida)", pero no dice qué pasa con esas mascotas en la lista de favoritos. Por otro lado, el mockup de favoritos muestra una favorita "RESERVADA" y RN-200 avisa de los cambios de estado de los favoritos, así que parece que siguen en la lista. Se ha implementado así:
 - la lista muestra los favoritos con su estado (reservada, adoptada, de baja), y solo los disponibles enlazan a su ficha;
 - se ocultan los de protectoras que han bloqueado al adoptante, que no están validadas, que están suspendidas o que se han eliminado (RN-23 y RN-77 dicen que esas mascotas "dejan de ser visibles");
 - solo se puede añadir a favoritos una mascota visible (404 si no).
 
 ¿Es correcto, o los favoritos no disponibles deberían ocultarse también?
+
+> **Respuesta del responsable (25/11/2026):** Es correcto. Los favoritos no disponibles siguen en la lista con su estado. No se cambia nada.
 
 **25/11/2026 · T-46 (bloquea T-46).** La carpeta `db/seed-photos/` no existe en `develop`, así que, como indica la propia tarea, T-46 queda `BLOQUEADA` hasta que se suban las fotos (y `CREDITOS.md`). Cuando estén en `develop`, basta con pasarla a `PENDIENTE`.
 
@@ -131,15 +135,25 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 Propuesta: solo para visitas anuladas con motivo `SLOT_CANCELLED` que estaban confirmadas, para la misma mascota, una sola vez, sin la antelación de 48 h pero con el resto de reglas (plazas, bloqueo, ausencia y cupo, que no cambia porque la original anulada deja de contar). De momento **T-22 no incluye la sustitución**: toda solicitud cumple las 48 h y queda pendiente. Cuando se responda, se puede hacer en una tarea aparte con tests nuevos.
 
+> **Respuesta del responsable (25/11/2026):** De acuerdo con la propuesta. Solo para visitas anuladas con motivo `SLOT_CANCELLED` que estaban confirmadas, para la misma mascota y una sola vez. Se salta la antelación de 48 h y queda confirmada directamente. Se aplican el resto de reglas: plazas, bloqueo, ausencia y cupo. Tarea **T-49**.
+
 **25/11/2026 · T-23 (no bloquea).** El cupo (RN-90) solo cuenta las visitas confirmadas o realizadas, y RN-93 lo comprueba al **solicitar**. Pero las pendientes no cuentan, así que un adoptante puede tener a la vez, por ejemplo, 5 solicitudes pendientes en la misma protectora; si la protectora las confirma todas, superaría las 3 visitas. ¿Hay que comprobar también el cupo al **confirmar** (CU-24), y responder con un error a la protectora si ya está lleno? De momento **no** se comprueba al confirmar, porque ninguna RN ni excepción de CU-24 lo dice.
 
 Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/adopter/visits/:id/cancel`); su botón irá en la pantalla "Mis visitas" de T-24, que aún no existe. Las acciones de la protectora (confirmar, rechazar y cancelar) están en el calendario de turnos.
 
+> **Respuesta del responsable (25/11/2026):** Sí. El cupo se comprueba también al **confirmar**. Si el adoptante ya lo tiene lleno, la protectora recibe un error y la visita sigue pendiente. Tarea **T-48**.
+
 **25/11/2026 · T-24 (no bloquea).** CU-21 y CU-22 incluyen también las **adopciones** (solicitudes, aprobadas pendientes de entrega), que todavía no existen: T-24 cubre solo las visitas, y las adopciones se añadirán a estas mismas pantallas en T-30–T-32. Además, CU-22 dice que la bandeja da "acceso al perfil de cada adoptante", pero ningún caso de uso ni RN dice qué datos del adoptante puede ver la protectora (¿nombre, provincia, datos del hogar de RN-27, historial de visitas con ella?). De momento la bandeja muestra solo el nombre. ¿Qué datos debe ver, y en qué tarea va?
+
+> **Respuesta del responsable (25/11/2026):** La protectora ve el nombre, la provincia, los datos del hogar (RN-27) y el **historial de visitas y ausencias** de ese adoptante con **esa misma** protectora. Nunca ve el historial con otras protectoras. Solo ve estos datos de los adoptantes que le han enviado alguna solicitud (RN-29). Tarea **T-50**.
 
 **25/11/2026 · T-25 (no bloquea).** RN-105 y RN-106 cuentan las 48 h "desde la visita", y CU-26 dice que no se puede marcar una ausencia si la visita "todavía no ha tenido lugar". Se ha tomado como referencia el **fin del turno**: la ausencia se puede registrar desde que termina el turno y hasta 48 h después, y a las 48 h del fin el sistema la marca como realizada. ¿Es correcto, o debe contarse desde el **inicio** del turno?
 
+> **Respuesta del responsable (25/11/2026):** Es correcto: las 48 h se cuentan desde el **fin** del turno. No se cambia nada.
+
 **25/11/2026 · T-29 (no bloquea).** RN-198 pide que el aviso fijo del chat diga a las dos partes "que el adoptante está bloqueado", pero RN-149 da al adoptante un texto neutro ("ha restringido tu acceso"). De momento el chat le dice al adoptante "Esta protectora te ha bloqueado hasta el …" y a la protectora "Has bloqueado a este adoptante hasta el …". ¿Se mantiene, o el adoptante debe ver también aquí el texto neutro de RN-149?
+
+> **Respuesta del responsable (25/11/2026):** En el chat, el adoptante ve el **texto neutro** de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". RN-198 está actualizada. Tarea **T-51**.
 
 ---
 
@@ -204,6 +218,9 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 | T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | EN_REVISION |
 | T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | EN_REVISION |
 | T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | EN_REVISION |
+| T-48 | Comprobar el **cupo** (RN-90) también al **confirmar** una visita. Si el adoptante ya lo tiene lleno con esa protectora, se responde con un error y la visita sigue pendiente. Solo API, más el mensaje de error en el calendario. Tests nuevos; no se modifican los de T-23. | CU-24; RN-90, 93; decisión del responsable del 25/11/2026 (sección 4) | T-23 | PENDIENTE |
+| T-49 | **Visita sustituta** (CU-23, RN-111). Solo cuando la visita anulada tenía motivo `SLOT_CANCELLED` y estaba confirmada. Es para la misma mascota y solo una vez (`replaces_visit_id`). No necesita las 48 h de antelación y queda confirmada directamente. Se aplican el resto de reglas: plazas, bloqueo, ausencia y cupo. Tests nuevos; no se modifican los de T-22. | CU-23; RN-87, 90, 111; decisión del responsable del 25/11/2026 (sección 4) | T-22, T-20 | PENDIENTE |
+| T-50 | **Perfil del adoptante en la bandeja** de la protectora (CU-22). La protectora ve el nombre, la provincia, los datos del hogar (RN-27) y el historial de visitas y ausencias de ese adoptante **con ella**. Solo ve los adoptantes que le han enviado alguna solicitud (RN-29). Tests nuevos, incluido que no se ve el historial con otras protectoras; no se modifican los de T-24. | CU-22; RN-27, 29; decisión del responsable del 25/11/2026 (sección 4) | T-24, T-25 | PENDIENTE |
 
 ### Fase 5 · Notificaciones y chat
 
@@ -211,6 +228,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 |---|---|---|---|---|
 | T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | EN_REVISION |
 | T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | EN_REVISION |
+| T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos; no se modifican los de T-29. | RN-149, 198; decisión del responsable del 25/11/2026 (sección 4) | T-29 | PENDIENTE |
 
 ### Fase 6 · Adopción
 
