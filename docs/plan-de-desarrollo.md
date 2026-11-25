@@ -77,7 +77,7 @@ Las reglas de `CLAUDE.md` se aplican igual en modo autónomo. En las ejecuciones
 | Decisión | Tareas afectadas | Estado |
 |---|---|---|
 | **Subida de archivos.** ¿Se añade la librería `multer` al stack y se guardan las fotos en `uploads/`, fuera de git? | T-13 (fotos de mascotas), la parte de fotos de T-29 (chat) y las fotos de T-42 (seed de la demo) | **Decidido (24/11/2026): sí, multer.** Fotos en `uploads/`, fuera de git, con nombre aleatorio; solo imágenes (comprobando el contenido, no solo la extensión) y tamaño máximo limitado. En la base de datos se guarda solo la ruta (RN-52). Express sirve `/uploads` como archivos estáticos. |
-| **Preguntas del cuestionario de adopción** (RN-207). | T-30 | Pendiente del responsable |
+| **Preguntas del cuestionario de adopción** (RN-207). | T-30 | **Decidido (25/11/2026):** ocho preguntas, todas opcionales; ver RN-207. |
 
 Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el desarrollador desbloqueará las tareas en su siguiente ejecución.
 
@@ -104,6 +104,8 @@ Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el d
 - **(b)** Mantener `/validate` solo para `PENDING` y añadir un endpoint aparte, por ejemplo `POST /api/admin/shelters/:id/revalidate`, solo para `REJECTED`, con su propia acción de auditoría (`SHELTER_REVALIDATED`) y un botón "Volver a validar" en la pestaña de rechazadas.
 
 Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLOQUEADA`.
+
+> **Respuesta del responsable (25/11/2026):** Opción **(a)**. Se autoriza cambiar ese test de T-11, que no está bloqueado: quitar `rejected` del bucle de `"CU-39: rejects validating a shelter that is not pending"`. El test sigue comprobando el 409 para una `VALIDATED`. El paso `REJECTED` → `VALIDATED` se cubre con tests nuevos. T-45 pasa a `PENDIENTE`.
 
 **25/11/2026 · T-18 (no bloquea).** RN-191 dice que solo se puede deshacer el descarte inmediatamente anterior, "no una cadena de descartes". El modelo de datos define el último descarte como "el `DISCARDED` más reciente". Pero al deshacerlo se borra la fila, y entonces el descarte anterior pasa a ser el más reciente: por la API se podría encadenar. Sin una columna o tabla nueva, el servidor no puede distinguirlo. Se ha implementado así:
 - el servidor solo deshace el `DISCARDED` más reciente (lo que dice el modelo de datos);
@@ -153,11 +155,12 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | EN_REVISION |
-| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos; no se modifican los de T-11. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | BLOQUEADA (choca con un test de T-11, ver sección 4) |
+| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos para `REJECTED` → `VALIDATED`. El responsable autoriza un único cambio en T-11: quitar `rejected` del bucle de `"CU-39: rejects validating a shelter that is not pending"` (`tests/integration/admin-shelters.test.ts`). Ningún otro test de T-11 se toca. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | PENDIENTE |
 | T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_REVISION |
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | EN_REVISION |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | EN_REVISION |
 | T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | EN_REVISION |
+| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | PENDIENTE |
 | T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | EN_REVISION |
 
 ### Fase 3 · Descubrir y favoritos
@@ -192,7 +195,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-30 | Solicitar una adopción con el cuestionario de adopción. | CU-27; RN-113–120, 207 | T-25 | BLOQUEADA (preguntas del cuestionario) |
+| T-30 | Solicitar una adopción con el cuestionario de adopción (preguntas en RN-207, todas opcionales). | CU-27; RN-113–120, 207 | T-25 | PENDIENTE |
 | T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | PENDIENTE |
 | T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | PENDIENTE |
 | T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | PENDIENTE |

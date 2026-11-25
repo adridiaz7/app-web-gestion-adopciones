@@ -334,7 +334,7 @@ PENDIENTE ────────┼──► CADUCADA
 | RN-116 | Una visita realizada sirve para solicitar la adopción durante **1 mes** desde la fecha de la visita. Pasado ese plazo, el adoptante debe hacer **otra visita** (que consume cupo) antes de solicitar la adopción. |
 | RN-117 | El adoptante debe tener completos los **datos del hogar** (RN-27). |
 | RN-206 | La app gestiona la adopción hasta la entrega de la mascota. El **contrato de adopción y las posibles tasas se gestionan fuera de la app**. |
-| RN-207 | Al solicitar la adopción, el adoptante rellena un **breve cuestionario de adopción**, cuyas respuestas ve la protectora junto a la solicitud. Las preguntas están pendientes de definir. |
+| RN-207 | Al solicitar la adopción, el adoptante rellena un **breve cuestionario de adopción**, cuyas respuestas ve la protectora junto a la solicitud. **Todas las preguntas son opcionales** y se redactan en un tono cercano y respetuoso: 1) Tipo de vivienda: piso, casa u otro. 2) ¿Tiene jardín o terraza? (sí / no). 3) La vivienda es: en propiedad, de alquiler o de alquiler con opción a compra (se elige una). 4) ¿Cuántas personas viven en casa? (número) y ¿hay niños? (sí / no). 5) ¿Convive con otros animales? ¿Cuáles? (texto corto). 6) ¿Cuántas horas al día pasaría sola la mascota? (número). 7) ¿Por qué quiere adoptar a esta mascota? (texto libre). 8) ¿Podrá hacerse cargo de los gastos de tener una mascota (vacunas, seguro, veterinario, comida…)? (sí / no). |
 | RN-118 | No puede solicitar la adopción un adoptante con una visita `NO_ASISTIDA` en esa protectora ni uno bloqueado por ella. |
 | RN-119 | Un adoptante no puede tener **dos solicitudes abiertas** (`PENDIENTE` o `APROBADA`) para la misma mascota. |
 | RN-120 | El adoptante puede retirar su solicitud mientras está `PENDIENTE` (`CANCELADA`). |
@@ -533,7 +533,6 @@ Estos valores no se escriben fijos en el código: van en la **configuración del
 - Compartir fichas de mascotas mediante enlaces públicos (RN-188).
 
 ### Pendiente de definir en fases posteriores
-- Preguntas del cuestionario de adopción (RN-207).
 - Si el chat admite vídeos y, en ese caso, sus límites de tamaño y duración (RN-139).
 
 > Resuelto en el [modelo entidad-relación](modelo-entidad-relacion.md): modelado de las fotos del chat, bloqueo del turno al reservar la última plaza, zona horaria y decisiones técnicas de PostgreSQL (estados, tipos, nombres y `ON DELETE`).
