@@ -1,7 +1,7 @@
 import type { ShelterSlot, SlotRequest } from "../../shared/api.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
-import { createSlot, deleteSlot, listSlots, updateSlot } from "../api/slots.js";
+import { createRecurringSlots, createSlot, deleteSlot, listSlots, updateSlot } from "../api/slots.js";
 import { appLayout } from "../components/app-layout.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
@@ -19,6 +19,9 @@ const VISIT_STATUS: Record<string, string> = {
   COMPLETED: "Realizada",
   NO_SHOW: "No asistió",
 };
+
+/** CU-50: ISO order, Monday (1) to Sunday (7). */
+const WEEKDAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 const DAY = new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
@@ -128,6 +131,64 @@ function calendar(initial: ShelterSlot[]): HTMLElement {
     }, fail);
   });
 
+  const recurringForm = h(
+    "form",
+    { class: "slot-form" },
+    h(
+      "div",
+      { class: "slot-form__fields" },
+      h("label", { class: "slot-form__field" }, h("span", {}, "Desde"), h("input", { name: "startDate", type: "date", required: true })),
+      h("label", { class: "slot-form__field" }, h("span", {}, "Hasta"), h("input", { name: "endDate", type: "date", required: true })),
+      h("label", { class: "slot-form__field" }, h("span", {}, "Inicio"), h("input", { name: "start", type: "time", required: true })),
+      h("label", { class: "slot-form__field" }, h("span", {}, "Fin"), h("input", { name: "end", type: "time", required: true })),
+      h(
+        "label",
+        { class: "slot-form__field" },
+        h("span", {}, "Plazas"),
+        h("input", { name: "capacity", type: "number", value: "1", min: "1", step: "1", required: true }),
+      ),
+    ),
+    h(
+      "fieldset",
+      { class: "slot-form__weekdays" },
+      h("legend", {}, "Días de la semana"),
+      ...WEEKDAYS.map((label, index) =>
+        h("label", { class: "checkbox" }, h("input", { type: "checkbox", name: "weekday", value: String(index + 1) }), ` ${label}`),
+      ),
+    ),
+    h("p", { class: "muted" }, "Se crea un turno independiente por cada día, como máximo para 3 meses. Los días que choquen con un turno que ya tienes no se crean."),
+    h("button", { type: "submit", class: "button button--primary" }, "Crear turnos"),
+  );
+  recurringForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const value = (name: string) => recurringForm.querySelector<HTMLInputElement>(`input[name="${name}"]`)?.value ?? "";
+    const weekdays = [...recurringForm.querySelectorAll<HTMLInputElement>('input[name="weekday"]:checked')].map((input) => Number(input.value));
+    createRecurringSlots({
+      startDate: value("startDate"),
+      endDate: value("endDate"),
+      weekdays,
+      startTime: value("start"),
+      endTime: value("end"),
+      capacity: Number(value("capacity")),
+    }).then((res) => {
+      slots = [...slots, ...res.slots];
+      const created = res.slots.length === 1 ? "Se ha creado 1 turno" : `Se han creado ${String(res.slots.length)} turnos`;
+      message.replaceChildren(
+        res.skipped.length === 0
+          ? notice("success", created)
+          : notice(
+              "warning",
+              created,
+              `No se han creado estos, porque chocan con turnos que ya tienes: ${res.skipped
+                .map((slot) => `${DAY.format(new Date(slot.startsAt))} (${madridTime(slot.startsAt)} – ${madridTime(slot.endsAt)})`)
+                .join("; ")}.`,
+            ),
+      );
+      draw();
+    }, fail);
+  });
+  const recurring = h("details", { class: "card slot-form" }, h("summary", {}, h("strong", {}, "Turnos recurrentes")), recurringForm);
+
   const list = h("div", { class: "slot-days" });
   const draw = (): void => {
     const ordered = sortSlots(slots);
@@ -148,11 +209,11 @@ function calendar(initial: ShelterSlot[]): HTMLElement {
   };
 
   draw();
-  root.append(message, createForm, list);
+  root.append(message, createForm, recurring, list);
   return root;
 }
 
-/** CU-18, CU-19, CU-20 · /protectora/turnos */
+/** CU-18, CU-19, CU-20, CU-50 · /protectora/turnos */
 export async function renderShelterSlots(root: HTMLElement): Promise<void> {
   const user = await currentUser();
   if (!user) {

@@ -366,6 +366,26 @@ export interface SlotResponse {
   slot: ShelterSlot;
 }
 
+/** CU-50 · body of POST /api/shelter/slots/recurring (Madrid dates and times). */
+export interface RecurringSlotsRequest {
+  /** YYYY-MM-DD */
+  startDate: string;
+  endDate: string;
+  /** ISO weekdays: 1 = Monday … 7 = Sunday. */
+  weekdays: number[];
+  /** HH:MM */
+  startTime: string;
+  endTime: string;
+  capacity: number;
+}
+
+export interface RecurringSlotsResponse {
+  /** The slots created. */
+  slots: ShelterSlot[];
+  /** RN-192: dates not generated because they overlap an existing slot (ISO instants). */
+  skipped: { startsAt: string; endsAt: string }[];
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

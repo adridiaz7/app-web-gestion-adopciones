@@ -113,3 +113,42 @@ export async function voidSlotVisits(db: Db, slotId: number): Promise<VoidedVisi
   );
   return rows.sort((a, b) => a.id - b.id);
 }
+
+export interface SlotTimes {
+  startsAt: Date;
+  endsAt: Date;
+}
+
+/**
+ * RN-192: the start and end instants of the dates between `startDate` and `endDate` that fall
+ * on one of the ISO `weekdays` (1 = Monday … 7 = Sunday), with the times in Madrid time.
+ */
+export async function selectRecurringTimes(
+  db: Db,
+  startDate: string,
+  endDate: string,
+  weekdays: number[],
+  startTime: string,
+  endTime: string,
+): Promise<SlotTimes[]> {
+  const { rows } = await db.query<SlotTimes>(
+    `SELECT (d::date + $4::time) AT TIME ZONE 'Europe/Madrid' AS "startsAt",
+            (d::date + $5::time) AT TIME ZONE 'Europe/Madrid' AS "endsAt"
+       FROM generate_series($1::date, $2::date, interval '1 day') AS d
+      WHERE extract(isodow FROM d)::int = ANY($3::int[])
+      ORDER BY d`,
+    [startDate, endDate, weekdays, startTime, endTime],
+  );
+  return rows;
+}
+
+/** RN-192: whether the shelter has a slot, not cancelled, that overlaps that time. */
+export async function hasOverlappingSlot(db: Db, shelterId: number, startsAt: Date, endsAt: Date): Promise<boolean> {
+  const { rows } = await db.query(
+    `SELECT 1 FROM "Visit_slot"
+      WHERE shelter_id = $1 AND cancelled_at IS NULL AND starts_at < $3 AND ends_at > $2
+      LIMIT 1`,
+    [shelterId, startsAt, endsAt],
+  );
+  return rows.length > 0;
+}

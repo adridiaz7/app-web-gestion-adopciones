@@ -1320,6 +1320,16 @@ textarea {
   gap: var(--space-1);
 }
 
+/* Recurring slots (CU-50) */
+.slot-form__weekdays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
 .slot-day {
   margin-bottom: var(--space-6);
 }

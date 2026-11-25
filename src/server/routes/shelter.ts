@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { deletePhoto, getPhotos, postPhoto, putPhotoOrder, receivePhoto } from "../controllers/pet-photos.js";
 import { getPet, getPets, postPet, putPet } from "../controllers/shelter-pets.js";
-import { deleteSlotHandler, getSlots, postSlot, putSlot } from "../controllers/visit-slots.js";
+import { deleteSlotHandler, getSlots, postRecurringSlots, postSlot, putSlot } from "../controllers/visit-slots.js";
 import { requireRole } from "../middlewares/session.js";
 
 /** Routes of the shelter's own area: every one needs the SHELTER role. */
@@ -21,6 +21,7 @@ export function createShelterRouter(): Router {
 
   router.get("/slots", getSlots);
   router.post("/slots", postSlot);
+  router.post("/slots/recurring", postRecurringSlots);
   router.put("/slots/:id", putSlot);
   router.delete("/slots/:id", deleteSlotHandler);
 

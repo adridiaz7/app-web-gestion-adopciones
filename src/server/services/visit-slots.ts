@@ -1,15 +1,19 @@
+import { getConfig } from "../config.js";
 import { getPool } from "../db/pool.js";
 import { withTransaction, type Db } from "../db/transaction.js";
 import { BadRequestError, ConflictError, NotFoundError } from "../errors.js";
 import {
   cancelSlotRow,
   countOccupied,
+  hasOverlappingSlot,
   insertSlot,
   lockShelterSlot,
   selectShelterSlot,
+  selectRecurringTimes,
   selectShelterSlots,
   updateSlotRow,
   voidSlotVisits,
+  type SlotTimes,
   type VisitSlot,
 } from "../models/visit-slots.js";
 import { audit } from "./audit.js";
@@ -46,6 +50,70 @@ export async function createSlot(shelterId: number, data: SlotData): Promise<Vis
   checkSlot(data);
   const pool = getPool();
   return slotOf(pool, shelterId, await insertSlot(pool, shelterId, data.startsAt, data.endsAt, data.capacity));
+}
+
+export interface RecurringSlotData {
+  /** YYYY-MM-DD, Madrid dates. */
+  startDate: string;
+  endDate: string;
+  /** ISO weekdays: 1 = Monday … 7 = Sunday. */
+  weekdays: number[];
+  /** HH:MM, Madrid time. */
+  startTime: string;
+  endTime: string;
+  capacity: number;
+}
+
+export interface RecurringSlotsResult {
+  slots: VisitSlot[];
+  /** RN-192: dates not generated because they overlap an existing slot. */
+  skipped: SlotTimes[];
+}
+
+const madridDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" });
+
+/** The same day `months` later (YYYY-MM-DD), or the last day of that month if it is shorter. */
+function addMonths(date: string, months: number): string {
+  const [year, month, day] = date.split("-").map(Number) as [number, number, number];
+  const lastDay = new Date(Date.UTC(year, month - 1 + months + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(year, month - 1 + months, Math.min(day, lastDay))).toISOString().slice(0, 10);
+}
+
+/** CU-50 exceptions and RN-84, RN-192 on the range and the times. */
+function checkRecurring(data: RecurringSlotData): void {
+  const maxMonths = getConfig().rules.recurringSlotsMaxRangeMonths;
+  if (data.startDate < madridDate.format(new Date())) throw new BadRequestError("La fecha de inicio ya ha pasado.");
+  if (data.endDate < data.startDate) throw new BadRequestError("La fecha de fin no puede ser anterior a la de inicio.");
+  if (data.endDate > addMonths(data.startDate, maxMonths)) {
+    throw new BadRequestError(`El rango de fechas no puede superar los ${String(maxMonths)} meses.`);
+  }
+  if (data.endTime <= data.startTime) throw new BadRequestError("La hora de fin tiene que ser posterior a la de inicio.");
+}
+
+/**
+ * CU-50, RN-192: creates an independent slot for each date of the range that falls on one of
+ * the weekdays. Dates already started are not generated, and those that overlap an existing
+ * slot are skipped and reported. All in one transaction (RN-171).
+ */
+export async function createRecurringSlots(shelterId: number, data: RecurringSlotData): Promise<RecurringSlotsResult> {
+  checkRecurring(data);
+  return withTransaction(async (client) => {
+    const times = await selectRecurringTimes(client, data.startDate, data.endDate, data.weekdays, data.startTime, data.endTime);
+    const now = Date.now();
+    const createdIds: number[] = [];
+    const skipped: SlotTimes[] = [];
+    for (const { startsAt, endsAt } of times) {
+      if (startsAt.getTime() <= now) continue;
+      if (await hasOverlappingSlot(client, shelterId, startsAt, endsAt)) {
+        skipped.push({ startsAt, endsAt });
+        continue;
+      }
+      createdIds.push(await insertSlot(client, shelterId, startsAt, endsAt, data.capacity));
+    }
+    const slots: VisitSlot[] = [];
+    for (const id of createdIds) slots.push(await slotOf(client, shelterId, id));
+    return { slots, skipped };
+  });
 }
 
 /**
