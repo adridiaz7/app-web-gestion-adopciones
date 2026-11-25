@@ -111,6 +111,13 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 ¿Basta con esto, o hay que impedirlo también en el servidor (por ejemplo, guardando en la sesión la mascota que se puede deshacer)?
 
+**25/11/2026 · T-19 (no bloquea).** CU-12 tiene la excepción "la mascota ya no es visible para el adoptante (no disponible, bloqueo o protectora no validada o suspendida)", pero no dice qué pasa con esas mascotas en la lista de favoritos. Por otro lado, el mockup de favoritos muestra una favorita "RESERVADA" y RN-200 avisa de los cambios de estado de los favoritos, así que parece que siguen en la lista. Se ha implementado así:
+- la lista muestra los favoritos con su estado (reservada, adoptada, de baja), y solo los disponibles enlazan a su ficha;
+- se ocultan los de protectoras que han bloqueado al adoptante, que no están validadas, que están suspendidas o que se han eliminado (RN-23 y RN-77 dicen que esas mascotas "dejan de ser visibles");
+- solo se puede añadir a favoritos una mascota visible (404 si no).
+
+¿Es correcto, o los favoritos no disponibles deberían ocultarse también?
+
 ---
 
 ## 5. Tareas
@@ -159,7 +166,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 |---|---|---|---|---|
 | T-17 | Cuestionario de preferencias: ofrecerlo tras el registro y editarlo desde el perfil. | CU-08; RN-30–38, 205 | T-07 | EN_REVISION |
 | T-18 | Modo descubrir: deslizar, descarte de 15 días, deshacer el último descarte y mensaje si no hay cuestionario. | CU-10; RN-70–75, 190, 191 | T-17, T-14 | EN_REVISION |
-| T-19 | Favoritos: lista, quitar y recuperar descartadas. | CU-12; RN-73, 74, 76 | T-18 | PENDIENTE |
+| T-19 | Favoritos: lista, quitar y recuperar descartadas. | CU-12; RN-73, 74, 76 | T-18 | EN_REVISION |
 
 ### Fase 4 · Turnos y visitas
 

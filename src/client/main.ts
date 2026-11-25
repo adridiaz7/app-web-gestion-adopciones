@@ -10,6 +10,7 @@ import { renderRegisterAdopter, renderRegisterShelter } from "./views/register.j
 import { renderPetProfile } from "./views/pet-profile.js";
 import { renderPreferences } from "./views/preferences.js";
 import { renderDiscover } from "./views/discover.js";
+import { renderFavorites } from "./views/favorites.js";
 import { renderShelterProfile, renderShelterSearch } from "./views/shelters.js";
 import { renderMyPets, renderPetForm } from "./views/shelter-pets.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
@@ -31,6 +32,7 @@ const routes: Route[] = [
   { path: "/protectoras", render: renderShelterSearch },
   { path: "/protectoras/:id", render: renderShelterProfile },
   { path: "/perfil/preferencias", render: renderPreferences },
+  { path: "/favoritos", render: renderFavorites },
   { path: "/admin/protectoras", render: renderAdminShelters },
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },

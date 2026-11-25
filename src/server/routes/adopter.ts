@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getDiscover, postDiscard, postFavorite, postUndo } from "../controllers/discover.js";
+import { deleteDiscard, deleteFavorite, getDiscards, getFavorites, putFavorite } from "../controllers/favorites.js";
 import { getMyPreferences, putMyPreferences } from "../controllers/preferences.js";
 import { requireRole } from "../middlewares/session.js";
 
@@ -15,6 +16,12 @@ export function createAdopterRouter(): Router {
   router.post("/discover/pets/:id/favorite", postFavorite);
   router.post("/discover/pets/:id/discard", postDiscard);
   router.post("/discover/undo", postUndo);
+
+  router.get("/favorites", getFavorites);
+  router.put("/favorites/:petId", putFavorite);
+  router.delete("/favorites/:petId", deleteFavorite);
+  router.get("/discards", getDiscards);
+  router.delete("/discards/:petId", deleteDiscard);
 
   return router;
 }

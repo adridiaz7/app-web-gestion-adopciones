@@ -324,6 +324,21 @@ export interface UndoDiscardRequest {
   petId: number;
 }
 
+/** CU-12 · a favourite keeps its pet's status (reserved, adopted…). */
+export interface FavoritePet extends GalleryPet {
+  status: PetStatus;
+}
+
+/** CU-12 · GET /api/adopter/favorites, most recent first. PUT and DELETE …/favorites/:petId add and remove. */
+export interface FavoritesResponse {
+  favorites: FavoritePet[];
+}
+
+/** CU-12 · GET /api/adopter/discards: discards still in force. DELETE …/discards/:petId recovers one. */
+export interface DiscardsResponse {
+  discards: GalleryPet[];
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

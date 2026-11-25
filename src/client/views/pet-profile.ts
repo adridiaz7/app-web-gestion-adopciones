@@ -1,10 +1,12 @@
 import type { PetProfile } from "../../shared/api.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
+import { listFavorites } from "../api/favorites.js";
 import { getPetProfile } from "../api/pets.js";
 import { ageLabel } from "../age.js";
 import { appLayout } from "../components/app-layout.js";
 import { authPage } from "../components/auth-layout.js";
+import { favoriteButton } from "../components/favorite-button.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
 import { h, mount } from "../dom.js";
@@ -47,7 +49,9 @@ function photoGallery(pet: PetProfile): HTMLElement {
   return h("div", {}, main, pet.photos.length > 1 ? h("div", { class: "profile-thumbs" }, ...thumbs) : null);
 }
 
-function profileContent(pet: PetProfile): Node[] {
+/** `favorite`: null when the user is not an adopter (only adopters keep favourites, CU-12). */
+function profileContent(pet: PetProfile, favorite: boolean | null): Node[] {
+  const message = h("div", {});
   // RN-46: species without a record are unknown, so they are not listed.
   const livesWith: [string, string][] = pet.getsAlongWith.map((g) => [`Con ${g.speciesName.toLowerCase()}s`, g.getsAlong ? "Se lleva bien" : "No se lleva bien"]);
 
@@ -90,6 +94,9 @@ function profileContent(pet: PetProfile): Node[] {
         h("h1", { class: "display" }, pet.name),
         h("p", { class: "muted" }, `${pet.breedName} · ${ageLabel(pet.birthDate)} · ${SEX_LABELS[pet.sex]} · ${SIZE_LABELS[pet.size]}`),
         h("p", {}, h("span", { class: "badge badge--available" }, "Disponible"), ` ${pet.shelter.locality} (${pet.shelter.provinceName})`),
+        // RN-73: the same favourite as in the gallery and discover mode.
+        favorite === null ? null : favoriteButton(pet.id, favorite, (text) => message.replaceChildren(notice("error", text)), true),
+        message,
       ),
     ),
   ];
@@ -122,8 +129,12 @@ export async function renderPetProfile(root: HTMLElement, params: RouteParams): 
 
   let content: Node[];
   try {
-    const { pet } = await getPetProfile(Number(params["id"]));
-    content = profileContent(pet);
+    const id = Number(params["id"]);
+    const [{ pet }, favorites] = await Promise.all([
+      getPetProfile(id),
+      user.role === "ADOPTER" ? listFavorites().then((r) => r.favorites.some((f) => f.id === id)) : Promise.resolve(null),
+    ]);
+    content = profileContent(pet, favorites);
   } catch (error) {
     content = [
       h("a", { class: "back-link", href: "/mascotas" }, "← Volver a explorar"),

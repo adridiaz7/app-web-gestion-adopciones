@@ -1,10 +1,12 @@
 import type { BreedsResponse, GalleryPet, ProvincesResponse } from "../../shared/api.js";
 import { currentUser, getProvinces, type SessionUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
+import { listFavorites } from "../api/favorites.js";
 import { getBreeds, getGallery } from "../api/pets.js";
 import { AGE_CHOICES, ageLabel } from "../age.js";
 import { appLayout } from "../components/app-layout.js";
 import { brand } from "../components/auth-layout.js";
+import { favoriteButton } from "../components/favorite-button.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
 import { h, mount } from "../dom.js";
@@ -106,18 +108,29 @@ function galleryContent(catalogue: BreedsResponse, provinces: ProvincesResponse,
   // RN-187: visitors get the invitation; users with a session open the profile.
   const onOpen = user ? null : () => dialog.showModal();
 
+  // RN-73: adopters get a heart on each card; their current favourites are marked.
+  const message = h("div", {});
+  const favoriteIds =
+    user?.role === "ADOPTER" ? listFavorites().then(({ favorites }) => new Set(favorites.map((f) => f.id)), () => new Set<number>()) : null;
+  const cardFor = (pet: GalleryPet, favorites: Set<number> | null): HTMLElement => {
+    const card = petCard(pet, onOpen);
+    if (!favorites) return card;
+    const heart = favoriteButton(pet.id, favorites.has(pet.id), (text) => message.replaceChildren(notice("error", text)));
+    return h("div", { class: "pet-card-wrap" }, card, heart);
+  };
+
   let request = 0;
   const load = async (): Promise<void> => {
     const mine = ++request;
     const values = Object.fromEntries(new FormData(form)) as GalleryFilterValues;
     try {
-      const { pets } = await getGallery(galleryQueryString(values));
+      const [{ pets }, favorites] = await Promise.all([getGallery(galleryQueryString(values)), favoriteIds]);
       if (mine !== request) return;
       count.textContent = pets.length === 1 ? "1 mascota" : `${String(pets.length)} mascotas`;
       results.replaceChildren(
         ...(pets.length === 0
           ? [notice("info", "No hay mascotas disponibles con estos filtros.", "Prueba a quitar alguno.")]
-          : pets.map((pet) => petCard(pet, onOpen))),
+          : pets.map((pet) => cardFor(pet, favorites))),
       );
     } catch (error) {
       if (mine !== request) return;
@@ -131,7 +144,7 @@ function galleryContent(catalogue: BreedsResponse, provinces: ProvincesResponse,
   form.addEventListener("submit", (event) => event.preventDefault());
   void load();
 
-  return [form, count, results, dialog];
+  return [form, count, message, results, dialog];
 }
 
 /** CU-09 · /mascotas: the gallery, open to visitors (RN-187) and to logged-in users. */

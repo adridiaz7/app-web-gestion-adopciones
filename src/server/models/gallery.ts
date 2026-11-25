@@ -6,8 +6,15 @@ import type { Db } from "../db/transaction.js";
  * placeholder of the adopter's id, or of NULL for a visitor (no block to check).
  */
 export function visiblePetCondition(adopterParam: string): string {
-  return `p.status = 'AVAILABLE'
-      AND s.validation_status = 'VALIDATED'
+  return `p.status = 'AVAILABLE' AND ${visibleShelterCondition(adopterParam)}`;
+}
+
+/**
+ * The shelter part of the visibility (RN-23, RN-77): validated, not suspended, not deleted,
+ * and not blocking the adopter. Same aliases and placeholder as visiblePetCondition.
+ */
+export function visibleShelterCondition(adopterParam: string): string {
+  return `s.validation_status = 'VALIDATED'
       AND su.deleted_at IS NULL
       AND NOT EXISTS (SELECT 1 FROM "Suspension" sp WHERE sp.user_id = p.shelter_id AND sp.ended_at IS NULL)
       AND (${adopterParam}::bigint IS NULL OR NOT EXISTS (
