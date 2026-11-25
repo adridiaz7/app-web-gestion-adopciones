@@ -12,7 +12,7 @@ export interface Viewer {
 }
 
 /** RN-77: blocks only hide pets from the blocked adopter. */
-const adopterOf = (viewer: Viewer | undefined): number | null => (viewer?.role === "ADOPTER" ? viewer.id : null);
+export const adopterOf = (viewer: Viewer | undefined): number | null => (viewer?.role === "ADOPTER" ? viewer.id : null);
 
 /**
  * CU-09: the gallery. Only visible pets (RN-58, RN-23); for an adopter, without the pets of

@@ -24,6 +24,8 @@ export interface GalleryFilters {
   provinceId?: number | undefined;
   minAgeMonths?: number | undefined;
   maxAgeMonths?: number | undefined;
+  /** Only the pets of this shelter (its profile, CU-13). Not a gallery filter of the API. */
+  shelterId?: number | undefined;
 }
 
 /** The data of a gallery card (RN-187). */
@@ -63,6 +65,7 @@ export async function selectGalleryPets(db: Db, adopterId: number | null, filter
         AND ($6::smallint IS NULL OR s.province_id = $6)
         AND ($7::int      IS NULL OR p.birth_date <= current_date - make_interval(months => $7::int))
         AND ($8::int      IS NULL OR p.birth_date >  current_date - make_interval(months => $8::int + 1))
+        AND ($9::bigint   IS NULL OR p.shelter_id = $9)
       ORDER BY p.created_at DESC, p.id DESC`,
     [
       adopterId,
@@ -73,6 +76,7 @@ export async function selectGalleryPets(db: Db, adopterId: number | null, filter
       filters.provinceId ?? null,
       filters.minAgeMonths ?? null,
       filters.maxAgeMonths ?? null,
+      filters.shelterId ?? null,
     ],
   );
   return rows;

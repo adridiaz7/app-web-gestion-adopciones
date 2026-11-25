@@ -7,6 +7,7 @@ import { getConfig } from "./config.js";
 import { NotFoundError } from "./errors.js";
 import { getBreeds, getProvinces } from "./controllers/catalogues.js";
 import { getGallery, getPetProfileHandler } from "./controllers/gallery.js";
+import { getShelterProfile, getShelters } from "./controllers/shelter-search.js";
 import { errorHandler } from "./middlewares/error-handler.js";
 import { loadSession } from "./middlewares/session.js";
 import { createAdminRouter } from "./routes/admin.js";
@@ -41,6 +42,8 @@ export function createApp(): express.Express {
   api.get("/breeds", getBreeds);
   api.get("/pets", getGallery);
   api.get("/pets/:id", getPetProfileHandler);
+  api.get("/shelters", getShelters);
+  api.get("/shelters/:id", getShelterProfile);
   api.use("/admin", createAdminRouter());
   api.use("/shelter", createShelterRouter());
 

@@ -58,7 +58,7 @@ function signUpDialog(): HTMLDialogElement {
 }
 
 /** With a session the card opens the profile (CU-11); without one, `onOpen` invites to sign up (RN-187). */
-function petCard(pet: GalleryPet, onOpen: (() => void) | null): HTMLElement {
+export function petCard(pet: GalleryPet, onOpen: (() => void) | null): HTMLElement {
   const photo = pet.photoUrl
     ? h("img", { class: "pet-card__photo", src: pet.photoUrl, alt: `Foto de ${pet.name}`, loading: "lazy" })
     : h("div", { class: "pet-card__photo pet-card__photo--empty", "aria-hidden": "true" }, "🐾");
@@ -165,7 +165,7 @@ export async function renderGallery(root: HTMLElement): Promise<void> {
   ];
 
   if (user) {
-    mount(root, appLayout(user, navFor(user.role), [...heading, ...content]));
+    mount(root, appLayout(user, navFor(user.role), [...heading, exploreTabs("pets"), ...content]));
     return;
   }
 
@@ -187,5 +187,17 @@ export async function renderGallery(root: HTMLElement): Promise<void> {
       ),
       h("main", { class: "public-page__main" }, ...heading, ...content),
     ),
+  );
+}
+
+/** Tabs of "Explorar" for users with a session: pets and shelters (CU-09, CU-13). */
+export function exploreTabs(current: "pets" | "shelters"): HTMLElement {
+  const tab = (href: string, label: string, active: boolean) =>
+    h("a", { class: "tabs__tab", href, "aria-current": active ? "page" : undefined }, label);
+  return h(
+    "nav",
+    { class: "tabs", "aria-label": "Explorar" },
+    tab("/mascotas", "Mascotas", current === "pets"),
+    tab("/protectoras", "Protectoras", current === "shelters"),
   );
 }

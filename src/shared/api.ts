@@ -245,6 +245,44 @@ export interface PetProfileResponse {
   pet: PetProfile;
 }
 
+/** A shelter card in the search (CU-13). */
+export interface ShelterCard {
+  id: number;
+  name: string;
+  description: string | null;
+  logoUrl: string | null;
+  locality: string;
+  provinceName: string;
+  /** Pets this adopter can see (0 when the shelter blocked them, RN-77). */
+  availablePets: number;
+}
+
+/** CU-13 · GET /api/shelters?name=&provinceId= */
+export interface SheltersResponse {
+  shelters: ShelterCard[];
+}
+
+/** CU-13 · GET /api/shelters/:id */
+export interface ShelterPageResponse {
+  shelter: {
+    id: number;
+    name: string;
+    description: string | null;
+    logoUrl: string | null;
+    address: string;
+    locality: string;
+    provinceName: string;
+    phone: string;
+    contactEmail: string | null;
+    website: string | null;
+    openingHours: string | null;
+  };
+  /** RN-149: the shelter has restricted this adopter's access; endsAt null = permanent. */
+  block: { endsAt: string | null } | null;
+  /** Available pets; empty while there is a block (RN-77). */
+  pets: GalleryPet[];
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;
