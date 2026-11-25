@@ -705,3 +705,37 @@ textarea {
   border-color: var(--neutral-300);
   color: var(--color-text-muted);
 }
+
+/* Pet photos (CU-15, CU-16) */
+.pet-photos {
+  margin-bottom: var(--space-6);
+}
+
+.pet-photos__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pet-photos__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.pet-photos__item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius-xl);
+}
+
+.pet-photos__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}

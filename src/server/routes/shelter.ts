@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { deletePhoto, getPhotos, postPhoto, putPhotoOrder, receivePhoto } from "../controllers/pet-photos.js";
 import { getPet, getPets, postPet, putPet } from "../controllers/shelter-pets.js";
 import { requireRole } from "../middlewares/session.js";
 
@@ -11,6 +12,11 @@ export function createShelterRouter(): Router {
   router.post("/pets", postPet);
   router.get("/pets/:id", getPet);
   router.put("/pets/:id", putPet);
+
+  router.get("/pets/:id/photos", getPhotos);
+  router.post("/pets/:id/photos", receivePhoto, postPhoto);
+  router.put("/pets/:id/photos/order", putPhotoOrder);
+  router.delete("/pets/:id/photos/:photoId", deletePhoto);
 
   return router;
 }

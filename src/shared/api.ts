@@ -163,6 +163,27 @@ export interface ShelterPetResponse {
   pet: ShelterPet;
 }
 
+/** A pet's photo (RN-51, RN-52). */
+export interface PetPhoto {
+  id: number;
+  /** Public path of the image, under /uploads. */
+  url: string;
+  /** 1 is the main photo. */
+  position: number;
+}
+
+/** CU-15, CU-16 · GET, POST /api/shelter/pets/:id/photos, DELETE …/photos/:photoId, PUT …/photos/order */
+export interface PetPhotosResponse {
+  photos: PetPhoto[];
+  /** RN-50: the configured maximum of photos per pet. */
+  maxPhotos: number;
+}
+
+/** CU-16 · PUT /api/shelter/pets/:id/photos/order */
+export interface PhotoOrderRequest {
+  photoIds: number[];
+}
+
 export interface ErrorResponse {
   /** Message for the user, in Spanish. */
   error: string;

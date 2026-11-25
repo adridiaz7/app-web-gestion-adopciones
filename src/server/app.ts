@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import { z } from "zod";
 import type { HealthResponse } from "../shared/api.js";
+import { getConfig } from "./config.js";
 import { NotFoundError } from "./errors.js";
 import { getBreeds, getProvinces } from "./controllers/catalogues.js";
 import { errorHandler } from "./middlewares/error-handler.js";
@@ -45,6 +46,9 @@ export function createApp(): express.Express {
   });
 
   app.use("/api", api);
+
+  // RN-52: uploaded photos are files on disk, served as they are.
+  app.use("/uploads", express.static(getConfig().uploadsDir, { index: false }));
 
   // One origin: the SPA is served next to the API.
   // Under /assets, so a client folder (like src/client/api) never clashes with the /api routes.

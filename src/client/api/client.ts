@@ -26,12 +26,15 @@ function isErrorResponse(value: unknown): value is ErrorResponse {
  * JSON answer (undefined when there is none) or throws an ApiError.
  */
 export async function apiRequest<T = unknown>(method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE", path: string, body?: unknown): Promise<T> {
+  // A FormData body (file uploads) goes as it is: the browser sets the multipart content type.
+  const isForm = body instanceof FormData;
   const init: RequestInit = {
     method,
-    headers: body === undefined ? { Accept: "application/json" } : { "Content-Type": "application/json", Accept: "application/json" },
+    headers: body === undefined || isForm ? { Accept: "application/json" } : { "Content-Type": "application/json", Accept: "application/json" },
     credentials: "same-origin",
   };
-  if (body !== undefined) init.body = JSON.stringify(body);
+  if (isForm) init.body = body;
+  else if (body !== undefined) init.body = JSON.stringify(body);
 
   let response: Response;
   try {

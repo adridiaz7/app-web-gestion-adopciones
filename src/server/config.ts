@@ -1,3 +1,5 @@
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 
 /**
@@ -22,6 +24,10 @@ const envSchema = z
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     // Public URL of the app, for the links in the emails. Defaults to localhost on PORT.
     APP_URL: z.url({ protocol: /^https?$/ }).optional(),
+    // Folder for the uploaded photos, outside git (RN-52). Defaults to uploads/ in the project root.
+    UPLOADS_DIR: z.string().min(1).optional(),
+    // Maximum size of an uploaded photo (owner's decision of 25/11/2026). Not a §16 parameter.
+    MAX_PHOTO_SIZE_MB: positiveInt(5),
 
     VISIT_MIN_NOTICE_HOURS: positiveInt(48), // RN-87
     VISIT_RESPONSE_DEADLINE_HOURS: positiveInt(24), // RN-94
@@ -62,6 +68,8 @@ function toConfig(env: Env) {
     port: env.PORT,
     databaseUrl: env.DATABASE_URL,
     appUrl: (env.APP_URL ?? `http://localhost:${String(env.PORT)}`).replace(/\/+$/, ""),
+    uploadsDir: resolve(env.UPLOADS_DIR ?? fileURLToPath(new URL("../../uploads", import.meta.url))),
+    maxPhotoSizeMb: env.MAX_PHOTO_SIZE_MB,
     rules: {
       visitMinNoticeHours: env.VISIT_MIN_NOTICE_HOURS,
       visitResponseDeadlineHours: env.VISIT_RESPONSE_DEADLINE_HOURS,

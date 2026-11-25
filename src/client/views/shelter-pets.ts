@@ -8,6 +8,7 @@ import { checked, field, onSubmit, selectField, submitButton, textValue } from "
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
 import { h, mount } from "../dom.js";
+import { petPhotosSection } from "../components/pet-photos.js";
 import { navigate, type RouteParams } from "../router.js";
 
 const STATUS_LABELS: Record<PetStatus, string> = {
@@ -191,7 +192,11 @@ export async function renderPetForm(root: HTMLElement, params: RouteParams): Pro
       }
     });
     body = pet
-      ? [h("p", { class: "muted" }, `Estado: ${STATUS_LABELS[pet.status]} · Alta: ${new Date(pet.createdAt).toLocaleDateString("es-ES")}`), form]
+      ? [
+          h("p", { class: "muted" }, `Estado: ${STATUS_LABELS[pet.status]} · Alta: ${new Date(pet.createdAt).toLocaleDateString("es-ES")}`),
+          petPhotosSection(pet.id),
+          form,
+        ]
       : [form];
   } catch (error) {
     body = [notice("error", error instanceof ApiError ? error.message : "No se ha podido cargar la mascota.")];
