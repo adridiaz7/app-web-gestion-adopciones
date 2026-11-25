@@ -120,6 +120,8 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 
 ¿Es correcto, o los favoritos no disponibles deberían ocultarse también?
 
+**25/11/2026 · T-46 (bloquea T-46).** La carpeta `db/seed-photos/` no existe en `develop`, así que, como indica la propia tarea, T-46 queda `BLOQUEADA` hasta que se suban las fotos (y `CREDITOS.md`). Cuando estén en `develop`, basta con pasarla a `PENDIENTE`.
+
 ---
 
 ## 5. Tareas
@@ -160,7 +162,7 @@ Recomiendo (a), que es lo que dice la decisión. Mientras tanto, T-45 queda `BLO
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | EN_REVISION |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | EN_REVISION |
 | T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | EN_REVISION |
-| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | PENDIENTE |
+| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | BLOQUEADA |
 | T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | EN_REVISION |
 
 ### Fase 3 · Descubrir y favoritos
