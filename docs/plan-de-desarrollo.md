@@ -2,7 +2,7 @@
 
 > Lista ordenada de tareas que el agente **desarrollador** sigue de forma autónoma y el agente **revisor** valida cada noche. El orden es la prioridad para la demo: de arriba abajo.
 >
-> **Última actualización:** 24/11/2026
+> **Última actualización:** 26/11/2026
 
 ---
 
@@ -176,48 +176,48 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-04 | Registro de adoptante (solo API; las pantallas van en T-09). | CU-01; RN-06–08, 25, 175, 182, 186 | T-03 | EN_REVISION |
-| T-05 | Registro de protectora (solo API). | CU-02; RN-14, 17, 182, 186 | T-04 | EN_REVISION |
-| T-06 | Verificar el email y reenviar el enlace (solo API). | CU-03; RN-07, 177, 180 | T-04 | EN_REVISION |
-| T-07 | Iniciar y cerrar sesión: sesiones en base de datos, cookie, middleware de sesión y de rol, y límite de intentos (solo API). | CU-04; RN-10, 176, 179 | T-06 | EN_REVISION |
-| T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | EN_REVISION |
-| T-09 | **Frontend base y pantallas de acceso:** `index.html`, router con History API, layout con barra lateral, tokens CSS del sistema de diseño y cliente de la API. Pantallas de inicio de sesión, tipo de cuenta, registros, verificación y recuperación. | Mockups `docs/ux-ui/acceso`; especificaciones §5 | T-08 | EN_REVISION |
-| T-10 | **`db/seed.sql` mínimo:** administrador, una protectora validada, un adoptante y 4 mascotas sin fotos. Incluye un script que genera los hashes Argon2id de las contraseñas de demo, documentadas en el propio seed. | Especificaciones §5 | T-07 | EN_REVISION |
-| T-44 | Al restablecer la contraseña se cierran **todas las sesiones abiertas** de esa cuenta (solo API). Tests nuevos; no se modifican los de T-08. | CU-05; decisión del responsable del 25/11/2026 (sección 4) | T-08 | EN_REVISION |
+| T-04 | Registro de adoptante (solo API; las pantallas van en T-09). | CU-01; RN-06–08, 25, 175, 182, 186 | T-03 | APROBADA |
+| T-05 | Registro de protectora (solo API). | CU-02; RN-14, 17, 182, 186 | T-04 | APROBADA |
+| T-06 | Verificar el email y reenviar el enlace (solo API). | CU-03; RN-07, 177, 180 | T-04 | APROBADA |
+| T-07 | Iniciar y cerrar sesión: sesiones en base de datos, cookie, middleware de sesión y de rol, y límite de intentos (solo API). | CU-04; RN-10, 176, 179 | T-06 | APROBADA |
+| T-08 | Recuperar la contraseña (solo API). | CU-05; RN-178, 181, 183 | T-07 | APROBADA |
+| T-09 | **Frontend base y pantallas de acceso:** `index.html`, router con History API, layout con barra lateral, tokens CSS del sistema de diseño y cliente de la API. Pantallas de inicio de sesión, tipo de cuenta, registros, verificación y recuperación. | Mockups `docs/ux-ui/acceso`; especificaciones §5 | T-08 | APROBADA |
+| T-10 | **`db/seed.sql` mínimo:** administrador, una protectora validada, un adoptante y 4 mascotas sin fotos. Incluye un script que genera los hashes Argon2id de las contraseñas de demo, documentadas en el propio seed. | Especificaciones §5 | T-07 | APROBADA |
+| T-44 | Al restablecer la contraseña se cierran **todas las sesiones abiertas** de esa cuenta (solo API). Tests nuevos; no se modifican los de T-08. | CU-05; decisión del responsable del 25/11/2026 (sección 4) | T-08 | APROBADA |
 
 ### Fase 2 · Mascotas, galería y ficha
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | EN_REVISION |
-| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos para `REJECTED` → `VALIDATED`. El responsable autoriza un único cambio en T-11: quitar `rejected` del bucle de `"CU-39: rejects validating a shelter that is not pending"` (`tests/integration/admin-shelters.test.ts`). Ningún otro test de T-11 se toca. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | EN_REVISION |
-| T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | EN_REVISION |
-| T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | EN_REVISION |
-| T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | EN_REVISION |
-| T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | EN_REVISION |
+| T-11 | Validar, rechazar y revocar protectoras (administrador). Imprescindible para que las mascotas sean visibles. | CU-39; RN-14–19, 23 | T-07 | APROBADA |
+| T-45 | El administrador puede **validar también una protectora `REJECTED`** (rechazada o revocada). Al hacerlo, sus mascotas vuelven a ser visibles (RN-23). Tests nuevos para `REJECTED` → `VALIDATED`. El responsable autoriza un único cambio en T-11: quitar `rejected` del bucle de `"CU-39: rejects validating a shelter that is not pending"` (`tests/integration/admin-shelters.test.ts`). Ningún otro test de T-11 se toca. | CU-39; RN-19, 23; decisión del responsable del 25/11/2026 (sección 4) | T-11 | APROBADA |
+| T-12 | Alta, edición y listado de las mascotas de una protectora, **sin fotos**. | CU-14, CU-15, CU-16; RN-22, 39–49, 53 | T-11 | APROBADA |
+| T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | APROBADA |
+| T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | APROBADA |
+| T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | APROBADA |
 | T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. Si hay logos en `db/seed-photos/logos/`, se asignan a las protectoras (`logo_path`). **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | BLOQUEADA |
-| T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | EN_REVISION |
+| T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | APROBADA |
 
 ### Fase 3 · Descubrir y favoritos
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-17 | Cuestionario de preferencias: ofrecerlo tras el registro y editarlo desde el perfil. | CU-08; RN-30–38, 205 | T-07 | EN_REVISION |
-| T-18 | Modo descubrir: deslizar, descarte de 15 días, deshacer el último descarte y mensaje si no hay cuestionario. | CU-10; RN-70–75, 190, 191 | T-17, T-14 | EN_REVISION |
-| T-19 | Favoritos: lista, quitar y recuperar descartadas. | CU-12; RN-73, 74, 76 | T-18 | EN_REVISION |
+| T-17 | Cuestionario de preferencias: ofrecerlo tras el registro y editarlo desde el perfil. | CU-08; RN-30–38, 205 | T-07 | APROBADA |
+| T-18 | Modo descubrir: deslizar, descarte de 15 días, deshacer el último descarte y mensaje si no hay cuestionario. | CU-10; RN-70–75, 190, 191 | T-17, T-14 | APROBADA |
+| T-19 | Favoritos: lista, quitar y recuperar descartadas. | CU-12; RN-73, 74, 76 | T-18 | APROBADA |
 
 ### Fase 4 · Turnos y visitas
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_REVISION |
-| T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | EN_REVISION |
-| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | EN_REVISION |
-| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | EN_REVISION |
-| T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | EN_REVISION |
-| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | EN_REVISION |
-| T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | EN_REVISION |
-| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | EN_REVISION |
+| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | CAMBIOS |
+| T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | CAMBIOS |
+| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | CAMBIOS |
+| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | CAMBIOS |
+| T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | CAMBIOS |
+| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | CAMBIOS |
+| T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | APROBADA |
+| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | CAMBIOS |
 | T-48 | Comprobar el **cupo** (RN-90) también al **confirmar** una visita. Si el adoptante ya lo tiene lleno con esa protectora, se responde con un error y la visita sigue pendiente. Solo API, más el mensaje de error en el calendario. Tests nuevos; no se modifican los de T-23. | CU-24; RN-90, 93; decisión del responsable del 25/11/2026 (sección 4) | T-23 | PENDIENTE |
 | T-49 | **Visita sustituta** (CU-23, RN-111). Solo cuando la visita anulada tenía motivo `SLOT_CANCELLED` y estaba confirmada. Es para la misma mascota y solo una vez (`replaces_visit_id`). No necesita las 48 h de antelación y queda confirmada directamente. Se aplican el resto de reglas: plazas, bloqueo, ausencia y cupo. Tests nuevos; no se modifican los de T-22. | CU-23; RN-87, 90, 111; decisión del responsable del 25/11/2026 (sección 4) | T-22, T-20 | PENDIENTE |
 | T-50 | **Perfil del adoptante en la bandeja** de la protectora (CU-22). La protectora ve el nombre, la provincia, los datos del hogar (RN-27) y el historial de visitas y ausencias de ese adoptante **con ella**. Solo ve los adoptantes que le han enviado alguna solicitud (RN-29). Tests nuevos, incluido que no se ve el historial con otras protectoras; no se modifican los de T-24. | CU-22; RN-27, 29; decisión del responsable del 25/11/2026 (sección 4) | T-24, T-25 | PENDIENTE |
@@ -226,16 +226,16 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | EN_REVISION |
-| T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | EN_REVISION |
+| T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | APROBADA |
+| T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | APROBADA |
 | T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos; no se modifican los de T-29. | RN-149, 198; decisión del responsable del 25/11/2026 (sección 4) | T-29 | PENDIENTE |
 
 ### Fase 6 · Adopción
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | EN_REVISION |
-| T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | EN_REVISION |
+| T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | CAMBIOS |
+| T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | CAMBIOS |
 | T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | PENDIENTE |
 | T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | PENDIENTE |
 

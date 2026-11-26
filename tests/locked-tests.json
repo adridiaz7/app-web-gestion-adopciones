@@ -1,34 +1,189 @@
 {
   "files": {
+    "tests/integration/admin-shelters-revalidate.test.ts": {
+      "feature": "T-45 Volver a validar una protectora rechazada",
+      "sha256": "0e3edf99fca521670dccb1bf335bf767481bf7f5dc2f3001bb30d63819f9435f",
+      "lockedAt": "2026-11-26T08:56:24.646Z"
+    },
+    "tests/integration/admin-shelters.test.ts": {
+      "feature": "T-11 Validar, rechazar y revocar protectoras",
+      "sha256": "c1af05f4484701c4c941d01b277efa207679ab9075860097301bd600a3ddf410",
+      "lockedAt": "2026-11-26T08:56:24.505Z"
+    },
     "tests/integration/audit.test.ts": {
       "feature": "T-03 Piezas transversales",
       "sha256": "9c3f112564610f0d319474d25e193774b5155ce4c1d98128e4119f97af69b00b",
       "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/integration/chat.test.ts": {
+      "feature": "T-29 Chat",
+      "sha256": "6cef06666c505b1b2300a208049af57c319de0602de13eea11878caf1530f158",
+      "lockedAt": "2026-11-26T08:56:26.265Z"
     },
     "tests/integration/db-transaction.test.ts": {
       "feature": "T-02 Base de datos",
       "sha256": "dd8f768d7ea3349ba2a8639ac72baf60744580a6f40a143e57767bc561971249",
       "lockedAt": "2026-11-24T23:12:50.666Z"
     },
+    "tests/integration/discover.test.ts": {
+      "feature": "T-18 Modo descubrir",
+      "sha256": "57e1ad41e5d3bba4b332626bc7df12548df40ac7ff1e333a5f7fe2c76e6d235b",
+      "lockedAt": "2026-11-26T08:56:25.674Z"
+    },
     "tests/integration/error-handler.test.ts": {
       "feature": "T-03 Piezas transversales",
       "sha256": "a07f9afd9ea4d431a624713b29d4a70a771e32f09d1b046aae3ae6b9a8938a28",
       "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/integration/favorites.test.ts": {
+      "feature": "T-19 Favoritos",
+      "sha256": "d92fbf66deacc802b3699564f35bf709b75e6705572f6c94d0d9ce2d99b234d1",
+      "lockedAt": "2026-11-26T08:56:25.816Z"
+    },
+    "tests/integration/gallery.test.ts": {
+      "feature": "T-14 Galería con filtros",
+      "sha256": "99eb2fc4b396fbc3bb0a740e781f8a86b6a802e65e3465f72be38ffd93884fef",
+      "lockedAt": "2026-11-26T08:56:25.084Z"
     },
     "tests/integration/health.test.ts": {
       "feature": "T-01 Esqueleto",
       "sha256": "d898898a1ad60d932dc832e6c3b301a5ff76cab7bdcece54db56a32fecb7fb71",
       "lockedAt": "2026-11-24T23:12:50.521Z"
     },
+    "tests/integration/login.test.ts": {
+      "feature": "T-07 Iniciar y cerrar sesión",
+      "sha256": "957105a07bb524b1cf0ba64ff71b58234bd586d9466799dad8835f87ac99c2bd",
+      "lockedAt": "2026-11-26T08:56:23.896Z"
+    },
+    "tests/integration/notification-inbox.test.ts": {
+      "feature": "T-28 Notificaciones",
+      "sha256": "8d6e0df274b7df283d53236f8d89020a5853474b123627eb660cf5572b25de5f",
+      "lockedAt": "2026-11-26T08:56:26.114Z"
+    },
     "tests/integration/notifications.test.ts": {
       "feature": "T-03 Piezas transversales",
       "sha256": "9490064d0ba836fdddc293fb40474c9062a765b2d74752aa417f12e09d6ea01a",
       "lockedAt": "2026-11-24T23:12:50.812Z"
     },
+    "tests/integration/password-reset-sessions.test.ts": {
+      "feature": "T-44 Cerrar las sesiones al restablecer la contraseña",
+      "sha256": "e719ac4fb75e1965544c01a4e8071184615763b5266fb21651275ec33b99fec7",
+      "lockedAt": "2026-11-26T08:56:24.355Z"
+    },
+    "tests/integration/password-reset.test.ts": {
+      "feature": "T-08 Recuperar la contraseña",
+      "sha256": "4859e1a1906bf2cdb7c270e0f48bbccc71de7a0b68bf8dba21e024051b3c0ec1",
+      "lockedAt": "2026-11-26T08:56:24.045Z"
+    },
+    "tests/integration/pet-photos.test.ts": {
+      "feature": "T-13 Fotos de las mascotas",
+      "sha256": "d41198e1e7a84b8e880a0bf1630edca05d31dd0ebb139243c37e4058688720a3",
+      "lockedAt": "2026-11-26T08:56:24.937Z"
+    },
+    "tests/integration/pet-profile.test.ts": {
+      "feature": "T-15 Ficha de la mascota",
+      "sha256": "c7631905b6c3f96a591b716c278ad780b0b09d72c7b591746f4fdd2dfe266a7e",
+      "lockedAt": "2026-11-26T08:56:25.230Z"
+    },
+    "tests/integration/preferences.test.ts": {
+      "feature": "T-17 Cuestionario de preferencias",
+      "sha256": "b788abf1e5c40bcaabb4e865142ff986679c8b3478bb9746723e6f192f0d4346",
+      "lockedAt": "2026-11-26T08:56:25.523Z"
+    },
+    "tests/integration/provinces.test.ts": {
+      "feature": "T-09 Frontend base y pantallas de acceso",
+      "sha256": "baf4e912cf3302ad1e6a29bd03660d6de27653b77dfe04d39c3d3eaf6539b1b9",
+      "lockedAt": "2026-11-26T08:56:24.191Z"
+    },
+    "tests/integration/register-adopter.test.ts": {
+      "feature": "T-04 Registro de adoptante",
+      "sha256": "d0d021a4f8397fca0ff667a8af906821b0387700054e62ba6b0affb5d2d30790",
+      "lockedAt": "2026-11-26T08:56:23.444Z"
+    },
+    "tests/integration/register-shelter.test.ts": {
+      "feature": "T-05 Registro de protectora",
+      "sha256": "5a961a07028992cc809d8ec35a77e489e48e3d9d4b7e6b07282ddd6320d46f6d",
+      "lockedAt": "2026-11-26T08:56:23.600Z"
+    },
+    "tests/integration/shelter-pets.test.ts": {
+      "feature": "T-12 Alta, edición y listado de mascotas",
+      "sha256": "8aee9b43b4a58b28cd6140b8b3273b8dc040b68a4673f6e94196bb09c070457f",
+      "lockedAt": "2026-11-26T08:56:24.795Z"
+    },
+    "tests/integration/shelter-search.test.ts": {
+      "feature": "T-16 Buscar protectoras y ver su perfil",
+      "sha256": "e68b56601719f5df186b08d20cfa682857a258e304bb788d45e414676732e17a",
+      "lockedAt": "2026-11-26T08:56:25.380Z"
+    },
+    "tests/integration/spa-static.test.ts": {
+      "feature": "T-09 Frontend base y pantallas de acceso",
+      "sha256": "25b5c2cac01f6a20a06f25740e6a52978649d1170e6d18b6645f268ffde2fd5f",
+      "lockedAt": "2026-11-26T08:56:24.191Z"
+    },
     "tests/integration/test-helpers.test.ts": {
       "feature": "T-02 Base de datos",
       "sha256": "1c682e64194c8e176a9243e8a95d48955e09b34439df70fd282149b7495f1129",
       "lockedAt": "2026-11-24T23:12:50.666Z"
+    },
+    "tests/integration/verify-email.test.ts": {
+      "feature": "T-06 Verificar el email y reenviar el enlace",
+      "sha256": "8e50704ab6384982059fe9544ca47722c4ab29f33ff3833610cb22e877dbbd79",
+      "lockedAt": "2026-11-26T08:56:23.756Z"
+    },
+    "tests/integration/visit-reminders.test.ts": {
+      "feature": "T-26 Reprogramar una visita y recordatorio",
+      "sha256": "b948266fd6bed238de49b1ed03f68292094294e6c46ef68c4743cf1d2f1a2848",
+      "lockedAt": "2026-11-26T08:56:25.963Z"
+    },
+    "tests/integration/visit-reschedule.test.ts": {
+      "feature": "T-26 Reprogramar una visita y recordatorio",
+      "sha256": "675d0999bca6cd37994350577a6a5f321e27865887dff56337314b4d3577eac1",
+      "lockedAt": "2026-11-26T08:56:25.963Z"
+    },
+    "tests/unit/adult-age.test.ts": {
+      "feature": "T-04 Registro de adoptante",
+      "sha256": "0058e2f3e81a1fa53ef0be6897396c7a64f47bfecd19ec15e08fac308ba10f89",
+      "lockedAt": "2026-11-26T08:56:23.444Z"
+    },
+    "tests/unit/client-age.test.ts": {
+      "feature": "T-12 Alta, edición y listado de mascotas",
+      "sha256": "0d27d29ab696c796f2158268fda614e741a2a113704f6489cf876a8fa3c620cd",
+      "lockedAt": "2026-11-26T08:56:24.795Z"
+    },
+    "tests/unit/client-api-form-data.test.ts": {
+      "feature": "T-13 Fotos de las mascotas",
+      "sha256": "e3348a19a7221c6612c5ec0ba1a2f7710c326a9cb494adf0d56d3b45529600ca",
+      "lockedAt": "2026-11-26T08:56:24.937Z"
+    },
+    "tests/unit/client-api.test.ts": {
+      "feature": "T-09 Frontend base y pantallas de acceso",
+      "sha256": "df8a555a2956c5d1ea4f38df42ac17e0d10660a3234629b2439fe206a22611fc",
+      "lockedAt": "2026-11-26T08:56:24.191Z"
+    },
+    "tests/unit/client-block-notice.test.ts": {
+      "feature": "T-16 Buscar protectoras y ver su perfil",
+      "sha256": "4e53fac77b741ac85481da7dc645ca2d9c18bad553a5c2c417df3eacc0451986",
+      "lockedAt": "2026-11-26T08:56:25.380Z"
+    },
+    "tests/unit/client-gallery-query.test.ts": {
+      "feature": "T-14 Galería con filtros",
+      "sha256": "bb94a0027bbcbce87b5df9504fbe6221183c78784134c9607a8b4785c9843621",
+      "lockedAt": "2026-11-26T08:56:25.084Z"
+    },
+    "tests/unit/client-notification-link.test.ts": {
+      "feature": "T-28 Notificaciones",
+      "sha256": "d54a59c2f0aef6aed6f251cb1f2cd817e19c949cc8de81547b68a70143fd093e",
+      "lockedAt": "2026-11-26T08:56:26.114Z"
+    },
+    "tests/unit/client-router.test.ts": {
+      "feature": "T-09 Frontend base y pantallas de acceso",
+      "sha256": "08a57cc5daef3db474bb987ecede6e75b88a3400685f297c2ba34f4f91dc12d1",
+      "lockedAt": "2026-11-26T08:56:24.191Z"
+    },
+    "tests/unit/config-app-url.test.ts": {
+      "feature": "T-04 Registro de adoptante",
+      "sha256": "877ae1f94df715124554bcc28f7fc7ef6ccb9b1153710370435badf1b601f10b",
+      "lockedAt": "2026-11-26T08:56:23.444Z"
     },
     "tests/unit/config.test.ts": {
       "feature": "T-01 Esqueleto",
@@ -44,6 +199,11 @@
       "feature": "T-03 Piezas transversales",
       "sha256": "03c2356003195a397d470577856ab9b825f4725f893df59510c40258baa8e80b",
       "lockedAt": "2026-11-24T23:12:50.812Z"
+    },
+    "tests/unit/passwords.test.ts": {
+      "feature": "T-04 Registro de adoptante",
+      "sha256": "9a130c90db2677ae3fca590f70c025083f47ca29ea8076aeff4e6b46cc4be509",
+      "lockedAt": "2026-11-26T08:56:23.444Z"
     }
   },
   "history": []
