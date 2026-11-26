@@ -213,3 +213,49 @@ export async function markOthersNotSelected(db: Db, petId: number, approvedId: n
 export async function reservePet(db: Db, petId: number): Promise<void> {
   await db.query(`UPDATE "Pet" SET status = 'RESERVED', updated_at = now() WHERE id = $1`, [petId]);
 }
+
+/** An adoption locked for closing it (CU-30 to CU-32), with its pet locked too. */
+export interface AdoptionToClose {
+  id: number;
+  adopterId: number;
+  shelterId: number;
+  petId: number;
+  petName: string;
+  status: string;
+}
+
+/** The adoption, if it is the adopter's or of one of the shelter's pets. */
+export async function lockAdoptionToClose(db: Db, adoptionId: number, owner: { adopterId: number } | { shelterId: number }): Promise<AdoptionToClose | null> {
+  const [column, ownerId] = "adopterId" in owner ? ["ad.adopter_id", owner.adopterId] : ["p.shelter_id", owner.shelterId];
+  const { rows } = await db.query<AdoptionToClose>(
+    `SELECT ad.id, ad.adopter_id AS "adopterId", p.shelter_id AS "shelterId", ad.pet_id AS "petId", p.name AS "petName", ad.status
+       FROM "Adoption" ad JOIN "Pet" p ON p.id = ad.pet_id
+      WHERE ad.id = $1 AND ${column} = $2
+        FOR UPDATE OF ad, p`,
+    [adoptionId, ownerId],
+  );
+  return rows[0] ?? null;
+}
+
+/** RN-129: who cancels and why are recorded. */
+export async function markAdoptionCancelled(db: Db, adoptionId: number, cancelledBy: "ADOPTER" | "SHELTER", reason: string): Promise<void> {
+  await db.query(
+    `UPDATE "Adoption" SET status = 'CANCELLED', cancelled_by = $2, cancellation_reason = $3, cancelled_at = now() WHERE id = $1`,
+    [adoptionId, cancelledBy, reason],
+  );
+}
+
+/** RN-126: completed, with the delivery date. */
+export async function markAdoptionCompleted(db: Db, adoptionId: number): Promise<void> {
+  await db.query(`UPDATE "Adoption" SET status = 'COMPLETED', delivered_at = now() WHERE id = $1`, [adoptionId]);
+}
+
+/** RN-131: returned, with the date and the reason. */
+export async function markAdoptionReturned(db: Db, adoptionId: number, reason: string): Promise<void> {
+  await db.query(`UPDATE "Adoption" SET status = 'RETURNED', returned_at = now(), return_reason = $2 WHERE id = $1`, [adoptionId, reason]);
+}
+
+/** RN-126, RN-131: the pet's new status. */
+export async function setPetStatus(db: Db, petId: number, status: "ADOPTED" | "AVAILABLE"): Promise<void> {
+  await db.query(`UPDATE "Pet" SET status = $2, updated_at = now() WHERE id = $1`, [petId, status]);
+}

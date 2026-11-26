@@ -1,6 +1,13 @@
 import { Router } from "express";
 import { deletePhoto, getPhotos, postPhoto, putPhotoOrder, receivePhoto } from "../controllers/pet-photos.js";
-import { getCandidates, postApproveAdoption, postRejectAdoption } from "../controllers/adoptions.js";
+import {
+  getCandidates,
+  postApproveAdoption,
+  postDeliverAdoption,
+  postRejectAdoption,
+  postReturnAdoption,
+  postShelterCancelAdoption,
+} from "../controllers/adoptions.js";
 import { getShelterAdopter } from "../controllers/shelter-adopters.js";
 import { getPet, getPets, postPet, postReactivatePet, postUnlistPet, putPet } from "../controllers/shelter-pets.js";
 import { getInbox, postConfirmVisit, postNoShow, postRejectVisit, postShelterCancelVisit } from "../controllers/visits.js";
@@ -21,6 +28,9 @@ export function createShelterRouter(): Router {
   router.get("/pets/:id/candidates", getCandidates);
   router.post("/adoptions/:id/approve", postApproveAdoption);
   router.post("/adoptions/:id/reject", postRejectAdoption);
+  router.post("/adoptions/:id/cancel", postShelterCancelAdoption);
+  router.post("/adoptions/:id/deliver", postDeliverAdoption);
+  router.post("/adoptions/:id/return", postReturnAdoption);
 
   router.get("/pets/:id/photos", getPhotos);
   router.post("/pets/:id/photos", receivePhoto, postPhoto);

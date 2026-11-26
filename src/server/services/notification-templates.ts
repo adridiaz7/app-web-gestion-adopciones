@@ -58,6 +58,18 @@ export const notificationTemplates = {
     body: `¡Enhorabuena! La protectora ha aprobado tu solicitud para adoptar a ${p.petName}. Acordad la entrega por el chat.`,
   }),
 
+  /** CU-30, RN-129: the adopter backed out of an approved adoption (to the shelter). */
+  ADOPTION_CANCELLED_BY_ADOPTER: (p: { petName: string; reason: string }): RenderedNotification => ({
+    title: "Adopción cancelada por el adoptante",
+    body: `El adoptante ha cancelado la adopción aprobada de ${p.petName}. Motivo: ${p.reason}. ${p.petName} vuelve a estar disponible.`,
+  }),
+
+  /** CU-30, RN-129: the shelter backed out of an approved adoption (to the adopter). */
+  ADOPTION_CANCELLED_BY_SHELTER: (p: { petName: string; reason: string }): RenderedNotification => ({
+    title: "Adopción cancelada",
+    body: `La protectora ha cancelado tu adopción aprobada de ${p.petName}. Motivo: ${p.reason}`,
+  }),
+
   /** CU-29, RN-124: another candidate was chosen. */
   ADOPTION_NOT_SELECTED: (p: { petName: string }): RenderedNotification => ({
     title: "Solicitud de adopción no seleccionada",

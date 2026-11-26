@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { AdoptionRequestResponse, AdoptionStatusResponse, CandidatesResponse, HouseholdResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { getHousehold, requestAdoption, type AdoptionAnswers } from "../services/adoption-requests.js";
+import { cancelAdoption, deliverAdoption, returnAdoption } from "../services/adoption-closing.js";
 import { approveAdoption, listCandidates, rejectAdoption } from "../services/adoption-decisions.js";
 
 const CHOOSE = "Elige una opción.";
@@ -98,6 +99,45 @@ export const getCandidates: RequestHandler = async (req, res) => {
 export const postApproveAdoption: RequestHandler = async (req, res) => {
   const { id } = adoptionParamsSchema.parse(req.params);
   const body: AdoptionStatusResponse = { adoption: await approveAdoption(userId(req.user), id) };
+  res.json(body);
+};
+
+/** RN-129, RN-131: a required reason for a cancellation or a return. */
+const reasonSchema = (message: string) =>
+  z.object({
+    reason: z.string({ error: message }).trim().min(1, { error: message }).max(1000, { error: "El motivo no puede tener más de 1000 caracteres." }),
+  });
+const cancelSchema = reasonSchema("Indica el motivo de la cancelación.");
+const returnSchema = reasonSchema("Indica el motivo de la devolución.");
+
+/** CU-30 · POST /api/adopter/adoptions/:id/cancel */
+export const postAdopterCancelAdoption: RequestHandler = async (req, res) => {
+  const { id } = adoptionParamsSchema.parse(req.params);
+  const { reason } = cancelSchema.parse(req.body ?? {});
+  const body: AdoptionStatusResponse = { adoption: await cancelAdoption("ADOPTER", userId(req.user), id, reason) };
+  res.json(body);
+};
+
+/** CU-30 · POST /api/shelter/adoptions/:id/cancel */
+export const postShelterCancelAdoption: RequestHandler = async (req, res) => {
+  const { id } = adoptionParamsSchema.parse(req.params);
+  const { reason } = cancelSchema.parse(req.body ?? {});
+  const body: AdoptionStatusResponse = { adoption: await cancelAdoption("SHELTER", userId(req.user), id, reason) };
+  res.json(body);
+};
+
+/** CU-31 · POST /api/shelter/adoptions/:id/deliver */
+export const postDeliverAdoption: RequestHandler = async (req, res) => {
+  const { id } = adoptionParamsSchema.parse(req.params);
+  const body: AdoptionStatusResponse = { adoption: await deliverAdoption(userId(req.user), id) };
+  res.json(body);
+};
+
+/** CU-32 · POST /api/shelter/adoptions/:id/return */
+export const postReturnAdoption: RequestHandler = async (req, res) => {
+  const { id } = adoptionParamsSchema.parse(req.params);
+  const { reason } = returnSchema.parse(req.body ?? {});
+  const body: AdoptionStatusResponse = { adoption: await returnAdoption(userId(req.user), id, reason) };
   res.json(body);
 };
 
