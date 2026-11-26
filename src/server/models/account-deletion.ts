@@ -27,35 +27,47 @@ export interface VoidedVisit extends VoidedByDeletion {
   startsAt: Date;
 }
 
-/** RN-12: the open (PENDING or CONFIRMED) visits of the adopter, or of the shelter, become VOIDED (ACCOUNT_DELETED). */
-export async function voidOpenVisitsOf(db: Db, column: "adopter_id" | "shelter_id", userId: number): Promise<VoidedVisit[]> {
+/** Why a whole account's visits and adoptions are voided: RN-12 (deleted) or RN-158 (suspended adopter). */
+export type AccountVoidReason = "ACCOUNT_DELETED" | "ADOPTER_SUSPENDED";
+
+/** RN-12, RN-158: the open (PENDING or CONFIRMED) visits of the adopter, or of the shelter, become VOIDED with `reason`. */
+export async function voidOpenVisitsOf(db: Db, column: "adopter_id" | "shelter_id", userId: number, reason: AccountVoidReason = "ACCOUNT_DELETED"): Promise<VoidedVisit[]> {
   const { rows } = await db.query<VoidedVisit>(
     `WITH open AS (
        SELECT id, status FROM "Visit" WHERE ${column} = $1 AND status IN ('PENDING', 'CONFIRMED') FOR UPDATE
      )
-     UPDATE "Visit" v SET status = 'VOIDED', void_reason = 'ACCOUNT_DELETED', voided_at = now()
+     UPDATE "Visit" v SET status = 'VOIDED', void_reason = $2, voided_at = now()
        FROM open, "Pet" p, "Visit_slot" vs
       WHERE v.id = open.id AND p.id = v.pet_id AND vs.id = v.slot_id
      RETURNING v.id, v.adopter_id AS "adopterId", v.pet_id AS "petId", p.name AS "petName",
                vs.starts_at AS "startsAt", open.status AS "previousStatus"`,
-    [userId],
+    [userId, reason],
   );
   return rows.sort((a, b) => a.id - b.id);
 }
 
-/** RN-12: the open (PENDING or APPROVED) adoptions of the adopter, or of the shelter's pets, become VOIDED (ACCOUNT_DELETED). */
-export async function voidOpenAdoptionsOf(db: Db, column: "adopter_id" | "shelter_id", userId: number): Promise<VoidedByDeletion[]> {
+/**
+ * RN-12, RN-158: the adoptions of the adopter, or of the shelter's pets, in `statuses` (by
+ * default the open ones, PENDING and APPROVED) become VOIDED with `reason`.
+ */
+export async function voidOpenAdoptionsOf(
+  db: Db,
+  column: "adopter_id" | "shelter_id",
+  userId: number,
+  reason: AccountVoidReason = "ACCOUNT_DELETED",
+  statuses: readonly ("PENDING" | "APPROVED")[] = ["PENDING", "APPROVED"],
+): Promise<VoidedByDeletion[]> {
   const where = column === "adopter_id" ? "a.adopter_id = $1" : "p.shelter_id = $1";
   const { rows } = await db.query<VoidedByDeletion>(
     `WITH open AS (
        SELECT a.id, a.status FROM "Adoption" a JOIN "Pet" p ON p.id = a.pet_id
-        WHERE ${where} AND a.status IN ('PENDING', 'APPROVED') FOR UPDATE OF a
+        WHERE ${where} AND a.status = ANY($3::text[]) FOR UPDATE OF a
      )
-     UPDATE "Adoption" a SET status = 'VOIDED', void_reason = 'ACCOUNT_DELETED', voided_at = now()
+     UPDATE "Adoption" a SET status = 'VOIDED', void_reason = $2, voided_at = now()
        FROM open, "Pet" p
       WHERE a.id = open.id AND p.id = a.pet_id
      RETURNING a.id, a.adopter_id AS "adopterId", a.pet_id AS "petId", p.name AS "petName", open.status AS "previousStatus"`,
-    [userId],
+    [userId, reason, statuses],
   );
   return rows.sort((a, b) => a.id - b.id);
 }

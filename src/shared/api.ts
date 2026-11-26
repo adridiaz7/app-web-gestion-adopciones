@@ -816,3 +816,29 @@ export interface AdminIncidentsResponse {
 export interface DeleteAccountRequest {
   password: string;
 }
+
+/** RN-155: the reasons of a suspension. */
+export type SuspensionReason = "INAPPROPRIATE_BEHAVIOUR" | "FALSE_INFORMATION" | "INAPPROPRIATE_CONTENT" | "FRAUD" | "REPEATED_INCIDENTS" | "OTHER";
+
+/** CU-40 · an account in GET /api/admin/users, with its active suspension (ISO instant). */
+export interface AdminUser {
+  id: number;
+  role: "ADOPTER" | "SHELTER";
+  email: string;
+  name: string;
+  suspension: { reason: SuspensionReason; detail: string | null; startedAt: string } | null;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+}
+
+/** CU-40 · body of POST /api/admin/users/:id/suspend. */
+export interface SuspendUserRequest {
+  reason: SuspensionReason;
+  detail?: string | null;
+}
+
+export interface SuspensionResponse {
+  suspension: { id: number; userId: number; reason: SuspensionReason; detail: string | null; startedAt: string };
+}

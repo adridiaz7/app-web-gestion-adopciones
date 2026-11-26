@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getShelters, postRejectShelter, postRevokeShelter, postValidateShelter } from "../controllers/admin-shelters.js";
+import { getAdminUsers, postReactivateUser, postSuspendUser } from "../controllers/admin-users.js";
 import { getIncidents, postCorrectAttendance, postIncidentStatus } from "../controllers/incidents.js";
 import { requireRole } from "../middlewares/session.js";
 
@@ -12,6 +13,10 @@ export function createAdminRouter(): Router {
   router.post("/shelters/:id/validate", postValidateShelter);
   router.post("/shelters/:id/reject", postRejectShelter);
   router.post("/shelters/:id/revoke", postRevokeShelter);
+
+  router.get("/users", getAdminUsers);
+  router.post("/users/:id/suspend", postSuspendUser);
+  router.post("/users/:id/reactivate", postReactivateUser);
 
   router.get("/incidents", getIncidents);
   router.post("/incidents/:id/status", postIncidentStatus);

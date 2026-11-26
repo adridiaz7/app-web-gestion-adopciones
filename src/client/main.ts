@@ -1,6 +1,7 @@
 import { startRouter, type Route } from "./router.js";
 import { renderAccountType } from "./views/account-type.js";
 import { renderAdminShelters } from "./views/admin-shelters.js";
+import { renderAdminUsers } from "./views/admin-users.js";
 import { renderCheckEmail } from "./views/check-email.js";
 import { renderGallery } from "./views/gallery.js";
 import { renderHome, renderNotFound, renderRoot } from "./views/home.js";
@@ -47,6 +48,7 @@ const routes: Route[] = [
   { path: "/favoritos", render: renderFavorites },
   { path: "/admin/protectoras", render: renderAdminShelters },
   { path: "/admin/incidencias", render: renderAdminIncidents },
+  { path: "/admin/cuentas", render: renderAdminUsers },
   { path: "/incidencias/nueva", render: renderNewIncident },
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },

@@ -77,6 +77,24 @@ export const notificationTemplates = {
     body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado porque la protectora ${p.shelterName} ha eliminado su cuenta.`,
   }),
 
+  /** RN-109, RN-110, RN-158: a visit voided because the administrator suspended the adopter. */
+  VISIT_VOIDED_ADOPTER_SUSPENDED: (p: { petName: string; startsAt: Date }): RenderedNotification => ({
+    title: "Visita anulada",
+    body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado porque tu cuenta ha sido suspendida.`,
+  }),
+
+  /** RN-132, RN-158: a pending adoption voided because the administrator suspended the adopter. */
+  ADOPTION_VOIDED_ADOPTER_SUSPENDED: (p: { petName: string }): RenderedNotification => ({
+    title: "Solicitud de adopción anulada",
+    body: `Tu solicitud para adoptar a ${p.petName} se ha anulado porque tu cuenta ha sido suspendida.`,
+  }),
+
+  /** RN-158: an approved adoption cancelled by the system because the administrator suspended the adopter. */
+  ADOPTION_CANCELLED_ADOPTER_SUSPENDED: (p: { petName: string }): RenderedNotification => ({
+    title: "Adopción cancelada",
+    body: `La adopción de ${p.petName} se ha cancelado porque tu cuenta ha sido suspendida.`,
+  }),
+
   /** RN-12, RN-132: an open adoption voided because the shelter deleted its account. */
   ADOPTION_VOIDED_ACCOUNT_DELETED: (p: { petName: string; shelterName: string }): RenderedNotification => ({
     title: "Solicitud de adopción anulada",
