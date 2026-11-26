@@ -198,6 +198,8 @@ Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted
 
 Hacer ahora solo el historial obligaría a rehacerlo cuando T-46 añada las protectoras y mascotas de la demo. T-42 queda `BLOQUEADA`; cuando se suban las fotos a `db/seed-photos/`, T-46 y T-42 pueden pasar a `PENDIENTE` (primero T-46). No queda ninguna otra tarea disponible: el resto está `APROBADA`, `EN_REVISION` (T-38, T-40, T-43) o `BLOQUEADA` (T-46, T-47, T-51).
 
+> **Respuesta del responsable (27/11/2026):** Las fotos, los logos y `CREDITOS.md` ya están en `db/seed-photos/`, en `master`. La estructura y los nombres están en T-46. **T-46 y T-42 pasan a `PENDIENTE`**: primero T-46 y, cuando esté en revisión, T-42 sobre ese seed.
+
 ---
 
 ## 5. Tareas
@@ -238,7 +240,7 @@ Hacer ahora solo el historial obligaría a rehacerlo cuando T-46 añada las prot
 | T-13 | Fotos de las mascotas con multer: subir, borrar y ordenar, como máximo 6. | CU-15, CU-16; RN-50–52 | T-12 | APROBADA |
 | T-14 | Galería con filtros, también para el usuario no registrado. | CU-09; RN-23, 24, 58, 77, 187, 189, 205 | T-12 | APROBADA |
 | T-15 | Ficha de la mascota (solo con sesión). | CU-11; RN-188 | T-14 | APROBADA |
-| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. Si hay logos en `db/seed-photos/logos/`, se asignan a las protectoras (`logo_path`). **Si `db/seed-photos/` no existe o no tiene fotos, la tarea queda `BLOQUEADA`** hasta que el responsable las suba. | Especificaciones §9 | T-13, T-15 | BLOQUEADA |
+| T-46 | **Seed visual para la demo** (adelanta una parte de T-42): 3–4 protectoras validadas y unas 15 mascotas publicadas con fotos, sin historial (visitas, chat ni solicitudes). Las fotos están en `db/seed-photos/`, junto con `CREDITOS.md`, que no se copia. El seed copia las fotos a `uploads/` y crea sus filas. Al terminar `npm run db:reset`, todo debe quedar listo. Se amplía `db/seed.sql` y se conservan las cuentas de demo actuales; T-42 añadirá después el historial. Si hay logos en `db/seed-photos/logos/`, se asignan a las protectoras (`logo_path`). **Estructura de `db/seed-photos/`** (indicaciones del responsable del 27/11/2026): **(1) Protectoras:** una por cada logo de `logos/`, con estos nombres exactos: `can-solo.png` → "Can Solo", `nakama.png` → "Nakama" y `parque-amigazo.png` → "Parque Amigazo". Cada una tiene su cuenta de demo, validada y con contraseña conocida, igual que las actuales. "Protectora Txiki" y sus 4 mascotas sin foto se conservan tal cual, sin logo. **(2) Mascotas:** una por cada carpeta de `mascotas/`, con el nombre `especie-nombre` (`perro` o `gato`). El nombre visible es el de la carpeta con la inicial en mayúscula y, si en español lleva tilde, con ella: `perro-pistacho` → "Pistacho", `perro-titan` → "Titán". Las fotos `1.jpg`, `2.jpg`… se cargan en ese orden, y la `1` es la principal (RN-51). Ahora hay 8: Diana, Paco y Paprika (gatos) y Pistacho, Rocky, Shiro, Titán y Torpedo (perros). La raza, el tamaño, la edad y el sexo se eligen **mirando las fotos**, con razas del catálogo, y la descripción es breve y en español. Se reparten de forma equilibrada entre las tres protectoras nuevas. **No hace falta llegar a 15 mascotas**: se crean las que haya. **(3)** El responsable añadirá más fotos y logos; se incorporarán en una tarea aparte. | Especificaciones §9 | T-13, T-15 | PENDIENTE |
 | T-16 | Buscar protectoras y ver su perfil. | CU-13; RN-24, 69, 149 | T-14 | APROBADA |
 
 ### Fase 3 · Descubrir y favoritos
@@ -315,7 +317,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | BLOQUEADA |
+| T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | PENDIENTE |
 
 ### Para el final, si da tiempo
 
