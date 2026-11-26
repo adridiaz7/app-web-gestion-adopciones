@@ -817,6 +817,22 @@ export interface DeleteAccountRequest {
   password: string;
 }
 
+/** CU-49 · POST /api/auth/change-password */
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/** CU-49 · POST /api/auth/change-email */
+export interface ChangeEmailRequest {
+  newEmail: string;
+}
+
+/** CU-49 · POST /api/auth/confirm-email-change */
+export interface ConfirmEmailChangeRequest {
+  token: string;
+}
+
 /** RN-155: the reasons of a suspension. */
 export type SuspensionReason = "INAPPROPRIATE_BEHAVIOUR" | "FALSE_INFORMATION" | "INAPPROPRIATE_CONTENT" | "FRAUD" | "REPEATED_INCIDENTS" | "OTHER";
 

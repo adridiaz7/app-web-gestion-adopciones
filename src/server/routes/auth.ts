@@ -1,6 +1,9 @@
 import { Router } from "express";
 import {
   getMe,
+  postChangeEmail,
+  postChangePassword,
+  postConfirmEmailChange,
   postForgotPassword,
   postLogin,
   postDeleteAccount,
@@ -28,6 +31,9 @@ export function createAuthRouter(): Router {
   router.post("/reset-password", postResetPassword);
   router.get("/me", requireAuth, getMe);
   router.post("/delete-account", requireRole("ADOPTER", "SHELTER"), postDeleteAccount);
+  router.post("/change-password", requireRole("ADOPTER", "SHELTER"), postChangePassword);
+  router.post("/change-email", requireRole("ADOPTER", "SHELTER"), postChangeEmail);
+  router.post("/confirm-email-change", postConfirmEmailChange);
 
   return router;
 }

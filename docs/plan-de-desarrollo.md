@@ -180,6 +180,12 @@ Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted
 
 **26/11/2026 · T-37 (no bloquea).** Al eliminar su cuenta un **adoptante**, sus visitas y adopciones abiertas se anulan (`ACCOUNT_DELETED`), pero RN-12 y CU-07 solo piden avisar a los adoptantes cuando se elimina una **protectora**, así que la protectora **no recibe aviso** de las visitas o solicitudes anuladas de ese adoptante (las ve anuladas en su calendario y en su bandeja). Si tenía una adopción **aprobada**, la mascota vuelve a `AVAILABLE` y se avisa a los no seleccionados, como al cancelarla (RN-130). Además, se anonimiza también la **fecha de nacimiento** (queda `1900-01-01`), porque es un dato personal. ¿Es correcto, o la protectora debe recibir un aviso? Se haría en una tarea aparte con tests nuevos.
 
+**26/11/2026 · T-43 (no bloquea).** CU-49 no concreta algunos detalles. Se ha implementado así:
+- **Sesiones al cambiar la contraseña:** no se cierra ninguna. Al restablecerla sí se cierran todas (T-44), pero para el cambio con la sesión iniciada no hay decisión. ¿Se cierran las demás sesiones y se mantiene la actual?
+- **Cambiar el email no pide la contraseña actual**, porque CU-49 solo la pide para la contraseña. El cambio se confirma con el enlace al email nuevo y se avisa al anterior. ¿Hay que pedirla también?
+- **Validez del enlace al email nuevo:** 24 h, la misma que la verificación de email (RN-177). Cada petición nueva anula el enlace anterior sin usar, pero **no hay espera de 5 minutos** entre peticiones (RN-180 solo habla de la verificación). Si el email nuevo ya está registrado, se responde igual y no se envía nada. Si se registra antes de abrir el enlace, el enlace deja de valer.
+- **Auditoría (RN-208):** `PASSWORD_CHANGED` y `EMAIL_CHANGED`, sin guardar las direcciones, para que no queden datos personales en el registro al eliminar la cuenta (RN-210).
+
 ---
 
 ## 5. Tareas
@@ -301,7 +307,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-43 | Cambiar el email o la contraseña con la sesión iniciada. | CU-49 | T-36 | PENDIENTE |
+| T-43 | Cambiar el email o la contraseña con la sesión iniciada. | CU-49 | T-36 | EN_REVISION |
 
 ---
 

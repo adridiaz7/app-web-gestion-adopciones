@@ -1,5 +1,8 @@
 import type {
   AdopterRegistrationRequest,
+  ChangeEmailRequest,
+  ChangePasswordRequest,
+  ConfirmEmailChangeRequest,
   DeleteAccountRequest,
   ForgotPasswordRequest,
   LoginRequest,
@@ -31,6 +34,13 @@ export const login = (body: LoginRequest) => apiRequest<SessionResponse>("POST",
 export const logout = () => apiRequest<undefined>("POST", "/auth/logout");
 
 /** CU-07: deletes the account and closes the session. */
+export const changePassword = (body: ChangePasswordRequest) => apiRequest<undefined>("POST", "/auth/change-password", body);
+
+export const changeEmail = (body: ChangeEmailRequest) => apiRequest<MessageResponse>("POST", "/auth/change-email", body);
+
+export const confirmEmailChange = (body: ConfirmEmailChangeRequest) =>
+  apiRequest<MessageResponse>("POST", "/auth/confirm-email-change", body);
+
 export const deleteAccount = (body: DeleteAccountRequest) => apiRequest<undefined>("POST", "/auth/delete-account", body);
 
 export const forgotPassword = (body: ForgotPasswordRequest) =>

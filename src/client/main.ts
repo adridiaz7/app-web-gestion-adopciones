@@ -27,6 +27,7 @@ import { renderMessages } from "./views/messages.js";
 import { renderAdoptionRequest } from "./views/adoption-request.js";
 import { renderShelterCandidates } from "./views/shelter-candidates.js";
 import { renderVerifyEmail } from "./views/verify-email.js";
+import { renderConfirmEmailChange } from "./views/confirm-email-change.js";
 
 const routes: Route[] = [
   { path: "/", render: renderRoot },
@@ -36,6 +37,7 @@ const routes: Route[] = [
   { path: "/registro/protectora", render: renderRegisterShelter },
   { path: "/revisa-tu-email", render: renderCheckEmail },
   { path: "/verificar-email", render: renderVerifyEmail },
+  { path: "/confirmar-email", render: renderConfirmEmailChange },
   { path: "/recuperar-contrasena", render: renderForgotPassword },
   { path: "/restablecer-contrasena", render: renderResetPassword },
   { path: "/inicio", render: renderHome },

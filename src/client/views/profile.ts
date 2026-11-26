@@ -1,3 +1,4 @@
+import { credentialsSection } from "../components/account-credentials.js";
 import { deleteAccountSection } from "../components/delete-account.js";
 import type { AdopterProfile, AdopterProfileUpdate, Household, ShelterProfile } from "../../shared/api.js";
 import { currentUser, getProvinces, type SessionUser } from "../api/auth.js";
@@ -201,6 +202,7 @@ export async function renderProfile(root: HTMLElement): Promise<void> {
       h("h1", { class: "display" }, "Mi perfil"),
       user.role === "ADOPTER" ? h("p", { class: "muted" }, "Tus datos personales y los de tu hogar. ", h("a", { href: "/perfil/preferencias" }, "Editar mis preferencias")) : h("p", { class: "muted" }, "Los datos que ven los adoptantes en el perfil de tu protectora."),
       ...body,
+      credentialsSection(user.email),
       deleteAccountSection(user.role),
     ]),
   );

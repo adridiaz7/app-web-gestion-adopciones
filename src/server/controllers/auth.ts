@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { MessageResponse, SessionResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { clearSessionCookie, readSessionToken, setSessionCookie } from "../middlewares/session.js";
+import { changePassword, confirmEmailChangeLink, requestEmailChange } from "../services/account-credentials.js";
 import { deleteAccount } from "../services/account-deletion.js";
 import { resendVerification, verifyEmail } from "../services/email-verification.js";
 import { requestPasswordReset, resetPassword } from "../services/password-reset.js";
@@ -196,4 +197,43 @@ export const postDeleteAccount: RequestHandler = async (req, res) => {
   await deleteAccount(req.user.id, password);
   clearSessionCookie(res);
   res.status(204).end();
+};
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string({ error: REQUIRED }).min(1, { error: REQUIRED }).max(256, { error: "La contraseña actual no es correcta." }),
+  newPassword: passwordSchema,
+});
+
+/** CU-49 · POST /api/auth/change-password */
+export const postChangePassword: RequestHandler = async (req, res) => {
+  if (!req.user) throw new UnauthorizedError();
+  const { currentPassword, newPassword } = changePasswordSchema.parse(req.body ?? {});
+  await changePassword(req.user.id, currentPassword, newPassword, req.ip);
+  res.status(204).end();
+};
+
+const changeEmailSchema = z.object({ newEmail: emailSchema });
+
+/** Same answer whether the new email is free or already registered (CU-49). */
+const EMAIL_LINK_SENT: MessageResponse = { message: "Te hemos enviado un enlace al email nuevo. El cambio se hará cuando lo abras." };
+
+/** CU-49 · POST /api/auth/change-email */
+export const postChangeEmail: RequestHandler = async (req, res) => {
+  if (!req.user) throw new UnauthorizedError();
+  const { newEmail } = changeEmailSchema.parse(req.body ?? {});
+  await requestEmailChange(req.user.id, newEmail);
+  res.status(202).json(EMAIL_LINK_SENT);
+};
+
+const MISSING_EMAIL_TOKEN = "Falta el enlace para confirmar el email.";
+const confirmEmailChangeSchema = z.object({
+  token: z.string({ error: MISSING_EMAIL_TOKEN }).min(1, { error: MISSING_EMAIL_TOKEN }),
+});
+
+/** CU-49 · POST /api/auth/confirm-email-change: works from the link, with or without a session. */
+export const postConfirmEmailChange: RequestHandler = async (req, res) => {
+  const { token } = confirmEmailChangeSchema.parse(req.body ?? {});
+  const email = await confirmEmailChangeLink(token);
+  const body: MessageResponse = { message: `Tu email se ha cambiado. A partir de ahora inicia sesión con ${email}.` };
+  res.json(body);
 };
