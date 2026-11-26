@@ -1,4 +1,4 @@
-| `mascotas/perro-torpedo/5.jpg` | https://www.pexels.com/es-es/foto/animal-perro-mascota-cabeza-16282081/ | Михаил Крамор | Licencia de Pexels || `mascotas/perro-torpedo/4.jpg` | https://www.pexels.com/es-es/foto/perro-mascota-sentado-pelo-9718755/ | Михаил Крамор | Licencia de Pexels || `mascotas/perro-torpedo/3.jpg` | https://www.pexels.com/es-es/foto/animal-perro-mascota-mono-17628643/ | Михаил Крамор | Licencia de Pexels || `mascotas/perro-torpedo/2.jpg` | https://www.pexels.com/es-es/foto/fotografia-de-animales-fotos-con-gran-angular-fotografia-de-perro-perro-de-rumbo-de-nueva-zelanda-12582118/ | Михаил Крамор | Licencia de Pexels || `mascotas/perro-torpedo/1.jpg` | https://www.pexels.com/es-es/foto/mascota-sentado-fotografia-de-animales-enfoque-selectivo-26560696/ | Михаил Крамор | Licencia de Pexels || `mascotas/perro-pistacho/2.jpg` | https://www.pexels.com/es-es/foto/adorable-perro-negro-y-canela-sentado-al-aire-libre-34606473/ | Davide Negro | Licencia de Pexels || `mascotas/perro-pistacho/1.jpg` | https://www.pexels.com/es-es/foto/adorable-retrato-de-un-perro-negro-y-canela-sentado-34541663/ | Davide Negro | Licencia de Pexels || `logos/parque-amigazo.png` | Generado con IA (ChatGPT) | — | — || `logos/nakama.png` | Generado con IA (ChatGPT) | — | — || `logos/can-solo.png` | Generado con IA (ChatGPT) | — | — |# Créditos de las imágenes
+# Créditos de las imágenes
 
 Imágenes de ejemplo para la demo (`db/seed-photos/`). No se usan con fines comerciales.
 
@@ -8,9 +8,9 @@ Los logos se han generado con IA (ChatGPT). Todas las fotos de mascotas son de [
 
 | Archivo | Origen | Autor | Licencia |
 |---|---|---|---|
-| `logos/can-solo.png` | Pendiente | — | — |
-| `logos/nakama.png` | Pendiente | — | — |
-| `logos/parque-amigazo.png` | Pendiente | — | — |
+| `logos/can-solo.png` | Generado con IA (ChatGPT) | — | — |
+| `logos/nakama.png` | Generado con IA (ChatGPT) | — | — |
+| `logos/parque-amigazo.png` | Generado con IA (ChatGPT) | — | — |
 
 ## Mascotas
 
@@ -24,8 +24,8 @@ Los logos se han generado con IA (ChatGPT). Todas las fotos de mascotas son de [
 | `mascotas/gato-paprika/1.jpg` | https://www.pexels.com/es-es/foto/hermoso-retrato-de-gato-atigrado-naranja-31636956/ | Muneeb Khan | Licencia de Pexels |
 | `mascotas/gato-paprika/2.jpg` | https://www.pexels.com/es-es/foto/retrato-en-primer-plano-de-un-adorable-gato-naranja-31636955/ | Muneeb Khan | Licencia de Pexels |
 | `mascotas/gato-paprika/3.jpg` | https://www.pexels.com/es-es/foto/primer-plano-de-un-adorable-gato-atigrado-naranja-al-aire-libre-31735121/ | Muneeb Khan | Licencia de Pexels |
-| `mascotas/perro-pistacho/1.jpg` | Pendiente | — | Licencia de Pexels |
-| `mascotas/perro-pistacho/2.jpg` | Pendiente | — | Licencia de Pexels |
+| `mascotas/perro-pistacho/1.jpg` | https://www.pexels.com/es-es/foto/adorable-retrato-de-un-perro-negro-y-canela-sentado-34541663/ | Davide Negro | Licencia de Pexels |
+| `mascotas/perro-pistacho/2.jpg` | https://www.pexels.com/es-es/foto/adorable-perro-negro-y-canela-sentado-al-aire-libre-34606473/ | Davide Negro | Licencia de Pexels |
 | `mascotas/perro-rocky/1.jpg` | https://www.pexels.com/es-es/foto/perro-feliz-caminando-en-parque-de-ciudad-de-mexico-33834489/ | Moisés Fonseca | Licencia de Pexels |
 | `mascotas/perro-rocky/2.jpg` | https://www.pexels.com/es-es/foto/labrador-retriever-disfrutando-de-un-paseo-en-ciudad-de-mexico-33834402/ | Moisés Fonseca | Licencia de Pexels |
 | `mascotas/perro-rocky/3.jpg` | https://www.pexels.com/es-es/foto/perro-encantador-con-correa-en-calle-de-ciudad-de-mexico-33834405/ | Moisés Fonseca | Licencia de Pexels |
@@ -35,8 +35,8 @@ Los logos se han generado con IA (ChatGPT). Todas las fotos de mascotas son de [
 | `mascotas/perro-shiro/4.jpg` | https://www.pexels.com/es-es/foto/animal-mascota-mono-adorable-6733252/ | Raynand Yray II | Licencia de Pexels |
 | `mascotas/perro-titan/1.jpg` | https://www.pexels.com/es-es/foto/perro-pomerania-peludo-en-un-paseo-en-un-dia-soleado-31131482/ | Gustavo Denuncio | Licencia de Pexels |
 | `mascotas/perro-titan/2.jpg` | https://www.pexels.com/es-es/foto/adorable-perro-pomerania-blanco-al-aire-libre-31131487/ | Gustavo Denuncio | Licencia de Pexels |
-| `mascotas/perro-torpedo/1.jpg` | Pendiente | — | Licencia de Pexels |
-| `mascotas/perro-torpedo/2.jpg` | Pendiente | — | Licencia de Pexels |
-| `mascotas/perro-torpedo/3.jpg` | Pendiente | — | Licencia de Pexels |
-| `mascotas/perro-torpedo/4.jpg` | Pendiente | — | Licencia de Pexels |
-| `mascotas/perro-torpedo/5.jpg` | Pendiente | — | Licencia de Pexels |
+| `mascotas/perro-torpedo/1.jpg` | https://www.pexels.com/es-es/foto/mascota-sentado-fotografia-de-animales-enfoque-selectivo-26560696/ | Михаил Крамор | Licencia de Pexels |
+| `mascotas/perro-torpedo/2.jpg` | https://www.pexels.com/es-es/foto/fotografia-de-animales-fotos-con-gran-angular-fotografia-de-perro-perro-de-rumbo-de-nueva-zelanda-12582118/ | Михаил Крамор | Licencia de Pexels |
+| `mascotas/perro-torpedo/3.jpg` | https://www.pexels.com/es-es/foto/animal-perro-mascota-mono-17628643/ | Михаил Крамор | Licencia de Pexels |
+| `mascotas/perro-torpedo/4.jpg` | https://www.pexels.com/es-es/foto/perro-mascota-sentado-pelo-9718755/ | Михаил Крамор | Licencia de Pexels |
+| `mascotas/perro-torpedo/5.jpg` | https://www.pexels.com/es-es/foto/animal-perro-mascota-cabeza-16282081/ | Михаил Крамор | Licencia de Pexels |
