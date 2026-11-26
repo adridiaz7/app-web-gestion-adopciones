@@ -1931,3 +1931,26 @@ textarea {
 .catalogue-item span {
   flex: 1;
 }
+
+/* CU-43: audit log table */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table code {
+  word-break: break-all;
+}

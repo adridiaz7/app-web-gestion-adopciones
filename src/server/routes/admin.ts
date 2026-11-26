@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getShelters, postRejectShelter, postRevokeShelter, postValidateShelter } from "../controllers/admin-shelters.js";
+import { getAuditLog, getStats } from "../controllers/admin-activity.js";
 import { postBreed, postSpecies, putBreed, putSpecies } from "../controllers/admin-catalogues.js";
 import { postRemovePet } from "../controllers/admin-pets.js";
 import { getAdminUsers, postReactivateUser, postSuspendUser } from "../controllers/admin-users.js";
@@ -26,6 +27,9 @@ export function createAdminRouter(): Router {
   router.put("/species/:id", putSpecies);
   router.post("/breeds", postBreed);
   router.put("/breeds/:id", putBreed);
+
+  router.get("/audit-log", getAuditLog);
+  router.get("/stats", getStats);
 
   router.get("/incidents", getIncidents);
   router.post("/incidents/:id/status", postIncidentStatus);

@@ -851,3 +851,30 @@ export interface SpeciesResponse {
 export interface BreedResponse {
   breed: { id: number; speciesId: number; name: string };
 }
+
+/** CU-43 · an entry of the audit log (RN-208), with its actor (null: the system). */
+export interface AuditLogEntry {
+  id: number;
+  action: string;
+  entityType: string | null;
+  entityId: number | null;
+  details: unknown;
+  createdAt: string;
+  actor: { id: number; email: string; role: string } | null;
+}
+
+export interface AuditLogResponse {
+  entries: AuditLogEntry[];
+}
+
+/** CU-44 · global indicators (RN-160); averages in days, null without data. */
+export interface StatsResponse {
+  stats: {
+    adoptions: { pending: number; approved: number; completed: number; returned: number; rejected: number; cancelled: number };
+    averageDaysToDecide: number | null;
+    averageDaysToDeliver: number | null;
+    visits: { completed: number; noShow: number };
+    blocks: { active: number; total: number };
+    incidents: { open: number; total: number };
+  };
+}

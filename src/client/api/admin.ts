@@ -2,6 +2,8 @@ import type {
   AdminShelterResponse,
   AdminSheltersResponse,
   AdminUsersResponse,
+  AuditLogResponse,
+  StatsResponse,
   BreedResponse,
   SpeciesResponse,
   SuspendUserRequest,
@@ -39,3 +41,9 @@ export const createSpecies = (name: string) => apiRequest<SpeciesResponse>("POST
 export const renameSpecies = (id: number, name: string) => apiRequest<SpeciesResponse>("PUT", `/admin/species/${String(id)}`, { name });
 export const createBreed = (speciesId: number, name: string) => apiRequest<BreedResponse>("POST", "/admin/breeds", { speciesId, name });
 export const renameBreed = (id: number, name: string) => apiRequest<BreedResponse>("PUT", `/admin/breeds/${String(id)}`, { name });
+
+/** CU-43, RN-161: `query` holds entityType, entityId and actorId, all optional. */
+export const listAuditLog = (query: URLSearchParams) => apiRequest<AuditLogResponse>("GET", `/admin/audit-log?${query.toString()}`);
+
+/** CU-44, RN-160 */
+export const getStats = () => apiRequest<StatsResponse>("GET", "/admin/stats");

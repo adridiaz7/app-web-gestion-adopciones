@@ -3,6 +3,7 @@ import { renderAccountType } from "./views/account-type.js";
 import { renderAdminShelters } from "./views/admin-shelters.js";
 import { renderAdminUsers } from "./views/admin-users.js";
 import { renderAdminCatalogues } from "./views/admin-catalogues.js";
+import { renderAdminActivity } from "./views/admin-activity.js";
 import { renderCheckEmail } from "./views/check-email.js";
 import { renderGallery } from "./views/gallery.js";
 import { renderHome, renderNotFound, renderRoot } from "./views/home.js";
@@ -51,6 +52,7 @@ const routes: Route[] = [
   { path: "/admin/incidencias", render: renderAdminIncidents },
   { path: "/admin/cuentas", render: renderAdminUsers },
   { path: "/admin/catalogos", render: renderAdminCatalogues },
+  { path: "/admin/actividad", render: renderAdminActivity },
   { path: "/incidencias/nueva", render: renderNewIncident },
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },
