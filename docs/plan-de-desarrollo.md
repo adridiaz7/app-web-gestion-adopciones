@@ -235,17 +235,17 @@ Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_REVISION |
-| T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | EN_REVISION |
-| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | EN_REVISION |
-| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | EN_REVISION |
-| T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | EN_REVISION |
-| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | EN_REVISION |
+| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | APROBADA |
+| T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | APROBADA |
+| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | APROBADA |
+| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | APROBADA |
+| T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | APROBADA |
+| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | APROBADA |
 | T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | APROBADA |
-| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | EN_REVISION |
-| T-48 | Comprobar el **cupo** (RN-90) también al **confirmar** una visita. Si el adoptante ya lo tiene lleno con esa protectora, se responde con un error y la visita sigue pendiente. Solo API, más el mensaje de error en el calendario. Tests nuevos; no se modifican los de T-23. | CU-24; RN-90, 93; decisión del responsable del 25/11/2026 (sección 4) | T-23 | EN_REVISION |
-| T-49 | **Visita sustituta** (CU-23, RN-111). Solo cuando la visita anulada tenía motivo `SLOT_CANCELLED` y estaba confirmada. Es para la misma mascota y solo una vez (`replaces_visit_id`). No necesita las 48 h de antelación y queda confirmada directamente. Se aplican el resto de reglas: plazas, bloqueo, ausencia y cupo. Tests nuevos; no se modifican los de T-22. | CU-23; RN-87, 90, 111; decisión del responsable del 25/11/2026 (sección 4) | T-22, T-20 | EN_REVISION |
-| T-50 | **Perfil del adoptante en la bandeja** de la protectora (CU-22). La protectora ve el nombre, la provincia, los datos del hogar (RN-27) y el historial de visitas y ausencias de ese adoptante **con ella**. Solo ve los adoptantes que le han enviado alguna solicitud (RN-29). Tests nuevos, incluido que no se ve el historial con otras protectoras; no se modifican los de T-24. | CU-22; RN-27, 29; decisión del responsable del 25/11/2026 (sección 4) | T-24, T-25 | EN_REVISION |
+| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | APROBADA |
+| T-48 | Comprobar el **cupo** (RN-90) también al **confirmar** una visita. Si el adoptante ya lo tiene lleno con esa protectora, se responde con un error y la visita sigue pendiente. Solo API, más el mensaje de error en el calendario. Tests nuevos; no se modifican los de T-23. | CU-24; RN-90, 93; decisión del responsable del 25/11/2026 (sección 4) | T-23 | APROBADA |
+| T-49 | **Visita sustituta** (CU-23, RN-111). Solo cuando la visita anulada tenía motivo `SLOT_CANCELLED` y estaba confirmada. Es para la misma mascota y solo una vez (`replaces_visit_id`). No necesita las 48 h de antelación y queda confirmada directamente. Se aplican el resto de reglas: plazas, bloqueo, ausencia y cupo. Tests nuevos; no se modifican los de T-22. | CU-23; RN-87, 90, 111; decisión del responsable del 25/11/2026 (sección 4) | T-22, T-20 | APROBADA |
+| T-50 | **Perfil del adoptante en la bandeja** de la protectora (CU-22). La protectora ve el nombre, la provincia, los datos del hogar (RN-27) y el historial de visitas y ausencias de ese adoptante **con ella**. Solo ve los adoptantes que le han enviado alguna solicitud (RN-29). Tests nuevos, incluido que no se ve el historial con otras protectoras; no se modifican los de T-24. | CU-22; RN-27, 29; decisión del responsable del 25/11/2026 (sección 4) | T-24, T-25 | APROBADA |
 
 ### Fase 5 · Notificaciones y chat
 
@@ -261,35 +261,35 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-36 | Editar el perfil (datos personales y del hogar, o datos públicos de la protectora, **logo incluido**, subido con multer como las fotos de T-13). Se entra desde una **tarjeta arriba de la barra lateral**, "Hola, {nombre} · Ver mi perfil" (el nombre de la protectora en su caso), como en las maquetas de `docs/ux-ui/app-adoptante`. | CU-06; RN-25, 27 | T-07 | EN_REVISION |
-| T-52 | **"Solicitar adopción" solo cuando se puede** (detectado por el responsable al revisar la app, 26/11/2026). Hoy la ficha de la mascota ofrece "Solicitar visita" y "Solicitar adopción" a la vez, y el adoptante solo descubre que no puede adoptar al enviar el formulario. **(1)** La API indica al adoptante si puede solicitar la adopción de esa mascota y, si no, el motivo. Se calcula en el servicio con **la misma comprobación** que valida `POST /api/adoptions`, sin duplicar reglas: visita `REALIZADA` a esa mascota (RN-113) dentro de su validez (RN-116), sin ausencia ni bloqueo con esa protectora (RN-118) y sin otra solicitud abierta para ella (RN-119). Los datos del hogar (RN-117) **no** cuentan, porque se completan en el propio formulario. **(2)** En la ficha, si no puede, el botón aparece **deshabilitado** con el motivo debajo, por ejemplo: "Para solicitar la adopción, primero tienes que visitar a {nombre}", "Tu visita a {nombre} fue hace más de un mes: pide otra visita para poder adoptarla" o "Ya has solicitado adoptar a {nombre}" (con enlace a la solicitud). El texto de bloqueo es neutro (RN-149). **(3)** Si se entra a `/mascotas/:id/adoptar` sin poder, se muestra el mismo aviso en lugar del formulario. Tests nuevos; no se modifican los de T-15 ni T-30. | CU-11, CU-27; RN-113, 116, 118, 119, 149 | T-30 | EN_REVISION |
+| T-36 | Editar el perfil (datos personales y del hogar, o datos públicos de la protectora, **logo incluido**, subido con multer como las fotos de T-13). Se entra desde una **tarjeta arriba de la barra lateral**, "Hola, {nombre} · Ver mi perfil" (el nombre de la protectora en su caso), como en las maquetas de `docs/ux-ui/app-adoptante`. | CU-06; RN-25, 27 | T-07 | APROBADA |
+| T-52 | **"Solicitar adopción" solo cuando se puede** (detectado por el responsable al revisar la app, 26/11/2026). Hoy la ficha de la mascota ofrece "Solicitar visita" y "Solicitar adopción" a la vez, y el adoptante solo descubre que no puede adoptar al enviar el formulario. **(1)** La API indica al adoptante si puede solicitar la adopción de esa mascota y, si no, el motivo. Se calcula en el servicio con **la misma comprobación** que valida `POST /api/adoptions`, sin duplicar reglas: visita `REALIZADA` a esa mascota (RN-113) dentro de su validez (RN-116), sin ausencia ni bloqueo con esa protectora (RN-118) y sin otra solicitud abierta para ella (RN-119). Los datos del hogar (RN-117) **no** cuentan, porque se completan en el propio formulario. **(2)** En la ficha, si no puede, el botón aparece **deshabilitado** con el motivo debajo, por ejemplo: "Para solicitar la adopción, primero tienes que visitar a {nombre}", "Tu visita a {nombre} fue hace más de un mes: pide otra visita para poder adoptarla" o "Ya has solicitado adoptar a {nombre}" (con enlace a la solicitud). El texto de bloqueo es neutro (RN-149). **(3)** Si se entra a `/mascotas/:id/adoptar` sin poder, se muestra el mismo aviso en lugar del formulario. Tests nuevos; no se modifican los de T-15 ni T-30. | CU-11, CU-27; RN-113, 116, 118, 119, 149 | T-30 | APROBADA |
 | T-47 | **Repaso visual según las maquetas** (indicaciones del responsable del 25/11/2026). Para estas pantallas, las maquetas de `docs/ux-ui/app-adoptante` **dejan de ser solo orientativas**: se siguen fielmente, salvo lo que diga esta tarea. Solo front, sin cambios en reglas ni API. Incluye: **(1) Explorar como una sola sección** con **tabs** Mascotas / Protectoras debajo del título, la activa subrayada en naranja; nada de botones. **(2) Interruptor flotante fijo** abajo en el centro, "Descubrir \| Buscador", para pasar del modo descubrir a la galería sin salir de Explorar. Es un rasgo distintivo de la app. **(3) Modo descubrir como la maqueta `01-explorar-modo-descubrir`:** foto grande, información superpuesta con la protectora encima del nombre y botón "Ver ficha"; botones ✕ y ♥ a los lados con su texto; pista "Arrastra la tarjeta"; al soltar, la tarjeta sale hacia el lado elegido. **(4) Filtros de la galería** compactos, en una sola línea y con menos espacio entre chips, como la maqueta `02-explorar-buscador`, salvo que la sección 3 diga otra cosa. **(5) Iconos SVG propios** junto a cada entrada de la barra lateral, para el adoptante y la protectora: brújula para Explorar, corazón para Favoritos, calendario para Visitas, etc. Con los colores del sistema de diseño y sin emojis. **(6) Logo de la protectora** en pequeño junto a su nombre en la ficha de la mascota, o sus iniciales en un círculo si no tiene logo. **Bloqueada hasta que el responsable revise la app** (sección 3); él la pasará a `PENDIENTE`, quizá con indicaciones nuevas. | Maquetas `docs/ux-ui/app-adoptante`; `docs/ux-ui/design-system.md` | T-32, T-36 | BLOQUEADA |
 
 ### Fase 6 · Adopción
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | EN_REVISION |
-| T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | EN_REVISION |
-| T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | EN_REVISION |
-| T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | EN_REVISION |
+| T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | APROBADA |
+| T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | APROBADA |
+| T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | APROBADA |
+| T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | APROBADA |
 
 ### Fase 7 · Bloqueos y notas internas
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-34 | Bloquear y desbloquear adoptantes (primero temporal, luego definitivo) y levantar automáticamente los bloqueos temporales. | CU-35, CU-56; RN-145–152, 198, 201–203 | T-29, T-32 | EN_REVISION |
-| T-35 | Notas internas sobre adoptantes. | CU-52; RN-204 | T-24 | EN_REVISION |
+| T-34 | Bloquear y desbloquear adoptantes (primero temporal, luego definitivo) y levantar automáticamente los bloqueos temporales. | CU-35, CU-56; RN-145–152, 198, 201–203 | T-29, T-32 | APROBADA |
+| T-35 | Notas internas sobre adoptantes. | CU-52; RN-204 | T-24 | APROBADA |
 
 ### Fase 8 · Perfil, avisos y administración
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | EN_REVISION |
-| T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | EN_REVISION |
-| T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | EN_REVISION |
-| T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | EN_REVISION |
-| T-41 | Supervisar la actividad (incluido el registro de auditoría) y estadísticas. | CU-43, CU-44; RN-160, 161 | T-39 | EN_REVISION |
+| T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | APROBADA |
+| T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | CAMBIOS |
+| T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | APROBADA |
+| T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | CAMBIOS |
+| T-41 | Supervisar la actividad (incluido el registro de auditoría) y estadísticas. | CU-43, CU-44; RN-160, 161 | T-39 | APROBADA |
 
 ### Fase 9 · Demo
 

@@ -1,5 +1,15 @@
 {
   "files": {
+    "tests/integration/account-deletion.test.ts": {
+      "feature": "T-37 Eliminar la cuenta con anonimizacion",
+      "sha256": "7a3b4092fa04ec321b7cb49bd48761c8968027137503777f30534f67c6daaad8",
+      "lockedAt": "2026-11-26T15:00:23.656Z"
+    },
+    "tests/integration/admin-activity.test.ts": {
+      "feature": "T-41 Supervisar la actividad y estadisticas",
+      "sha256": "9f454414ee063dbdf6a255926b29254bc133e7c670f710c77cf7b39f0655fc9b",
+      "lockedAt": "2026-11-26T15:00:24.036Z"
+    },
     "tests/integration/admin-shelters-revalidate.test.ts": {
       "feature": "T-45 Volver a validar una protectora rechazada",
       "sha256": "0e3edf99fca521670dccb1bf335bf767481bf7f5dc2f3001bb30d63819f9435f",
@@ -9,6 +19,51 @@
       "feature": "T-11 Validar, rechazar y revocar protectoras",
       "sha256": "c1af05f4484701c4c941d01b277efa207679ab9075860097301bd600a3ddf410",
       "lockedAt": "2026-11-26T08:56:24.505Z"
+    },
+    "tests/integration/adopter-blocks.test.ts": {
+      "feature": "T-34 Bloquear y desbloquear adoptantes",
+      "sha256": "fe81ad0924dcf2a891dfab140b2b62a4714818466722ff65f7b14d93a61085e6",
+      "lockedAt": "2026-11-26T15:00:23.116Z"
+    },
+    "tests/integration/adopter-notes.test.ts": {
+      "feature": "T-35 Notas internas sobre adoptantes",
+      "sha256": "726fb3180df447a0f769b890ec6e9e72235194d152552b0f4a1a4e0eb12ff812",
+      "lockedAt": "2026-11-26T15:00:23.297Z"
+    },
+    "tests/integration/adopter-profile.test.ts": {
+      "feature": "T-36 Editar el perfil",
+      "sha256": "3f452e516204aeceab90326e98e43abf197f33ace21fa9518be2c3a004103d93",
+      "lockedAt": "2026-11-26T15:00:23.469Z"
+    },
+    "tests/integration/adoption-closing.test.ts": {
+      "feature": "T-32 Cancelar una adopcion, registrar la entrega y una devolucion",
+      "sha256": "0ec60f6fdde5fb1a68625ea83651130cc1a93b4922fb9cf267e8cda572e05f9c",
+      "lockedAt": "2026-11-26T15:00:22.767Z"
+    },
+    "tests/integration/adoption-decisions.test.ts": {
+      "feature": "T-31 Comparar candidatos y aprobar o rechazar",
+      "sha256": "f5d9b5d79fc3ad2808f21dbe8fab14b5b512a7bd7fc6477645c187862190fa6e",
+      "lockedAt": "2026-11-26T15:00:22.588Z"
+    },
+    "tests/integration/adoption-eligibility.test.ts": {
+      "feature": "T-52 Solicitar adopcion solo cuando se puede",
+      "sha256": "350fcae1c74d84b49eddba7332d5882f2834dce48ca47564f9ee455bb5335c6c",
+      "lockedAt": "2026-11-26T15:00:24.798Z"
+    },
+    "tests/integration/adoption-lists.test.ts": {
+      "feature": "T-32 Cancelar una adopcion, registrar la entrega y una devolucion",
+      "sha256": "b5889a0873edf76fc3d3d88f6f7262f85db6ed001b223659cea184749bc578a8",
+      "lockedAt": "2026-11-26T15:00:22.767Z"
+    },
+    "tests/integration/adoption-reminders.test.ts": {
+      "feature": "T-33 Recordatorios de adopciones y entregas pendientes",
+      "sha256": "51fb0740863bc35d06a9773331c32e3183de4a2066a660c4a38436a04f6158ab",
+      "lockedAt": "2026-11-26T15:00:22.935Z"
+    },
+    "tests/integration/adoption-requests.test.ts": {
+      "feature": "T-30 Solicitar una adopcion",
+      "sha256": "08e5ba7dc0c7a97ca184d69c9da676436311edbfe1a35e3d59a0752f423b3c85",
+      "lockedAt": "2026-11-26T15:00:22.416Z"
     },
     "tests/integration/audit.test.ts": {
       "feature": "T-03 Piezas transversales",
@@ -50,6 +105,16 @@
       "sha256": "d898898a1ad60d932dc832e6c3b301a5ff76cab7bdcece54db56a32fecb7fb71",
       "lockedAt": "2026-11-24T23:12:50.521Z"
     },
+    "tests/integration/incidents-admin.test.ts": {
+      "feature": "T-39 Incidencias",
+      "sha256": "a2f78bdde20cee0d168774666cd5a7029bab08447be7377e7654bd7dfb50e36d",
+      "lockedAt": "2026-11-26T15:00:23.853Z"
+    },
+    "tests/integration/incidents-open.test.ts": {
+      "feature": "T-39 Incidencias",
+      "sha256": "67c33b4867e596a17e577b69e6cace83096b36e27b82093cb8a1e0773c6002ba",
+      "lockedAt": "2026-11-26T15:00:23.853Z"
+    },
     "tests/integration/login.test.ts": {
       "feature": "T-07 Iniciar y cerrar sesión",
       "sha256": "957105a07bb524b1cf0ba64ff71b58234bd586d9466799dad8835f87ac99c2bd",
@@ -85,6 +150,11 @@
       "sha256": "c7631905b6c3f96a591b716c278ad780b0b09d72c7b591746f4fdd2dfe266a7e",
       "lockedAt": "2026-11-26T08:56:25.230Z"
     },
+    "tests/integration/pet-unlisting.test.ts": {
+      "feature": "T-27 Dar de baja y reactivar una mascota",
+      "sha256": "105ab3c2651c2d501bec26693375f738e18a0b1a9cf15ed86c6c58c407c397e2",
+      "lockedAt": "2026-11-26T15:00:22.234Z"
+    },
     "tests/integration/preferences.test.ts": {
       "feature": "T-17 Cuestionario de preferencias",
       "sha256": "b788abf1e5c40bcaabb4e865142ff986679c8b3478bb9746723e6f192f0d4346",
@@ -94,6 +164,11 @@
       "feature": "T-09 Frontend base y pantallas de acceso",
       "sha256": "baf4e912cf3302ad1e6a29bd03660d6de27653b77dfe04d39c3d3eaf6539b1b9",
       "lockedAt": "2026-11-26T08:56:24.191Z"
+    },
+    "tests/integration/recurring-slots.test.ts": {
+      "feature": "T-21 Turnos recurrentes",
+      "sha256": "7ea1274d0d7e11c9882f1d9c33886247d8d3535632afe7c923afed2b88e21b8b",
+      "lockedAt": "2026-11-26T15:00:21.330Z"
     },
     "tests/integration/register-adopter.test.ts": {
       "feature": "T-04 Registro de adoptante",
@@ -105,10 +180,20 @@
       "sha256": "5a961a07028992cc809d8ec35a77e489e48e3d9d4b7e6b07282ddd6320d46f6d",
       "lockedAt": "2026-11-26T08:56:23.600Z"
     },
+    "tests/integration/shelter-adopter-profile.test.ts": {
+      "feature": "T-50 Perfil del adoptante en la bandeja",
+      "sha256": "419a26f43f997e7d5fc112e8eb4661083dc16b83828f0abfdd3615afa88e063f",
+      "lockedAt": "2026-11-26T15:00:24.603Z"
+    },
     "tests/integration/shelter-pets.test.ts": {
       "feature": "T-12 Alta, edición y listado de mascotas",
       "sha256": "8aee9b43b4a58b28cd6140b8b3273b8dc040b68a4673f6e94196bb09c070457f",
       "lockedAt": "2026-11-26T08:56:24.795Z"
+    },
+    "tests/integration/shelter-profile.test.ts": {
+      "feature": "T-36 Editar el perfil",
+      "sha256": "7796c0405709e5769fdcfd8b99058e1fb558319341d62a39fe221e324b8c6e74",
+      "lockedAt": "2026-11-26T15:00:23.469Z"
     },
     "tests/integration/shelter-search.test.ts": {
       "feature": "T-16 Buscar protectoras y ver su perfil",
@@ -130,20 +215,65 @@
       "sha256": "8e50704ab6384982059fe9544ca47722c4ab29f33ff3833610cb22e877dbbd79",
       "lockedAt": "2026-11-26T08:56:23.756Z"
     },
+    "tests/integration/visit-attendance.test.ts": {
+      "feature": "T-25 Caducar, marcar realizadas y registrar ausencias",
+      "sha256": "8a9997a3edf63e759f4033ac853d81fb11e147abf6dff4880c712317d6631f6b",
+      "lockedAt": "2026-11-26T15:00:22.063Z"
+    },
+    "tests/integration/visit-confirm-quota.test.ts": {
+      "feature": "T-48 Comprobar el cupo al confirmar",
+      "sha256": "bcf1fba68b62d05fec97eb0b4aa86123faf77896856c961d9a244a49584d61c4",
+      "lockedAt": "2026-11-26T15:00:24.215Z"
+    },
+    "tests/integration/visit-lists.test.ts": {
+      "feature": "T-24 Mis visitas y bandeja de solicitudes",
+      "sha256": "4572822e97e65bb431c431c64fca13ded6f2c8194a6c417686f8efd8647a989f",
+      "lockedAt": "2026-11-26T15:00:21.879Z"
+    },
     "tests/integration/visit-reminders.test.ts": {
       "feature": "T-26 Reprogramar una visita y recordatorio",
       "sha256": "b948266fd6bed238de49b1ed03f68292094294e6c46ef68c4743cf1d2f1a2848",
       "lockedAt": "2026-11-26T08:56:25.963Z"
+    },
+    "tests/integration/visit-replacement.test.ts": {
+      "feature": "T-49 Visita sustituta",
+      "sha256": "9503fe2374a9f892d928d5c09b64b46e5024efc6c67824ec73c716ba383c138a",
+      "lockedAt": "2026-11-26T15:00:24.413Z"
+    },
+    "tests/integration/visit-requests.test.ts": {
+      "feature": "T-22 Solicitar una visita",
+      "sha256": "26a2ed8195559c479bf18bf5729d0712e5027b80bd91b38a33048e211037f656",
+      "lockedAt": "2026-11-26T15:00:21.517Z"
     },
     "tests/integration/visit-reschedule.test.ts": {
       "feature": "T-26 Reprogramar una visita y recordatorio",
       "sha256": "675d0999bca6cd37994350577a6a5f321e27865887dff56337314b4d3577eac1",
       "lockedAt": "2026-11-26T08:56:25.963Z"
     },
+    "tests/integration/visit-responses.test.ts": {
+      "feature": "T-23 Confirmar, rechazar y cancelar visitas",
+      "sha256": "e6754f1983f43b6e2dcecb1e72dea252b19c1a7172c4908dd464cdbb67377fb9",
+      "lockedAt": "2026-11-26T15:00:21.700Z"
+    },
+    "tests/integration/visit-slots.test.ts": {
+      "feature": "T-20 Turnos de visita",
+      "sha256": "23f196cf48e55dd6d17d472f31318b5724da14d80097d78ca1ddb02a0a32834c",
+      "lockedAt": "2026-11-26T15:00:21.143Z"
+    },
     "tests/unit/adult-age.test.ts": {
       "feature": "T-04 Registro de adoptante",
       "sha256": "0058e2f3e81a1fa53ef0be6897396c7a64f47bfecd19ec15e08fac308ba10f89",
       "lockedAt": "2026-11-26T08:56:23.444Z"
+    },
+    "tests/unit/audit-anonymize.test.ts": {
+      "feature": "T-37 Eliminar la cuenta con anonimizacion",
+      "sha256": "3c326f056cf613bf0f9560dfa834e8609e97cbf77ecd2e382215827610103bf9",
+      "lockedAt": "2026-11-26T15:00:23.656Z"
+    },
+    "tests/unit/client-adoption-eligibility.test.ts": {
+      "feature": "T-52 Solicitar adopcion solo cuando se puede",
+      "sha256": "1c90bdf6b5c6a199ba28b034d52b9c4270d36add281029ab5adf54fde1577096",
+      "lockedAt": "2026-11-26T15:00:24.798Z"
     },
     "tests/unit/client-age.test.ts": {
       "feature": "T-12 Alta, edición y listado de mascotas",
@@ -169,6 +299,11 @@
       "feature": "T-14 Galería con filtros",
       "sha256": "bb94a0027bbcbce87b5df9504fbe6221183c78784134c9607a8b4785c9843621",
       "lockedAt": "2026-11-26T08:56:25.084Z"
+    },
+    "tests/unit/client-madrid-time.test.ts": {
+      "feature": "T-20 Turnos de visita",
+      "sha256": "3bd3295d3538330e0c8bce3ee2ce7a59ad5a96584dd626e098a6fd6ace2d7043",
+      "lockedAt": "2026-11-26T15:00:21.143Z"
     },
     "tests/unit/client-notification-link.test.ts": {
       "feature": "T-28 Notificaciones",
