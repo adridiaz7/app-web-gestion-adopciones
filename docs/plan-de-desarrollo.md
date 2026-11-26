@@ -155,6 +155,16 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 > **Respuesta del responsable (25/11/2026):** En el chat, el adoptante ve el **texto neutro** de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". RN-198 está actualizada. Tarea **T-51**.
 
+**26/11/2026 · T-51 (bloquea T-51).** T-51 choca con dos tests de T-29 que **ya están bloqueados** (`tests/integration/chat.test.ts`):
+- `"RN-136, RN-198, CU-33: with an active block nobody can write, both can read, and both see a fixed notice with the end date"` (línea 181) comprueba, **también para el adoptante**, que el aviso cumple `/bloquead.* hasta el …/`;
+- `"RN-198: a permanent block has a notice with no end date; once lifted, they can write again"` (línea 192) comprueba con la sesión **del adoptante** que el aviso cumple `/bloquead/`.
+
+El texto neutro ("La protectora X ha restringido tu acceso hasta el …") no contiene "bloquead", así que esos dos tests fallarían. Meter la palabra en el texto del adoptante le quitaría la neutralidad que pide RN-149. Opciones:
+- **(a)** Autorizar el cambio de esos dos tests bloqueados (con `relock`/`unlock --approved`): que comprueben "bloquead" solo con la sesión de la protectora, y para el adoptante el texto neutro (eso lo cubrirían tests nuevos de T-51).
+- **(b)** Dejar el chat como está (el adoptante ve "Esta protectora te ha bloqueado hasta el …") y descartar T-51.
+
+No he tocado nada. T-51 queda `BLOQUEADA`.
+
 ---
 
 ## 5. Tareas
@@ -228,7 +238,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 |---|---|---|---|---|
 | T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | APROBADA |
 | T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | APROBADA |
-| T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos; no se modifican los de T-29. | RN-149, 198; decisión del responsable del 25/11/2026 (sección 4) | T-29 | PENDIENTE |
+| T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos; no se modifican los de T-29. | RN-149, 198; decisión del responsable del 25/11/2026 (sección 4) | T-29 | BLOQUEADA |
 
 ### Fase 6 · Adopción
 
