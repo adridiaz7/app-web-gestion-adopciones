@@ -89,6 +89,18 @@ export const notificationTemplates = {
     body: `La adopción de ${p.petName} se ha cancelado porque la protectora ${p.shelterName} ha restringido tu acceso.`,
   }),
 
+  /** CU-37, RN-169: the incident the user opened was resolved. */
+  INCIDENT_RESOLVED: (p: { resolution: string }): RenderedNotification => ({
+    title: "Incidencia resuelta",
+    body: `El administrador ha resuelto tu incidencia: ${p.resolution}`,
+  }),
+
+  /** CU-37: the incident the user opened was dismissed. */
+  INCIDENT_DISMISSED: (p: { resolution: string }): RenderedNotification => ({
+    title: "Incidencia descartada",
+    body: `El administrador ha descartado tu incidencia: ${p.resolution}`,
+  }),
+
   /** CU-54, RN-199: a new pet compatible with the adopter's questionnaire. */
   NEW_COMPATIBLE_PET: (p: { petName: string; shelterName: string }): RenderedNotification => ({
     title: "Nueva mascota compatible",

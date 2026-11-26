@@ -136,6 +136,8 @@ function profileContent({ shelter, block, pets }: ShelterPageResponse): Node[] {
     ),
     // RN-149: neutral notice while the shelter restricts this adopter's access.
     block ? notice("warning", "Acceso restringido", blockNoticeText(shelter.name, block.endsAt)) : null,
+    // CU-36: report this shelter to the administrator.
+    h("a", { class: "button button--secondary button--small", href: `/incidencias/nueva?usuario=${String(shelter.id)}` }, "Abrir una incidencia sobre esta protectora"),
     h(
       "div",
       { class: "shelter-info" },

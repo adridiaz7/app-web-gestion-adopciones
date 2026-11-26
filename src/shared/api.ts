@@ -765,3 +765,42 @@ export interface AdopterNotesResponse {
 export interface AdopterNoteResponse {
   note: AdopterNote;
 }
+
+/** RN-167: the reasons of an incident. */
+export type IncidentReason = "WRONG_ATTENDANCE" | "INAPPROPRIATE_BEHAVIOUR" | "FALSE_INFORMATION" | "INAPPROPRIATE_CONTENT" | "UNFAIR_BLOCK" | "OTHER";
+
+/** CU-36 · body of POST /api/incidents (RN-166: at most one of visitId and adoptionId). */
+export interface OpenIncidentRequest {
+  reportedId: number;
+  reason: IncidentReason;
+  description: string;
+  visitId?: number | null;
+  adoptionId?: number | null;
+}
+
+/** CU-36 · the incident just opened (RN-168). */
+export interface OpenIncidentResponse {
+  incident: { id: number; status: "OPEN" };
+}
+
+/** CU-37 · an incident as the administrator sees it (ISO instants). */
+export interface AdminIncident {
+  id: number;
+  reporterId: number;
+  reporterEmail: string;
+  reportedId: number;
+  reportedEmail: string;
+  reason: IncidentReason;
+  description: string;
+  visitId: number | null;
+  adoptionId: number | null;
+  status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "DISMISSED";
+  resolution: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+}
+
+/** CU-37 · GET /api/admin/incidents */
+export interface AdminIncidentsResponse {
+  incidents: AdminIncident[];
+}

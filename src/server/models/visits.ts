@@ -438,3 +438,18 @@ export async function selectReplaceableVisit(db: Db, visitId: number, adopterId:
   );
   return rows[0] ?? null;
 }
+
+/** RN-108, CU-38: a NO_SHOW visit becomes COMPLETED, marked by the administrator now. Returns whether it changed. */
+export async function correctNoShow(db: Db, visitId: number): Promise<boolean> {
+  const { rowCount } = await db.query(
+    `UPDATE "Visit" SET status = 'COMPLETED', attendance_marked_by = 'ADMIN', attendance_marked_at = now() WHERE id = $1 AND status = 'NO_SHOW'`,
+    [visitId],
+  );
+  return rowCount === 1;
+}
+
+/** Whether the visit exists. */
+export async function visitExists(db: Db, visitId: number): Promise<boolean> {
+  const { rowCount } = await db.query(`SELECT 1 FROM "Visit" WHERE id = $1`, [visitId]);
+  return rowCount === 1;
+}

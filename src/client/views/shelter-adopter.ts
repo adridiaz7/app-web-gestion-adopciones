@@ -58,6 +58,7 @@ export async function renderShelterAdopter(root: HTMLElement, params: RouteParam
       history(adopter.visits),
       adopterNotesSection(adopter.id),
       adopterBlockSection(adopter.id, adopter.name),
+      h("a", { class: "button button--secondary", href: `/incidencias/nueva?usuario=${String(adopter.id)}` }, "Abrir una incidencia sobre este adoptante"),
     ];
   } catch (error) {
     body = [notice("error", error instanceof ApiError ? error.message : "No se ha podido cargar el adoptante.")];

@@ -6,7 +6,7 @@ export function navFor(role: SessionUser["role"]): NavItem[] {
   const home: NavItem = { href: "/inicio", label: "Inicio" };
   switch (role) {
     case "ADMIN":
-      return [home, { href: "/admin/protectoras", label: "Protectoras" }];
+      return [home, { href: "/admin/protectoras", label: "Protectoras" }, { href: "/admin/incidencias", label: "Incidencias" }];
     case "SHELTER":
       return [home, { href: "/protectora/mascotas", label: "Mis mascotas" }, { href: "/protectora/solicitudes", label: "Solicitudes" }, { href: "/protectora/turnos", label: "Turnos" }, { href: "/mensajes", label: "Mensajes" }];
     case "ADOPTER":

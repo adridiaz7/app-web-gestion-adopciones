@@ -8,6 +8,7 @@ import { renderLogin } from "./views/login.js";
 import { renderForgotPassword, renderResetPassword } from "./views/password-recovery.js";
 import { renderRegisterAdopter, renderRegisterShelter } from "./views/register.js";
 import { renderPetProfile } from "./views/pet-profile.js";
+import { renderAdminIncidents, renderNewIncident } from "./views/incidents.js";
 import { renderProfile } from "./views/profile.js";
 import { renderPreferences } from "./views/preferences.js";
 import { renderDiscover } from "./views/discover.js";
@@ -45,6 +46,8 @@ const routes: Route[] = [
   { path: "/perfil/preferencias", render: renderPreferences },
   { path: "/favoritos", render: renderFavorites },
   { path: "/admin/protectoras", render: renderAdminShelters },
+  { path: "/admin/incidencias", render: renderAdminIncidents },
+  { path: "/incidencias/nueva", render: renderNewIncident },
   { path: "/protectora/mascotas", render: renderMyPets },
   { path: "/protectora/mascotas/nueva", render: renderPetForm },
   { path: "/protectora/mascotas/:id", render: renderPetForm },

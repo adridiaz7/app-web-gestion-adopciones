@@ -151,6 +151,12 @@ function visitRow(visit: AdopterVisit, { onCancel, onReschedule, onReplace }: Ro
       });
       side.append(replace);
     }
+    // CU-36, CU-38: a no-show the adopter disagrees with is claimed through an incident.
+    if (visit.status === "NO_SHOW") {
+      side.append(
+        h("a", { class: "button button--secondary button--small", href: `/incidencias/nueva?usuario=${String(visit.shelterId)}&visita=${String(visit.id)}` }, "Reclamar la ausencia"),
+      );
+    }
   }
   return h(
     "article",

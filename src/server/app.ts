@@ -13,6 +13,7 @@ import { loadSession } from "./middlewares/session.js";
 import { createAdminRouter } from "./routes/admin.js";
 import { createAdopterRouter } from "./routes/adopter.js";
 import { createAuthRouter } from "./routes/auth.js";
+import { createIncidentsRouter } from "./routes/incidents.js";
 import { createChatRouter } from "./routes/chat.js";
 import { createNotificationsRouter } from "./routes/notifications.js";
 import { createShelterRouter } from "./routes/shelter.js";
@@ -52,6 +53,7 @@ export function createApp(): express.Express {
   api.use("/shelter", createShelterRouter());
   api.use("/notifications", createNotificationsRouter());
   api.use("/conversations", createChatRouter());
+  api.use("/incidents", createIncidentsRouter());
 
   api.use(() => {
     throw new NotFoundError();
