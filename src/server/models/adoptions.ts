@@ -259,3 +259,51 @@ export async function markAdoptionReturned(db: Db, adoptionId: number, reason: s
 export async function setPetStatus(db: Db, petId: number, status: "ADOPTED" | "AVAILABLE"): Promise<void> {
   await db.query(`UPDATE "Pet" SET status = $2, updated_at = now() WHERE id = $1`, [petId, status]);
 }
+
+/** CU-21: an adoption as the adopter sees it in their list. */
+export interface AdopterAdoption {
+  id: number;
+  status: string;
+  petId: number;
+  petName: string;
+  shelterName: string;
+  requestedAt: Date;
+}
+
+export async function selectAdopterAdoptions(db: Db, adopterId: number): Promise<AdopterAdoption[]> {
+  const { rows } = await db.query<AdopterAdoption>(
+    `SELECT ad.id, ad.status, ad.pet_id AS "petId", p.name AS "petName", s.name AS "shelterName", ad.created_at AS "requestedAt"
+       FROM "Adoption" ad
+       JOIN "Pet"     p ON p.id = ad.pet_id
+       JOIN "Shelter" s ON s.user_id = p.shelter_id
+      WHERE ad.adopter_id = $1
+      ORDER BY ad.created_at DESC, ad.id DESC`,
+    [adopterId],
+  );
+  return rows;
+}
+
+/** CU-22: an approved adoption pending delivery, or a completed one, of the shelter. */
+export interface ShelterAdoption {
+  id: number;
+  status: string;
+  petId: number;
+  petName: string;
+  adopterId: number;
+  adopterName: string;
+  deliveredAt: Date | null;
+}
+
+export async function selectShelterAdoptions(db: Db, shelterId: number): Promise<ShelterAdoption[]> {
+  const { rows } = await db.query<ShelterAdoption>(
+    `SELECT ad.id, ad.status, ad.pet_id AS "petId", p.name AS "petName", ad.adopter_id AS "adopterId",
+            a.first_name || ' ' || a.last_name AS "adopterName", ad.delivered_at AS "deliveredAt"
+       FROM "Adoption" ad
+       JOIN "Pet"     p ON p.id = ad.pet_id
+       JOIN "Adopter" a ON a.user_id = ad.adopter_id
+      WHERE p.shelter_id = $1 AND ad.status IN ('APPROVED', 'COMPLETED')
+      ORDER BY ad.status, ad.decided_at, ad.id`,
+    [shelterId],
+  );
+  return rows;
+}

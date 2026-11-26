@@ -670,3 +670,13 @@ export interface ShelterAdopterResponse {
     visits: { id: number; petName: string; status: VisitStatus; startsAt: string; endsAt: string }[];
   };
 }
+
+/** CU-21 · GET /api/adopter/adoptions */
+export interface AdopterAdoptionsResponse {
+  adoptions: { id: number; status: string; petId: number; petName: string; shelterName: string; requestedAt: string }[];
+}
+
+/** CU-22 · GET /api/shelter/adoptions: approved pending delivery, and completed. */
+export interface ShelterAdoptionsResponse {
+  adoptions: { id: number; status: string; petId: number; petName: string; adopterId: number; adopterName: string; deliveredAt: string | null }[];
+}

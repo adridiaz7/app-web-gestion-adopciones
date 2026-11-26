@@ -1,4 +1,5 @@
-import type { AdopterVisit, ShelterQuota, VisitStatus } from "../../shared/api.js";
+import type { AdopterAdoptionsResponse, AdopterVisit, ShelterQuota, VisitStatus } from "../../shared/api.js";
+import { cancelMyAdoption, listMyAdoptions } from "../api/adoptions.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { cancelVisit, listMyVisits } from "../api/visits.js";
@@ -33,6 +34,43 @@ const VOID_REASONS: Record<string, string> = {
 
 const DAY = new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", weekday: "short", day: "numeric", month: "short" });
 const DATE = new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
+
+const ADOPTION_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Solicitud pendiente",
+  APPROVED: "Aprobada",
+  REJECTED: "Rechazada",
+  NOT_SELECTED: "No seleccionada",
+  CANCELLED: "Cancelada",
+  VOIDED: "Anulada",
+  COMPLETED: "Completada",
+  RETURNED: "Devuelta",
+};
+
+/** CU-21, CU-30: the adopter's adoptions; a pending or approved one can be cancelled with a reason (RN-129). */
+function adoptionList(adoptions: AdopterAdoptionsResponse["adoptions"], onCancel: (id: number, petName: string) => void): HTMLElement {
+  return h(
+    "div",
+    { class: "visit-list" },
+    ...adoptions.map((adoption) => {
+      const side = h("div", { class: "visit-row__side" });
+      if (adoption.status === "PENDING" || adoption.status === "APPROVED") {
+        const cancel = h("button", { type: "button", class: "button button--secondary button--small" }, "Cancelar");
+        cancel.addEventListener("click", () => {
+          onCancel(adoption.id, adoption.petName);
+        });
+        side.append(cancel);
+      }
+      return h(
+        "article",
+        { class: "card visit-row" },
+        h("div", {}, h("a", { href: `/mascotas/${String(adoption.petId)}` }, h("strong", {}, adoption.petName)), h("p", { class: "muted" }, adoption.shelterName)),
+        h("div", {}, h("p", { class: "muted" }, `Solicitada el ${DATE.format(new Date(adoption.requestedAt))}`)),
+        h("span", { class: "badge" }, ADOPTION_STATUS_LABELS[adoption.status] ?? adoption.status),
+        side,
+      );
+    }),
+  );
+}
 
 const isUpcoming = (visit: AdopterVisit): boolean => visit.status === "PENDING" || visit.status === "CONFIRMED";
 
@@ -143,7 +181,15 @@ export async function renderVisits(root: HTMLElement): Promise<void> {
   const message = h("div", {});
   let content: Node[];
   try {
-    const { visits, quotas } = await listMyVisits();
+    const [{ visits, quotas }, { adoptions }] = await Promise.all([listMyVisits(), listMyAdoptions()]);
+    const onCancelAdoption = (id: number, petName: string): void => {
+      const reason = window.prompt(`Motivo para cancelar la adopción de ${petName}:`);
+      if (reason === null) return;
+      cancelMyAdoption(id, { reason }).then(
+        () => void renderVisits(root),
+        (error: unknown) => message.replaceChildren(notice("error", error instanceof ApiError ? error.message : "No se ha podido cancelar la adopción.")),
+      );
+    };
     const upcoming = visits.filter(isUpcoming);
     const past = visits.filter((visit) => !isUpcoming(visit)).reverse();
     const shown = history ? past : upcoming;
@@ -169,6 +215,8 @@ export async function renderVisits(root: HTMLElement): Promise<void> {
       shown.length === 0
         ? notice("info", history ? "Todavía no tienes visitas pasadas." : "No tienes visitas próximas.", "Solicita una visita desde la ficha de una mascota.")
         : h("div", { class: "visit-list" }, ...shown.map((visit) => visitRow(visit, { onCancel, onReschedule, onReplace }))),
+      adoptions.length > 0 ? h("h2", { class: "overline" }, "Mis adopciones") : null,
+      adoptions.length > 0 ? adoptionList(adoptions, onCancelAdoption) : null,
     ].filter((node): node is HTMLElement => node !== null);
   } catch (error) {
     content = [notice("error", error instanceof ApiError ? error.message : "No se han podido cargar tus visitas.")];

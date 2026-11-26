@@ -1,9 +1,9 @@
 import type { Request, RequestHandler } from "express";
 import { z } from "zod";
-import type { AdoptionRequestResponse, AdoptionStatusResponse, CandidatesResponse, HouseholdResponse } from "../../shared/api.js";
+import type { AdopterAdoptionsResponse, AdoptionRequestResponse, ShelterAdoptionsResponse, AdoptionStatusResponse, CandidatesResponse, HouseholdResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { getHousehold, requestAdoption, type AdoptionAnswers } from "../services/adoption-requests.js";
-import { cancelAdoption, deliverAdoption, returnAdoption } from "../services/adoption-closing.js";
+import { cancelAdoption, deliverAdoption, listAdopterAdoptions, listShelterAdoptions, returnAdoption } from "../services/adoption-closing.js";
 import { approveAdoption, listCandidates, rejectAdoption } from "../services/adoption-decisions.js";
 
 const CHOOSE = "Elige una opción.";
@@ -146,5 +146,19 @@ export const postRejectAdoption: RequestHandler = async (req, res) => {
   const { id } = adoptionParamsSchema.parse(req.params);
   const { reason } = rejectSchema.parse(req.body ?? {});
   const body: AdoptionStatusResponse = { adoption: await rejectAdoption(userId(req.user), id, reason) };
+  res.json(body);
+};
+
+/** CU-21 · GET /api/adopter/adoptions */
+export const getAdopterAdoptions: RequestHandler = async (req, res) => {
+  const adoptions = await listAdopterAdoptions(userId(req.user));
+  const body: AdopterAdoptionsResponse = { adoptions: adoptions.map((a) => ({ ...a, requestedAt: a.requestedAt.toISOString() })) };
+  res.json(body);
+};
+
+/** CU-22 · GET /api/shelter/adoptions */
+export const getShelterAdoptions: RequestHandler = async (req, res) => {
+  const adoptions = await listShelterAdoptions(userId(req.user));
+  const body: ShelterAdoptionsResponse = { adoptions: adoptions.map((a) => ({ ...a, deliveredAt: a.deliveredAt?.toISOString() ?? null })) };
   res.json(body);
 };

@@ -1,3 +1,4 @@
+import { getPool } from "../db/pool.js";
 import { withTransaction, type Db } from "../db/transaction.js";
 import { ConflictError, NotFoundError } from "../errors.js";
 import {
@@ -8,7 +9,11 @@ import {
   releaseReservedPet,
   selectNotSelectedAdopters,
   setPetStatus,
+  selectAdopterAdoptions,
+  selectShelterAdoptions,
+  type AdopterAdoption,
   type AdoptionToClose,
+  type ShelterAdoption,
 } from "../models/adoptions.js";
 import { audit } from "./audit.js";
 import { createNotification } from "./notifications.js";
@@ -120,4 +125,14 @@ export async function returnAdoption(shelterId: number, adoptionId: number, reas
     await auditPetStatus(client, shelterId, adoption.petId, "ADOPTED", "AVAILABLE");
     return "RETURNED";
   });
+}
+
+/** CU-21: the adopter's adoptions, newest first. */
+export async function listAdopterAdoptions(adopterId: number): Promise<AdopterAdoption[]> {
+  return selectAdopterAdoptions(getPool(), adopterId);
+}
+
+/** CU-22: the shelter's approved adoptions pending delivery and the completed ones. */
+export async function listShelterAdoptions(shelterId: number): Promise<ShelterAdoption[]> {
+  return selectShelterAdoptions(getPool(), shelterId);
 }

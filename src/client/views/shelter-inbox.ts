@@ -1,4 +1,5 @@
 import type { InboxVisit } from "../../shared/api.js";
+import { cancelShelterAdoption, deliverAdoption, listShelterAdoptions, returnAdoption } from "../api/adoptions.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { cancelVisitAsShelter, confirmVisit, getInbox, rejectVisit } from "../api/visits.js";
@@ -50,7 +51,37 @@ export async function renderShelterInbox(root: HTMLElement): Promise<void> {
 
   let content: Node[];
   try {
-    const { pending, upcoming } = await getInbox();
+    const [{ pending, upcoming }, { adoptions }] = await Promise.all([getInbox(), listShelterAdoptions()]);
+    // CU-30, CU-31, CU-32: an approved adoption is delivered or cancelled; a completed one can be returned.
+    const adoptionRow = (adoption: (typeof adoptions)[number]): HTMLElement => {
+      const actions =
+        adoption.status === "APPROVED"
+          ? [
+              button("Registrar entrega", true, () => {
+                if (!window.confirm(`¿${adoption.petName} se ha ido ya con ${adoption.adopterName}?`)) return;
+                deliverAdoption(adoption.id).then(reload, fail);
+              }),
+              button("Cancelar adopción", false, () => {
+                const reason = window.prompt(`Motivo de la cancelación (se enviará a ${adoption.adopterName}):`);
+                if (reason === null) return;
+                cancelShelterAdoption(adoption.id, { reason }).then(reload, fail);
+              }),
+            ]
+          : [
+              button("Registrar devolución", false, () => {
+                const reason = window.prompt(`Motivo de la devolución de ${adoption.petName}:`);
+                if (reason === null) return;
+                returnAdoption(adoption.id, { reason }).then(reload, fail);
+              }),
+            ];
+      return h(
+        "article",
+        { class: "card visit-row visit-row--inbox" },
+        h("div", {}, h("strong", {}, adoption.petName), h("p", {}, h("a", { href: `/protectora/adoptantes/${String(adoption.adopterId)}` }, adoption.adopterName))),
+        h("span", { class: "muted" }, adoption.status === "APPROVED" ? "Aprobada, pendiente de entrega" : `Entregada el ${DATE_TIME.format(new Date(adoption.deliveredAt ?? ""))}`),
+        h("span", { class: "slot-card__actions" }, ...actions),
+      );
+    };
     // CU-24: confirm or reject (RN-96: optional reason).
     const pendingRow = (visit: InboxVisit): HTMLElement =>
       inboxRow(
@@ -93,6 +124,10 @@ export async function renderShelterInbox(root: HTMLElement): Promise<void> {
       upcoming.length === 0
         ? notice("info", "No hay visitas confirmadas próximas.")
         : h("div", { class: "visit-list" }, ...upcoming.map(upcomingRow)),
+      h("h2", { class: "overline" }, "Adopciones aprobadas y entregadas"),
+      adoptions.length === 0
+        ? notice("info", "No hay adopciones aprobadas ni entregadas.")
+        : h("div", { class: "visit-list" }, ...adoptions.map(adoptionRow)),
     ];
   } catch (error) {
     content = [notice("error", errorText(error, "No se ha podido cargar la bandeja."))];

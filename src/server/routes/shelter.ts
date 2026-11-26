@@ -2,6 +2,7 @@ import { Router } from "express";
 import { deletePhoto, getPhotos, postPhoto, putPhotoOrder, receivePhoto } from "../controllers/pet-photos.js";
 import {
   getCandidates,
+  getShelterAdoptions,
   postApproveAdoption,
   postDeliverAdoption,
   postRejectAdoption,
@@ -28,6 +29,7 @@ export function createShelterRouter(): Router {
   router.get("/pets/:id/candidates", getCandidates);
   router.post("/adoptions/:id/approve", postApproveAdoption);
   router.post("/adoptions/:id/reject", postRejectAdoption);
+  router.get("/adoptions", getShelterAdoptions);
   router.post("/adoptions/:id/cancel", postShelterCancelAdoption);
   router.post("/adoptions/:id/deliver", postDeliverAdoption);
   router.post("/adoptions/:id/return", postReturnAdoption);
