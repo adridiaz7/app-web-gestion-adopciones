@@ -13,6 +13,7 @@ import { renderDiscover } from "./views/discover.js";
 import { renderFavorites } from "./views/favorites.js";
 import { renderShelterProfile, renderShelterSearch } from "./views/shelters.js";
 import { renderMyPets, renderPetForm } from "./views/shelter-pets.js";
+import { renderShelterAdopter } from "./views/shelter-adopter.js";
 import { renderShelterInbox } from "./views/shelter-inbox.js";
 import { renderShelterSlots } from "./views/shelter-slots.js";
 import { renderVisits } from "./views/visits.js";
@@ -48,6 +49,7 @@ const routes: Route[] = [
   { path: "/protectora/mascotas/:id/candidatos", render: renderShelterCandidates },
   { path: "/protectora/turnos", render: renderShelterSlots },
   { path: "/protectora/solicitudes", render: renderShelterInbox },
+  { path: "/protectora/adoptantes/:id", render: renderShelterAdopter },
   { path: "/visitas", render: renderVisits },
   { path: "/notificaciones", render: renderNotifications },
   { path: "/mensajes", render: renderMessages },

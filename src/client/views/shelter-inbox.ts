@@ -18,7 +18,7 @@ function inboxRow(visit: InboxVisit, actions: HTMLElement, note: string): HTMLEl
   return h(
     "article",
     { class: "card visit-row visit-row--inbox" },
-    h("div", {}, h("strong", {}, visit.petName), h("p", { class: "muted" }, visit.adopterName)),
+    h("div", {}, h("strong", {}, visit.petName), h("p", {}, h("a", { href: `/protectora/adoptantes/${String(visit.adopterId)}` }, visit.adopterName))),
     h("div", {}, h("strong", {}, DAY.format(new Date(visit.startsAt))), h("p", { class: "muted" }, `${madridTime(visit.startsAt)} – ${madridTime(visit.endsAt)}`)),
     h("span", { class: "muted" }, note),
     actions,

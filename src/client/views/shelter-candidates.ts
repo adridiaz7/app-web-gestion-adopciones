@@ -15,7 +15,7 @@ const yesNo = (value: boolean | null | undefined): string => (value === null || 
 const errorText = (error: unknown, fallback: string): string => (error instanceof ApiError ? error.message : fallback);
 
 /** RN-27: the household data as label–value rows. */
-function householdList(household: Household): HTMLElement {
+export function householdList(household: Household): HTMLElement {
   const rows: [string, string][] = [
     ["Vivienda", `${HOUSING[household.housingType ?? ""] ?? "—"} · ${TENURE[household.housingTenure ?? ""] ?? "—"}`],
     ["Jardín o terraza", yesNo(household.hasOutdoorSpace)],

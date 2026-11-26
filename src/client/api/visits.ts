@@ -3,6 +3,7 @@ import type {
   AvailableSlotsResponse,
   RejectVisitRequest,
   RescheduleVisitRequest,
+  ShelterAdopterResponse,
   ShelterInboxResponse,
   VisitRequest,
   VisitRequestResponse,
@@ -47,3 +48,6 @@ export const getReplacementSlots = (id: number) => apiRequest<AvailableSlotsResp
 /** CU-23, RN-111: the adopter replaces that voided visit; the new one is confirmed at once. */
 export const replaceVisit = (id: number, body: RescheduleVisitRequest) =>
   apiRequest<VisitRequestResponse>("POST", `/adopter/visits/${String(id)}/replace`, body);
+
+/** CU-22, RN-29: the profile of an adopter who has sent the shelter some request. */
+export const getShelterAdopter = (id: number) => apiRequest<ShelterAdopterResponse>("GET", `/shelter/adopters/${String(id)}`);

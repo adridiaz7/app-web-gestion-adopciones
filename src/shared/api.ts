@@ -656,3 +656,17 @@ export interface RejectAdoptionRequest {
 export interface AdoptionStatusResponse {
   adoption: { id: number; status: string };
 }
+
+/** CU-22, RN-27, RN-29 · GET /api/shelter/adopters/:id */
+export interface ShelterAdopterResponse {
+  adopter: {
+    id: number;
+    name: string;
+    provinceName: string;
+    household: Household;
+    /** Visits with this shelter the adopter did not come to. */
+    noShows: number;
+    /** Only the visits with this shelter, most recent first. */
+    visits: { id: number; petName: string; status: VisitStatus; startsAt: string; endsAt: string }[];
+  };
+}
