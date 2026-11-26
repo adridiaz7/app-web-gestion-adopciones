@@ -82,7 +82,7 @@
 | ID | Regla |
 |---|---|
 | RN-11 | Un usuario puede **eliminar su cuenta** (derecho de supresión del RGPD). Los datos personales se **anonimizan** y el historial se conserva sin ellos. |
-| RN-12 | Si se elimina un **adoptante**: sus solicitudes abiertas pasan a `ANULADA` y se anonimizan sus datos personales (nombre, email, teléfono, dirección, datos del hogar…). <br>Si se elimina una **protectora**: sus mascotas pasan a `BAJA`, sus solicitudes abiertas pasan a `ANULADA` con aviso a los adoptantes, y se anonimizan sus datos de contacto. |
+| RN-12 | Si se elimina un **adoptante**: sus solicitudes abiertas pasan a `ANULADA` con aviso a la protectora, y se anonimizan sus datos personales (nombre, email, teléfono, dirección, datos del hogar…). <br>Si se elimina una **protectora**: sus mascotas pasan a `BAJA`, sus solicitudes abiertas pasan a `ANULADA` con aviso a los adoptantes, y se anonimizan sus datos de contacto. |
 | RN-13 | En el chat, los mensajes de una cuenta eliminada se conservan, y el autor aparece como "Usuario eliminado". La otra parte puede seguir leyendo la conversación, pero ya no puede escribir en ella. |
 
 ---

@@ -70,11 +70,6 @@
       "sha256": "9c3f112564610f0d319474d25e193774b5155ce4c1d98128e4119f97af69b00b",
       "lockedAt": "2026-11-24T23:12:50.812Z"
     },
-    "tests/integration/chat.test.ts": {
-      "feature": "T-29 Chat",
-      "sha256": "6cef06666c505b1b2300a208049af57c319de0602de13eea11878caf1530f158",
-      "lockedAt": "2026-11-26T08:56:26.265Z"
-    },
     "tests/integration/db-transaction.test.ts": {
       "feature": "T-02 Base de datos",
       "sha256": "dd8f768d7ea3349ba2a8639ac72baf60744580a6f40a143e57767bc561971249",
@@ -341,5 +336,12 @@
       "lockedAt": "2026-11-26T08:56:23.444Z"
     }
   },
-  "history": []
+  "history": [
+    {
+      "date": "2026-11-26T19:13:02.348Z",
+      "action": "unlock",
+      "file": "tests/integration/chat.test.ts",
+      "reason": "T-51: el adoptante ve el texto neutro de RN-149 en el chat; se modifican solo los dos tests de RN-198 que comprueban 'bloquead' con la sesión del adoptante. Aprobado por el responsable (owner) el 26/11/2026."
+    }
+  ]
 }

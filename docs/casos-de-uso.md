@@ -112,7 +112,8 @@
 **Excepciones:**
 - Los datos tienen un formato incorrecto.
 - Adoptante: la nueva fecha de nacimiento corresponde a un menor de edad.
-- Protectora: el CIF nuevo ya está registrado por otra protectora.
+
+El nombre y el CIF de la protectora no se pueden modificar, porque son los datos que valida el administrador (RN-16).
 
 ---
 
@@ -120,7 +121,7 @@
 
 **Actor:** Adoptante, Protectora
 
-**Objetivo:** Eliminar su cuenta. Los datos personales se anonimizan y el historial se conserva. Si es un adoptante, sus visitas y adopciones abiertas se anulan. Si es una protectora, sus mascotas pasan a baja y sus visitas y adopciones abiertas se anulan, con aviso a los adoptantes. En ambos casos, sus conversaciones de chat se conservan con el autor como "Usuario eliminado", y la otra parte puede leerlas pero ya no escribir.
+**Objetivo:** Eliminar su cuenta. Los datos personales se anonimizan y el historial se conserva. Si es un adoptante, sus visitas y adopciones abiertas se anulan, con aviso a la protectora. Si es una protectora, sus mascotas pasan a baja y sus visitas y adopciones abiertas se anulan, con aviso a los adoptantes. En ambos casos, sus conversaciones de chat se conservan con el autor como "Usuario eliminado", y la otra parte puede leerlas pero ya no escribir.
 
 **Excepciones:**
 - El usuario no confirma la eliminación.
