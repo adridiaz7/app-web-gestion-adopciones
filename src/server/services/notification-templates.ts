@@ -89,6 +89,23 @@ export const notificationTemplates = {
     body: `La adopción de ${p.petName} se ha cancelado porque la protectora ${p.shelterName} ha restringido tu acceso.`,
   }),
 
+  /** CU-54, RN-199: a new pet compatible with the adopter's questionnaire. */
+  NEW_COMPATIBLE_PET: (p: { petName: string; shelterName: string }): RenderedNotification => ({
+    title: "Nueva mascota compatible",
+    body: `${p.petName}, de ${p.shelterName}, encaja con tus preferencias y está disponible para adopción.`,
+  }),
+
+  /** CU-55, RN-200: a favourite pet changed its status. */
+  FAVORITE_STATUS_CHANGED: (p: { petName: string; status: "AVAILABLE" | "RESERVED" | "ADOPTED" | "UNLISTED" }): RenderedNotification => {
+    const texts = {
+      AVAILABLE: `${p.petName}, de tus favoritos, vuelve a estar disponible.`,
+      RESERVED: `${p.petName}, de tus favoritos, está reservada: la protectora ha aprobado una adopción.`,
+      ADOPTED: `${p.petName}, de tus favoritos, ha sido adoptada.`,
+      UNLISTED: `${p.petName}, de tus favoritos, se ha dado de baja y ya no está disponible.`,
+    };
+    return { title: "Cambio en tus favoritos", body: texts[p.status] };
+  },
+
   /** CU-47, RN-122: a request still unanswered (to the shelter). */
   ADOPTION_PENDING_REMINDER: (p: { petName: string; adopterName: string }): RenderedNotification => ({
     title: "Solicitud de adopción pendiente",

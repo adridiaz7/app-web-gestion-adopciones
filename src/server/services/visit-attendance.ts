@@ -4,6 +4,7 @@ import { ConflictError, NotFoundError } from "../errors.js";
 import { cancelApprovedAdoptionsBySystem, releaseReservedPet, selectNotSelectedAdopters, voidPendingAdoptions } from "../models/adoptions.js";
 import { completeConfirmedVisits, expirePendingVisits, lockVisit, markVisitNoShow, voidOpenVisits, type ChangedVisit } from "../models/visits.js";
 import { audit } from "./audit.js";
+import { alertPetAvailable } from "./pet-alerts.js";
 import { createNotification } from "./notifications.js";
 
 const HOUR = 60 * 60 * 1000;
@@ -98,6 +99,7 @@ async function applyNoShowConsequences(db: Db, adopterId: number, shelterId: num
       for (const userId of await selectNotSelectedAdopters(db, adoption.petId)) {
         await createNotification(db, { userId, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
+      await alertPetAvailable(db, adoption.petId); // RN-199, RN-200
     }
   }
 }

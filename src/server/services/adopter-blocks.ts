@@ -16,6 +16,7 @@ import {
 import { selectAdopterForShelter } from "../models/shelter-adopters.js";
 import { voidOpenVisits } from "../models/visits.js";
 import { audit } from "./audit.js";
+import { alertPetAvailable } from "./pet-alerts.js";
 import { createNotification } from "./notifications.js";
 
 export type { Block, BlockReason };
@@ -99,6 +100,7 @@ async function applyBlockEffects(db: Db, shelterId: number, shelterName: string,
       for (const userId of await selectNotSelectedAdopters(db, adoption.petId)) {
         await createNotification(db, { userId, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
+      await alertPetAvailable(db, adoption.petId); // RN-199, RN-200
     }
   }
 }

@@ -14,6 +14,7 @@ import {
 import { selectShelterPet } from "../models/pets.js";
 import { voidPetOpenVisits } from "../models/visits.js";
 import { audit } from "./audit.js";
+import { alertFavorites } from "./pet-alerts.js";
 import { createNotification } from "./notifications.js";
 
 export type { CandidateRow };
@@ -55,6 +56,7 @@ export async function approveAdoption(shelterId: number, adoptionId: number): Pr
     });
 
     await reservePet(client, adoption.petId);
+    await alertFavorites(client, adoption.petId, "RESERVED"); // RN-200
     await audit(client, {
       actorUserId: shelterId,
       action: "PET_STATUS_CHANGED",

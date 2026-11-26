@@ -11,6 +11,7 @@ import {
   type ValidationStatus,
 } from "../models/shelters.js";
 import { audit } from "./audit.js";
+import { alertShelterPets } from "./pet-alerts.js";
 
 export type { ShelterForAdmin, ValidationStatus };
 
@@ -63,6 +64,8 @@ async function changeStatus(
 export async function validateShelter(adminId: number, shelterId: number): Promise<ShelterForAdmin> {
   return changeStatus(adminId, shelterId, ["PENDING", "REJECTED"], NOT_PENDING, "SHELTER_VALIDATED", async (client) => {
     await markShelterValidated(client, shelterId);
+    // RN-199: its available pets become visible, so they are new for the compatible adopters.
+    await alertShelterPets(client, shelterId);
     return { validationStatus: "VALIDATED" };
   });
 }

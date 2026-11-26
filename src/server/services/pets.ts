@@ -13,6 +13,7 @@ import {
   type ShelterPet,
 } from "../models/pets.js";
 import { audit } from "./audit.js";
+import { alertCompatibleAdopters } from "./pet-alerts.js";
 
 export type { PetData, ShelterPet };
 
@@ -58,6 +59,7 @@ export async function createPet(shelterId: number, pet: PetData): Promise<Shelte
     await checkPetData(client, pet);
     const petId = await insertPet(client, shelterId, pet);
     await replaceGetsAlong(client, petId, pet.getsAlongWith);
+    await alertCompatibleAdopters(client, petId); // RN-199: only if the pet is visible already
     const created = await selectShelterPet(client, shelterId, petId);
     if (!created) throw new NotFoundError(NOT_FOUND);
     return created;

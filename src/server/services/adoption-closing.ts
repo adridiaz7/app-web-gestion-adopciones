@@ -16,6 +16,7 @@ import {
   type ShelterAdoption,
 } from "../models/adoptions.js";
 import { audit } from "./audit.js";
+import { alertFavorites, alertPetAvailable } from "./pet-alerts.js";
 import { createNotification } from "./notifications.js";
 
 const NOT_FOUND = "La solicitud de adopción no existe.";
@@ -86,6 +87,7 @@ export async function cancelAdoption(
       for (const candidate of await selectNotSelectedAdopters(client, adoption.petId)) {
         await createNotification(client, { userId: candidate, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
+      await alertPetAvailable(client, adoption.petId); // RN-199, RN-200
     }
     return "CANCELLED";
   });
@@ -104,6 +106,7 @@ export async function deliverAdoption(shelterId: number, adoptionId: number): Pr
       details: { before: { status: "APPROVED" }, after: { status: "COMPLETED" } },
     });
     await setPetStatus(client, adoption.petId, "ADOPTED");
+    await alertFavorites(client, adoption.petId, "ADOPTED"); // RN-200
     await auditPetStatus(client, shelterId, adoption.petId, "RESERVED", "ADOPTED");
     return "COMPLETED";
   });
@@ -122,6 +125,7 @@ export async function returnAdoption(shelterId: number, adoptionId: number, reas
       details: { before: { status: "COMPLETED" }, after: { status: "RETURNED", reason } },
     });
     await setPetStatus(client, adoption.petId, "AVAILABLE");
+    await alertPetAvailable(client, adoption.petId); // RN-199, RN-200
     await auditPetStatus(client, shelterId, adoption.petId, "ADOPTED", "AVAILABLE");
     return "RETURNED";
   });

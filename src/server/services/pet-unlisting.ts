@@ -4,6 +4,7 @@ import { selectAdoptersVoidedByUnlisting, voidPetPendingAdoptions } from "../mod
 import { markPetReactivated, markPetUnlisted, selectShelterPet, type ShelterPet, type UnlistReason } from "../models/pets.js";
 import { voidPetOpenVisits } from "../models/visits.js";
 import { audit } from "./audit.js";
+import { alertFavorites, alertPetAvailable } from "./pet-alerts.js";
 import { createNotification } from "./notifications.js";
 
 const NOT_FOUND = "La mascota no existe.";
@@ -25,6 +26,7 @@ export async function unlistPet(shelterId: number, petId: number, reason: Shelte
     if (pet.status !== "AVAILABLE") throw new ConflictError("Solo se puede dar de baja una mascota disponible.");
 
     await markPetUnlisted(client, petId, reason);
+    await alertFavorites(client, petId, "UNLISTED"); // RN-200
     await audit(client, {
       actorUserId: shelterId,
       action: "PET_STATUS_CHANGED",
@@ -97,6 +99,8 @@ export async function reactivatePet(shelterId: number, petId: number): Promise<S
     for (const userId of adopters) {
       await createNotification(client, { userId, type: "PET_AVAILABLE_AGAIN", params: { petName: pet.name }, link: { petId } });
     }
+    // RN-199, RN-200
+    await alertPetAvailable(client, petId, adopters);
 
     const updated = await selectShelterPet(client, shelterId, petId);
     if (!updated) throw new NotFoundError(NOT_FOUND);

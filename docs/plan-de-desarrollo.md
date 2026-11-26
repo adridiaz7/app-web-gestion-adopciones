@@ -281,7 +281,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | BLOQUEADA |
-| T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | PENDIENTE |
+| T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | EN_REVISION |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | PENDIENTE |
 | T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | PENDIENTE |
 | T-41 | Supervisar la actividad (incluido el registro de auditoría) y estadísticas. | CU-43, CU-44; RN-160, 161 | T-39 | PENDIENTE |
