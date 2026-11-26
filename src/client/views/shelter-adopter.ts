@@ -2,6 +2,7 @@ import type { ShelterAdopterResponse } from "../../shared/api.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { getShelterAdopter } from "../api/visits.js";
+import { adopterBlockSection } from "../components/adopter-block.js";
 import { appLayout } from "../components/app-layout.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
@@ -54,6 +55,7 @@ export async function renderShelterAdopter(root: HTMLElement, params: RouteParam
       h("h2", {}, "Historial con tu protectora"),
       h("p", { class: "muted" }, `${adopter.visits.length === 1 ? "1 visita" : `${String(adopter.visits.length)} visitas`} · ${noShows}`),
       history(adopter.visits),
+      adopterBlockSection(adopter.id, adopter.name),
     ];
   } catch (error) {
     body = [notice("error", error instanceof ApiError ? error.message : "No se ha podido cargar el adoptante.")];

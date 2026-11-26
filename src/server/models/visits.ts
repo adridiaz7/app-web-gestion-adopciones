@@ -350,7 +350,7 @@ export async function markVisitNoShow(db: Db, visitId: number): Promise<void> {
 }
 
 /** RN-103, RN-109: the adopter's open (PENDING or CONFIRMED) visits at the shelter become VOIDED with that reason. */
-export async function voidOpenVisits(db: Db, adopterId: number, shelterId: number, reason: "NO_SHOW"): Promise<ChangedVisit[]> {
+export async function voidOpenVisits(db: Db, adopterId: number, shelterId: number, reason: "NO_SHOW" | "ADOPTER_BLOCKED"): Promise<ChangedVisit[]> {
   const { rows } = await db.query<ChangedVisit>(
     `WITH open AS (
        SELECT id, status FROM "Visit"

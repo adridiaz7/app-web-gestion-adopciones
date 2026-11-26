@@ -17,6 +17,13 @@ export function formatDateTime(date: Date): string {
   return dateTimeFormat.format(date);
 }
 
+const dateFormat = new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", dateStyle: "long" });
+
+/** "3 de diciembre de 2026", always in Spanish time. */
+export function formatDate(date: Date): string {
+  return dateFormat.format(date);
+}
+
 export interface RenderedNotification {
   title: string;
   body: string;
@@ -50,6 +57,36 @@ export const notificationTemplates = {
   VISIT_VOIDED_PET_UNLISTED: (p: { petName: string; startsAt: Date; reason: UnlistReasonText }): RenderedNotification => ({
     title: "Visita anulada",
     body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado. ${unlistReasonText(p.petName, p.reason)}`,
+  }),
+
+  /** CU-35, RN-149: neutral text for the blocked adopter (the reason is internal, RN-147). */
+  ADOPTER_BLOCKED: (p: { shelterName: string; endsAt: Date | null }): RenderedNotification => ({
+    title: "Acceso restringido",
+    body: `La protectora ${p.shelterName} ha restringido tu acceso a sus mascotas${p.endsAt ? ` hasta el ${formatDate(p.endsAt)}` : ""}.`,
+  }),
+
+  /** CU-35, CU-56, RN-150, RN-202: the restriction is over (the voided requests are not recovered). */
+  BLOCK_LIFTED: (p: { shelterName: string }): RenderedNotification => ({
+    title: "Acceso restablecido",
+    body: `Ya puedes volver a ver las mascotas de la protectora ${p.shelterName} y escribirle. Las solicitudes que se anularon no se recuperan: si te interesa alguna mascota, vuelve a solicitarlo.`,
+  }),
+
+  /** RN-109, RN-110, RN-148: a visit voided because the shelter blocked the adopter (neutral text). */
+  VISIT_VOIDED_ADOPTER_BLOCKED: (p: { petName: string; startsAt: Date; shelterName: string }): RenderedNotification => ({
+    title: "Visita anulada",
+    body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado porque la protectora ${p.shelterName} ha restringido tu acceso.`,
+  }),
+
+  /** RN-132, RN-148: a pending adoption voided because the shelter blocked the adopter. */
+  ADOPTION_VOIDED_ADOPTER_BLOCKED: (p: { petName: string; shelterName: string }): RenderedNotification => ({
+    title: "Solicitud de adopción anulada",
+    body: `Tu solicitud para adoptar a ${p.petName} se ha anulado porque la protectora ${p.shelterName} ha restringido tu acceso.`,
+  }),
+
+  /** RN-148: an approved adoption cancelled because the shelter blocked the adopter. */
+  ADOPTION_CANCELLED_ADOPTER_BLOCKED: (p: { petName: string; shelterName: string }): RenderedNotification => ({
+    title: "Adopción cancelada",
+    body: `La adopción de ${p.petName} se ha cancelado porque la protectora ${p.shelterName} ha restringido tu acceso.`,
   }),
 
   /** CU-47, RN-122: a request still unanswered (to the shelter). */

@@ -9,7 +9,7 @@ export interface ChangedAdoption {
 }
 
 /** RN-103: the adopter's PENDING adoptions of the shelter's pets become VOIDED with that reason. */
-export async function voidPendingAdoptions(db: Db, adopterId: number, shelterId: number, reason: "NO_SHOW"): Promise<ChangedAdoption[]> {
+export async function voidPendingAdoptions(db: Db, adopterId: number, shelterId: number, reason: "NO_SHOW" | "ADOPTER_BLOCKED"): Promise<ChangedAdoption[]> {
   const { rows } = await db.query<ChangedAdoption>(
     `UPDATE "Adoption" a SET status = 'VOIDED', void_reason = $3, voided_at = now()
        FROM "Pet" p
@@ -22,12 +22,17 @@ export async function voidPendingAdoptions(db: Db, adopterId: number, shelterId:
 
 /** RN-103: the adopter's APPROVED adoptions of the shelter's pets are cancelled by the system. */
 export async function cancelApprovedAdoptionsBySystem(db: Db, adopterId: number, shelterId: number): Promise<ChangedAdoption[]> {
+  return cancelApprovedAdoptions(db, adopterId, shelterId, "SYSTEM");
+}
+
+/** RN-103, RN-148: the adopter's APPROVED adoptions of the shelter's pets are cancelled by `by`. */
+export async function cancelApprovedAdoptions(db: Db, adopterId: number, shelterId: number, by: "SYSTEM" | "SHELTER"): Promise<ChangedAdoption[]> {
   const { rows } = await db.query<ChangedAdoption>(
-    `UPDATE "Adoption" a SET status = 'CANCELLED', cancelled_by = 'SYSTEM', cancelled_at = now()
+    `UPDATE "Adoption" a SET status = 'CANCELLED', cancelled_by = $3, cancelled_at = now()
        FROM "Pet" p
       WHERE p.id = a.pet_id AND p.shelter_id = $2 AND a.adopter_id = $1 AND a.status = 'APPROVED'
      RETURNING a.id, a.pet_id AS "petId", p.name AS "petName"`,
-    [adopterId, shelterId],
+    [adopterId, shelterId, by],
   );
   return rows.sort((a, b) => a.id - b.id);
 }

@@ -724,3 +724,26 @@ export type ShelterProfileUpdate = Omit<ShelterProfile, "email" | "name" | "cif"
 export interface ShelterProfileResponse {
   profile: ShelterProfile;
 }
+
+/** RN-147: the internal reasons of a block. */
+export type BlockReason = "INAPPROPRIATE_BEHAVIOUR" | "FALSE_INFORMATION" | "BREACHES" | "OTHER";
+
+/** CU-35 · a shelter's active block of an adopter (ISO instants; endsAt null = permanent, RN-201). */
+export interface AdopterBlock {
+  id: number;
+  reason: BlockReason;
+  detail: string | null;
+  createdAt: string;
+  endsAt: string | null;
+}
+
+/** CU-35 · body of POST /api/shelter/adopters/:id/block */
+export interface AdopterBlockRequest {
+  reason: BlockReason;
+  detail?: string | null;
+}
+
+/** CU-35 · GET, POST /block and POST /unblock of /api/shelter/adopters/:id */
+export interface AdopterBlockResponse {
+  block: AdopterBlock | null;
+}

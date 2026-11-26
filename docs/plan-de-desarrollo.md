@@ -265,7 +265,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-34 | Bloquear y desbloquear adoptantes (primero temporal, luego definitivo) y levantar automáticamente los bloqueos temporales. | CU-35, CU-56; RN-145–152, 198, 201–203 | T-29, T-32 | PENDIENTE |
+| T-34 | Bloquear y desbloquear adoptantes (primero temporal, luego definitivo) y levantar automáticamente los bloqueos temporales. | CU-35, CU-56; RN-145–152, 198, 201–203 | T-29, T-32 | EN_REVISION |
 | T-35 | Notas internas sobre adoptantes. | CU-52; RN-204 | T-24 | PENDIENTE |
 
 ### Fase 8 · Perfil, avisos y administración
