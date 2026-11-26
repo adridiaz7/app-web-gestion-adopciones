@@ -389,6 +389,11 @@
       "feature": "T-04 Registro de adoptante",
       "sha256": "9a130c90db2677ae3fca590f70c025083f47ca29ea8076aeff4e6b46cc4be509",
       "lockedAt": "2026-11-26T08:56:23.444Z"
+    },
+    "tests/unit/seed-photos.test.ts": {
+      "feature": "T-46 Seed visual para la demo",
+      "sha256": "8db182d9af1295d8037edf9cce42a8c35f5892c7517034be6159715273b77356",
+      "lockedAt": "2026-11-26T23:57:14.494Z"
     }
   },
   "history": [
