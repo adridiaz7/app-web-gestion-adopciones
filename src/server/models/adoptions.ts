@@ -203,7 +203,7 @@ export async function markOthersNotSelected(db: Db, petId: number, approvedId: n
   return rows.sort((a, b) => a.id - b.id);
 }
 
-/** RN-124: the pet becomes RESERVED. Returns its previous status. */
+/** RN-124: the pet becomes RESERVED. */
 export async function reservePet(db: Db, petId: number): Promise<void> {
   await db.query(`UPDATE "Pet" SET status = 'RESERVED', updated_at = now() WHERE id = $1`, [petId]);
 }

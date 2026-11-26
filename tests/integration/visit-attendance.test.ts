@@ -196,3 +196,15 @@ describe("T-25 CU-26 POST /api/shelter/visits/:id/no-show", () => {
     expect(told).toEqual([{ type: "PET_AVAILABLE_AGAIN", pet_id: pet.id }]);
   });
 });
+
+describe("T-25 CU-26 permissions", () => {
+  it("CU-26: only shelters register no-shows", async () => {
+    const past = await visit({ startsInHours: -2 });
+    const upcoming = await visit({ startsInHours: 72, status: "PENDING" });
+    expect((await request(createApp()).post(`/api/shelter/visits/${String(past.id)}/no-show`).send({})).status).toBe(401);
+    expect((await noShow(past.id, adopter.id)).status).toBe(403);
+    expect(await visitRow(past.id)).toEqual({ status: "CONFIRMED", attendance_marked_by: null, marked: false, void_reason: null });
+    expect((await visitRow(upcoming.id)).status).toBe("PENDING");
+    expect(await notificationTypes(adopter.id)).toEqual([]);
+  });
+});

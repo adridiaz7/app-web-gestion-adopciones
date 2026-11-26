@@ -4,7 +4,7 @@ import { createApp } from "../../src/server/app.js";
 import { getPool } from "../../src/server/db/pool.js";
 import { sessionCookie } from "../helpers/auth.js";
 import { truncateAll } from "../helpers/db.js";
-import { createAdopter, createPet, createShelter, createVisit, createVisitSlot, type CreatedUser } from "../helpers/factories.js";
+import { createAdmin, createAdopter, createPet, createShelter, createVisit, createVisitSlot, type CreatedUser } from "../helpers/factories.js";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -171,5 +171,17 @@ describe("T-24 CU-22 GET /api/shelter/inbox", () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ pending: [], upcoming: [] });
+  });
+});
+
+describe("T-24 CU-21, CU-22 permissions", () => {
+  it("CU-21, CU-22: each list needs a session and its role", async () => {
+    await visit({ startsAt: new Date(Date.now() + 7 * DAY) });
+    const admin = await createAdmin();
+    const app = createApp();
+    expect((await request(app).get("/api/adopter/visits")).status).toBe(401);
+    expect((await request(app).get("/api/shelter/inbox")).status).toBe(401);
+    for (const other of [shelter.id, admin.id]) expect((await get("/api/adopter/visits", other)).status).toBe(403);
+    for (const other of [adopter.id, admin.id]) expect((await get("/api/shelter/inbox", other)).status).toBe(403);
   });
 });

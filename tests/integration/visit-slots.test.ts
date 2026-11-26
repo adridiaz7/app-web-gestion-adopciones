@@ -232,3 +232,17 @@ describe("T-20 CU-20 PUT and DELETE /api/shelter/slots/:id", () => {
     }
   });
 });
+
+describe("T-20 CU-18, CU-19, CU-20 permissions", () => {
+  it("CU-18, CU-19, CU-20: a session is required", async () => {
+    const slot = await createVisitSlot({ shelterId: shelter.id, startsAt: future(4), capacity: 2 });
+    const body = { startsAt: future(3).toISOString(), endsAt: future(3, 1).toISOString(), capacity: 1 };
+    const app = createApp();
+    expect((await request(app).get(URL)).status).toBe(401);
+    expect((await request(app).post(URL).send(body)).status).toBe(401);
+    expect((await request(app).put(`${URL}/${String(slot.id)}`).send(body)).status).toBe(401);
+    expect((await request(app).delete(`${URL}/${String(slot.id)}`)).status).toBe(401);
+    const { rows } = await getPool().query(`SELECT id, capacity, cancelled_at FROM "Visit_slot"`);
+    expect(rows).toEqual([{ id: slot.id, capacity: 2, cancelled_at: null }]);
+  });
+});

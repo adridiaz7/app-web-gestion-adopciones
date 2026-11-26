@@ -272,3 +272,16 @@ describe("T-27 CU-14 GET /api/shelter/pets", () => {
     expect(res.body.pets[0]).toMatchObject({ id: petId, status: "UNLISTED", unlistReason: "DECEASED" });
   });
 });
+
+describe("T-27 CU-17 permissions", () => {
+  it("CU-17: unlisting and reactivating need a session", async () => {
+    const app = createApp();
+    expect((await request(app).post(`/api/shelter/pets/${String(petId)}/unlist`).send({ reason: "FOSTER" })).status).toBe(401);
+    expect(await pet()).toEqual({ status: "AVAILABLE", unlist_reason: null, unlisted: false });
+
+    expect((await action(petId, "unlist", { reason: "FOSTER" })).status).toBe(200);
+    const unlisted = await pet();
+    expect((await request(app).post(`/api/shelter/pets/${String(petId)}/reactivate`).send({})).status).toBe(401);
+    expect(await pet()).toEqual(unlisted);
+  });
+});

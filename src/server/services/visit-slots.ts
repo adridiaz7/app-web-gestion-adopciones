@@ -74,7 +74,9 @@ const madridDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" 
 
 /** The same day `months` later (YYYY-MM-DD), or the last day of that month if it is shorter. */
 function addMonths(date: string, months: number): string {
-  const [year, month, day] = date.split("-").map(Number) as [number, number, number];
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!match) throw new Error(`Invalid date: ${date}`);
+  const [year, month, day] = [Number(match[1]), Number(match[2]), Number(match[3])];
   const lastDay = new Date(Date.UTC(year, month - 1 + months + 1, 0)).getUTCDate();
   return new Date(Date.UTC(year, month - 1 + months, Math.min(day, lastDay))).toISOString().slice(0, 10);
 }

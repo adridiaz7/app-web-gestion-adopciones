@@ -185,3 +185,16 @@ describe("T-31 CU-29 POST /api/shelter/adoptions/:id/reject", () => {
     expect(res.body).toEqual({ error: "La solicitud no está pendiente." });
   });
 });
+
+describe("T-31 CU-28, CU-29 permissions", () => {
+  it("CU-28, CU-29: comparing, approving and rejecting need a session", async () => {
+    const { id } = await candidate();
+    const app = createApp();
+    expect((await request(app).get(`/api/shelter/pets/${String(petId)}/candidates`)).status).toBe(401);
+    expect((await request(app).post(`/api/shelter/adoptions/${String(id)}/approve`).send({})).status).toBe(401);
+    expect((await request(app).post(`/api/shelter/adoptions/${String(id)}/reject`).send({ reason: "Motivo" })).status).toBe(401);
+    expect(await status("Adoption", id)).toBe("PENDING");
+    expect(await status("Pet", petId)).toBe("AVAILABLE");
+    expect(await notifications()).toEqual([]);
+  });
+});

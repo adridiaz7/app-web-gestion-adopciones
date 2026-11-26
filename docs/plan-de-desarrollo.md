@@ -210,14 +210,14 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | CAMBIOS |
-| T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | CAMBIOS |
-| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | CAMBIOS |
-| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | CAMBIOS |
-| T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | CAMBIOS |
-| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | CAMBIOS |
+| T-20 | Turnos de visita: calendario, crear, modificar y eliminar. | CU-18, CU-19, CU-20; RN-78–85, 111, 112 | T-11 | EN_REVISION |
+| T-21 | Turnos recurrentes. | CU-50; RN-192 | T-20 | EN_REVISION |
+| T-22 | Solicitar una visita desde la ficha (franjas disponibles para esa mascota). Al hacerlo se crea la conversación. | CU-23; RN-80–93, 134, 193, 194 | T-20, T-15 | EN_REVISION |
+| T-23 | Confirmar, rechazar y cancelar visitas. | CU-24, CU-25; RN-94–101 | T-22 | EN_REVISION |
+| T-24 | Consultar mis visitas (adoptante) y la bandeja de solicitudes (protectora). | CU-21, CU-22 | T-23 | EN_REVISION |
+| T-25 | Tareas programadas de visitas (caducar sin respuesta, marcar como realizadas) y registrar ausencias. | CU-26, CU-45, CU-46; RN-95, 102–107 | T-23 | EN_REVISION |
 | T-26 | Reprogramar una visita y recordatorio de visita. | CU-51, CU-53; RN-195–197 | T-25 | APROBADA |
-| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | CAMBIOS |
+| T-27 | Dar de baja y reactivar una mascota (anula sus visitas y avisa a los adoptantes). | CU-17; RN-60–67 | T-23 | EN_REVISION |
 | T-48 | Comprobar el **cupo** (RN-90) también al **confirmar** una visita. Si el adoptante ya lo tiene lleno con esa protectora, se responde con un error y la visita sigue pendiente. Solo API, más el mensaje de error en el calendario. Tests nuevos; no se modifican los de T-23. | CU-24; RN-90, 93; decisión del responsable del 25/11/2026 (sección 4) | T-23 | PENDIENTE |
 | T-49 | **Visita sustituta** (CU-23, RN-111). Solo cuando la visita anulada tenía motivo `SLOT_CANCELLED` y estaba confirmada. Es para la misma mascota y solo una vez (`replaces_visit_id`). No necesita las 48 h de antelación y queda confirmada directamente. Se aplican el resto de reglas: plazas, bloqueo, ausencia y cupo. Tests nuevos; no se modifican los de T-22. | CU-23; RN-87, 90, 111; decisión del responsable del 25/11/2026 (sección 4) | T-22, T-20 | PENDIENTE |
 | T-50 | **Perfil del adoptante en la bandeja** de la protectora (CU-22). La protectora ve el nombre, la provincia, los datos del hogar (RN-27) y el historial de visitas y ausencias de ese adoptante **con ella**. Solo ve los adoptantes que le han enviado alguna solicitud (RN-29). Tests nuevos, incluido que no se ve el historial con otras protectoras; no se modifican los de T-24. | CU-22; RN-27, 29; decisión del responsable del 25/11/2026 (sección 4) | T-24, T-25 | PENDIENTE |
@@ -235,7 +235,7 @@ Nota: la cancelación por parte del adoptante ya está en la API (`POST /api/ado
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | CAMBIOS |
-| T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | CAMBIOS |
+| T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | EN_REVISION |
 | T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | PENDIENTE |
 | T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | PENDIENTE |
 

@@ -4,7 +4,7 @@ import { createApp } from "../../src/server/app.js";
 import { getPool } from "../../src/server/db/pool.js";
 import { sessionCookie } from "../helpers/auth.js";
 import { truncateAll } from "../helpers/db.js";
-import { createAdopter, createPet, createShelter, createVisit, createVisitSlot, type CreatedUser } from "../helpers/factories.js";
+import { createAdmin, createAdopter, createPet, createShelter, createVisit, createVisitSlot, type CreatedUser } from "../helpers/factories.js";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -257,5 +257,22 @@ describe("T-23 CU-25 POST /api/shelter/visits/:id/cancel", () => {
       expect(closed.status, status).toBe(409);
       expect(closed.body).toEqual({ error: "La visita ya está cerrada." });
     }
+  });
+});
+
+describe("T-23 CU-24, CU-25 permissions", () => {
+  it("CU-24, CU-25: each action needs a session and the role of its side", async () => {
+    const id = await visit("PENDING");
+    const before = await visitRow(id);
+    const app = createApp();
+    for (const action of ["confirm", "reject", "cancel"]) {
+      const path = `/api/shelter/visits/${String(id)}/${action}`;
+      expect((await request(app).post(path).send({ reason: "Motivo" })).status, action).toBe(401);
+      expect((await shelterAction(id, action, { reason: "Motivo" }, adopterCookie)).status, action).toBe(403);
+    }
+    expect((await request(app).post(`/api/adopter/visits/${String(id)}/cancel`)).status).toBe(401);
+    expect((await adopterCancel(id, shelterCookie)).status).toBe(403);
+    expect((await adopterCancel(id, await sessionCookie((await createAdmin()).id))).status).toBe(403);
+    expect(await visitRow(id)).toEqual(before);
   });
 });

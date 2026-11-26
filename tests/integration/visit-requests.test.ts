@@ -4,7 +4,7 @@ import { createApp } from "../../src/server/app.js";
 import { getPool } from "../../src/server/db/pool.js";
 import { sessionCookie } from "../helpers/auth.js";
 import { truncateAll } from "../helpers/db.js";
-import { createAdopter, createPet, createShelter, createVisit, createVisitSlot, type CreatedUser } from "../helpers/factories.js";
+import { createAdmin, createAdopter, createPet, createShelter, createVisit, createVisitSlot, type CreatedUser } from "../helpers/factories.js";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -276,5 +276,22 @@ describe("T-22 RN-194 GET /api/adopter/pets/:id/slots", () => {
       expect(res.status).toBe(404);
       expect(res.body).toEqual({ error: "Esta mascota no está disponible." });
     }
+  });
+});
+
+describe("T-22 CU-23 permissions", () => {
+  it("CU-23: only adopters request visits", async () => {
+    const slotId = await slot();
+    const others = [await sessionCookie(shelter.id), await sessionCookie((await createAdmin()).id)];
+    const app = createApp();
+    expect((await request(app).post("/api/adopter/visits").send({ petId, slotId })).status).toBe(401);
+    expect((await request(app).get(`/api/adopter/pets/${String(petId)}/slots`)).status).toBe(401);
+    for (const other of others) {
+      expect((await requestVisit({ petId, slotId }, other)).status).toBe(403);
+      expect((await availableSlots(petId, other)).status).toBe(403);
+    }
+    expect(await visitRows()).toEqual([]);
+    const { rows } = await getPool().query(`SELECT id FROM "Conversation"`);
+    expect(rows).toEqual([]);
   });
 });

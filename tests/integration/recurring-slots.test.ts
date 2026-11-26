@@ -4,7 +4,7 @@ import { createApp } from "../../src/server/app.js";
 import { getPool } from "../../src/server/db/pool.js";
 import { sessionCookie } from "../helpers/auth.js";
 import { truncateAll } from "../helpers/db.js";
-import { createShelter, type CreatedUser } from "../helpers/factories.js";
+import { createAdopter, createShelter, type CreatedUser } from "../helpers/factories.js";
 
 const URL = "/api/shelter/slots/recurring";
 const DAY = 24 * 60 * 60 * 1000;
@@ -206,5 +206,15 @@ describe("T-21 CU-50 POST /api/shelter/slots/recurring", () => {
     expect(res.status).toBe(201);
     expect(res.body.skipped).toEqual([]);
     expect((await slotsInMadrid()).map((slot) => slot.start)).toEqual([`${startDate} 08:00`, `${startDate} 10:00`, `${startDate} 12:00`]);
+  });
+});
+
+describe("T-21 CU-50 permissions", () => {
+  it("CU-50: only shelters create recurring slots", async () => {
+    const adopter = await createAdopter();
+    expect((await request(createApp()).post(URL).send(body())).status).toBe(401);
+    expect((await create(body(), await sessionCookie(adopter.id))).status).toBe(403);
+    const { rows } = await getPool().query(`SELECT id FROM "Visit_slot"`);
+    expect(rows).toEqual([]);
   });
 });
