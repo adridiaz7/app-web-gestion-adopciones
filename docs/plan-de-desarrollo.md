@@ -178,6 +178,8 @@ Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted
 
 > **Respuesta del responsable (26/11/2026):** De acuerdo con las cuatro propuestas: **(a)** se añade `ACCOUNT_DELETED` al `CHECK` de `unlist_reason` (y al modelo de datos); **(b)** pasan a baja solo las `AVAILABLE` y `RESERVED` (la adopción aprobada de una `RESERVED` se anula con `ACCOUNT_DELETED`) y las `ADOPTED` se quedan como están; **(c)** en la auditoría se vacían los valores de `details` de las entradas del perfil eliminado (se conservan las claves) y se borra `ip_address` de las entradas de esa cuenta, manteniendo `actor_user_id`; **(d)** se pide la contraseña actual para confirmar. La anonimización de datos, como se propone. T-37 pasa a `PENDIENTE`.
 
+**26/11/2026 · T-37 (no bloquea).** Al eliminar su cuenta un **adoptante**, sus visitas y adopciones abiertas se anulan (`ACCOUNT_DELETED`), pero RN-12 y CU-07 solo piden avisar a los adoptantes cuando se elimina una **protectora**, así que la protectora **no recibe aviso** de las visitas o solicitudes anuladas de ese adoptante (las ve anuladas en su calendario y en su bandeja). Si tenía una adopción **aprobada**, la mascota vuelve a `AVAILABLE` y se avisa a los no seleccionados, como al cancelarla (RN-130). Además, se anonimiza también la **fecha de nacimiento** (queda `1900-01-01`), porque es un dato personal. ¿Es correcto, o la protectora debe recibir un aviso? Se haría en una tarea aparte con tests nuevos.
+
 ---
 
 ## 5. Tareas
@@ -286,7 +288,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 | T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | EN_REVISION |
 | T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | EN_REVISION |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | EN_REVISION |
-| T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | EN_CURSO |
+| T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | EN_REVISION |
 | T-41 | Supervisar la actividad (incluido el registro de auditoría) y estadísticas. | CU-43, CU-44; RN-160, 161 | T-39 | PENDIENTE |
 
 ### Fase 9 · Demo

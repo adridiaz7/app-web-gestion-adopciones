@@ -1912,3 +1912,22 @@ textarea {
   padding: var(--space-6);
   border-color: var(--error-200);
 }
+
+/* CU-42: catalogue lists */
+.catalogue-list {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.catalogue-item,
+.catalogue-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.catalogue-item span {
+  flex: 1;
+}

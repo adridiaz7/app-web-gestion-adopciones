@@ -2,6 +2,8 @@ import type {
   AdminShelterResponse,
   AdminSheltersResponse,
   AdminUsersResponse,
+  BreedResponse,
+  SpeciesResponse,
   SuspendUserRequest,
   SuspensionResponse,
   ValidationStatus,
@@ -31,3 +33,9 @@ export const reactivateUser = (id: number) => apiRequest<undefined>("POST", `/ad
 
 /** CU-41, RN-163: only an available pet. */
 export const removePet = (id: number) => apiRequest<undefined>("POST", `/admin/pets/${String(id)}/remove`);
+
+/** CU-42, RN-159 */
+export const createSpecies = (name: string) => apiRequest<SpeciesResponse>("POST", "/admin/species", { name });
+export const renameSpecies = (id: number, name: string) => apiRequest<SpeciesResponse>("PUT", `/admin/species/${String(id)}`, { name });
+export const createBreed = (speciesId: number, name: string) => apiRequest<BreedResponse>("POST", "/admin/breeds", { speciesId, name });
+export const renameBreed = (id: number, name: string) => apiRequest<BreedResponse>("PUT", `/admin/breeds/${String(id)}`, { name });

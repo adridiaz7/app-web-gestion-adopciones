@@ -842,3 +842,12 @@ export interface SuspendUserRequest {
 export interface SuspensionResponse {
   suspension: { id: number; userId: number; reason: SuspensionReason; detail: string | null; startedAt: string };
 }
+
+/** CU-42 · a species or a breed created or renamed by the administrator. */
+export interface SpeciesResponse {
+  species: { id: number; name: string };
+}
+
+export interface BreedResponse {
+  breed: { id: number; speciesId: number; name: string };
+}
