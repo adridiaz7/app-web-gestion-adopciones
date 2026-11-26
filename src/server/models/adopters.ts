@@ -40,13 +40,14 @@ export interface Household {
   hoursAlonePerDay: number | null;
 }
 
-export async function selectHousehold(db: Db, adopterId: number): Promise<Household | null> {
+/** With `forUpdate`, the adopter's row stays locked until the end of the transaction. */
+export async function selectHousehold(db: Db, adopterId: number, forUpdate = false): Promise<Household | null> {
   const { rows } = await db.query<Household>(
     `SELECT housing_type AS "housingType", has_outdoor_space AS "hasOutdoorSpace", housing_tenure AS "housingTenure",
             household_members AS "householdMembers", has_children AS "hasChildren", has_other_pets AS "hasOtherPets",
             other_pets_description AS "otherPetsDescription", has_pet_experience AS "hasPetExperience",
             hours_alone_per_day AS "hoursAlonePerDay"
-       FROM "Adopter" WHERE user_id = $1`,
+       FROM "Adopter" WHERE user_id = $1${forUpdate ? " FOR UPDATE" : ""}`,
     [adopterId],
   );
   return rows[0] ?? null;

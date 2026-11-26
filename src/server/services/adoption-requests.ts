@@ -29,6 +29,30 @@ export interface RequestedAdoption {
 const PET_NOT_AVAILABLE = "Esta mascota no está disponible.";
 const madridDay = new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
 
+const HOUSEHOLD_FIELDS: readonly (keyof Household)[] = [
+  "housingType",
+  "hasOutdoorSpace",
+  "housingTenure",
+  "householdMembers",
+  "hasChildren",
+  "hasOtherPets",
+  "otherPetsDescription",
+  "hasPetExperience",
+  "hoursAlonePerDay",
+];
+
+/** RN-208: only the household fields that change, with their old and new values. */
+function householdChanges(before: Household, after: Household): { before: Record<string, unknown>; after: Record<string, unknown> } {
+  const diff: { before: Record<string, unknown>; after: Record<string, unknown> } = { before: {}, after: {} };
+  for (const field of HOUSEHOLD_FIELDS) {
+    if (before[field] !== after[field]) {
+      diff.before[field] = before[field];
+      diff.after[field] = after[field];
+    }
+  }
+  return diff;
+}
+
 /** RN-207: the household data of the profile, to prefill the adoption form. */
 export async function getHousehold(adopterId: number): Promise<Household> {
   const household = await selectHousehold(getPool(), adopterId);
@@ -62,17 +86,21 @@ export async function requestAdoption(adopterId: number, petId: number, househol
     if (await hasOpenAdoption(client, adopterId, petId)) throw new ConflictError(`Ya tienes una solicitud de adopción abierta para ${petName}.`);
 
     // RN-113, RN-115, RN-116: a completed visit to this pet, within its validity.
-    const visit = await selectLatestCompletedVisit(client, adopterId, petId);
+    const visit = await selectLatestCompletedVisit(client, adopterId, petId, months);
     if (!visit) throw new ConflictError(`Para solicitar la adopción tienes que haber visitado antes a ${petName}.`);
-    const validUntil = new Date(visit.startsAt);
-    validUntil.setMonth(validUntil.getMonth() + months);
-    if (validUntil.getTime() < Date.now()) {
+    if (!visit.stillValid) {
       const period = months === 1 ? "1 mes" : `${String(months)} meses`;
       throw new ConflictError(`Tu visita a ${petName} fue hace más de ${period}. Para solicitar la adopción, haz otra visita.`);
     }
 
-    // RN-117, RN-207
+    // RN-117, RN-207; RN-208: a change of the profile is audited with old and new values.
+    const before = await selectHousehold(client, adopterId, true);
+    if (!before) throw new NotFoundError("El adoptante no existe.");
     await updateHousehold(client, adopterId, household);
+    const diff = householdChanges(before, household);
+    if (Object.keys(diff.after).length > 0) {
+      await audit(client, { actorUserId: adopterId, action: "PROFILE_UPDATED", entityType: "Adopter", entityId: adopterId, details: diff });
+    }
     const id = await insertAdoption(client, adopterId, petId, visit.id, answers);
     await audit(client, {
       actorUserId: adopterId,

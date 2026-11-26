@@ -1,6 +1,7 @@
 import request from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
 import { createApp } from "../../src/server/app.js";
+import { getConfig } from "../../src/server/config.js";
 import { getPool } from "../../src/server/db/pool.js";
 import { sessionCookie } from "../helpers/auth.js";
 import { truncateAll } from "../helpers/db.js";
@@ -209,5 +210,71 @@ describe("T-30 RN-207 GET /api/adopter/household", () => {
       hasPetExperience: null,
       hoursAlonePerDay: null,
     });
+  });
+});
+
+describe("T-30 RN-208 household changes in the adoption form", () => {
+  async function profileAudits(): Promise<{ actor_user_id: number; entity_type: string; entity_id: number; details: unknown }[]> {
+    const { rows } = await getPool().query<{ actor_user_id: number; entity_type: string; entity_id: number; details: unknown }>(
+      `SELECT actor_user_id, entity_type, entity_id, details FROM "Audit_log" WHERE action = 'PROFILE_UPDATED' ORDER BY id`,
+    );
+    return rows;
+  }
+
+  it("RN-208: household data changed in the adoption form are audited with old and new values", async () => {
+    await getPool().query(
+      `UPDATE "Adopter" SET housing_type = 'APARTMENT', has_outdoor_space = true, housing_tenure = 'RENTED', household_members = 2,
+              has_children = true, has_other_pets = true, other_pets_description = 'Un gato de 4 años',
+              has_pet_experience = true, hours_alone_per_day = 4 WHERE user_id = $1`,
+      [adopter.id],
+    );
+    await visit(3);
+
+    expect((await apply(validBody())).status).toBe(201);
+
+    expect(await profileAudits()).toEqual([
+      {
+        actor_user_id: adopter.id,
+        entity_type: "Adopter",
+        entity_id: adopter.id,
+        details: { before: { housingTenure: "RENTED", householdMembers: 2 }, after: { housingTenure: "RENT_TO_OWN", householdMembers: 3 } },
+      },
+    ]);
+  });
+
+  it("RN-208: nothing is audited as a profile edit when the household data do not change", async () => {
+    await getPool().query(
+      `UPDATE "Adopter" SET housing_type = 'APARTMENT', has_outdoor_space = true, housing_tenure = 'RENT_TO_OWN', household_members = 3,
+              has_children = true, has_other_pets = true, other_pets_description = 'Un gato de 4 años',
+              has_pet_experience = true, hours_alone_per_day = 4 WHERE user_id = $1`,
+      [adopter.id],
+    );
+    await visit(3);
+
+    expect((await apply(validBody())).status).toBe(201);
+
+    expect(await profileAudits()).toEqual([]);
+  });
+});
+
+describe("T-30 RN-116 validity of the visit", () => {
+  /** A completed visit of the adopter to the pet, in a slot starting at the instant Postgres computes from `expression`. */
+  async function visitAt(expression: string): Promise<void> {
+    const id = await visit(3);
+    await getPool().query(
+      `UPDATE "Visit_slot" SET starts_at = ${expression}, ends_at = ${expression} + interval '1 hour'
+        WHERE id = (SELECT slot_id FROM "Visit" WHERE id = $1)`,
+      [id],
+    );
+  }
+
+  it("RN-116: a visit exactly 1 month ago minus a minute still counts", async () => {
+    await visitAt(`now() - make_interval(months => ${String(getConfig().rules.visitValidityForAdoptionMonths)}) + interval '1 minute'`);
+    expect((await apply(validBody())).status).toBe(201);
+  });
+
+  it("RN-116: a visit 1 month and a minute ago no longer counts", async () => {
+    await visitAt(`now() - make_interval(months => ${String(getConfig().rules.visitValidityForAdoptionMonths)}) - interval '1 minute'`);
+    expect((await apply(validBody())).status).toBe(409);
   });
 });

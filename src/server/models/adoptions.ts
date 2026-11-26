@@ -94,14 +94,20 @@ export async function hasOpenAdoption(db: Db, adopterId: number, petId: number):
 }
 
 /** RN-113, RN-116: the adopter's most recent COMPLETED visit to the pet, with the slot's start. */
-export async function selectLatestCompletedVisit(db: Db, adopterId: number, petId: number): Promise<{ id: number; startsAt: Date } | null> {
-  const { rows } = await db.query<{ id: number; startsAt: Date }>(
-    `SELECT v.id, vs.starts_at AS "startsAt"
+export async function selectLatestCompletedVisit(
+  db: Db,
+  adopterId: number,
+  petId: number,
+  validityMonths: number,
+): Promise<{ id: number; stillValid: boolean } | null> {
+  // RN-116: "1 month" as Postgres counts it (the last day of a shorter month), like the quota of RN-91.
+  const { rows } = await db.query<{ id: number; stillValid: boolean }>(
+    `SELECT v.id, vs.starts_at + make_interval(months => $3) >= now() AS "stillValid"
        FROM "Visit" v JOIN "Visit_slot" vs ON vs.id = v.slot_id
       WHERE v.adopter_id = $1 AND v.pet_id = $2 AND v.status = 'COMPLETED'
       ORDER BY vs.starts_at DESC, v.id DESC
       LIMIT 1`,
-    [adopterId, petId],
+    [adopterId, petId, validityMonths],
   );
   return rows[0] ?? null;
 }
