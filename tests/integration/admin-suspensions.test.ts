@@ -171,6 +171,19 @@ describe("T-40 CU-40 POST /api/admin/users/:id/reactivate", () => {
     expect((await reactivate(adopter.id, await sessionCookie(shelter.id))).status).toBe(403);
     expect(await suspensions(adopter.id)).toEqual([{ reason: "FRAUD", detail: "Datos falsos", ended: false }]);
   });
+
+  it("RN-199, RN-23: reactivating a suspended shelter announces its available pets to compatible adopters", async () => {
+    const luna = (await createPet({ shelterId: shelter.id, name: "Luna" })).id;
+    const kira = (await createPet({ shelterId: shelter.id, name: "Kira" })).id;
+    await getPool().query(`UPDATE "Pet" SET status = 'RESERVED' WHERE id = $1`, [kira]);
+    await getPool().query(`INSERT INTO "Adopter_preferences" (adopter_id) VALUES ($1)`, [adopter.id]);
+    await suspend(shelter.id);
+
+    expect((await reactivate(shelter.id)).status).toBe(204);
+
+    const { rows } = await getPool().query(`SELECT user_id, pet_id FROM "Notification" WHERE type = 'NEW_COMPATIBLE_PET'`);
+    expect(rows).toEqual([{ user_id: adopter.id, pet_id: luna }]);
+  });
 });
 
 describe("T-40 CU-40 GET /api/admin/users", () => {

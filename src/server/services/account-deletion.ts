@@ -59,10 +59,12 @@ async function voidAdopterProcesses(db: Db, adopterId: number): Promise<void> {
         entityId: adoption.petId,
         details: { before: { status: "RESERVED" }, after: { status: "AVAILABLE" } },
       });
-      for (const userId of await selectNotSelectedAdopters(db, adoption.petId)) {
+      const notSelected = await selectNotSelectedAdopters(db, adoption.petId);
+      for (const userId of notSelected) {
         await createNotification(db, { userId, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
-      await alertPetAvailable(db, adoption.petId); // RN-199, RN-200
+      // RN-199, RN-200: the adopter of this adoption and the candidates were already told
+      await alertPetAvailable(db, adoption.petId, [adopterId, ...notSelected]);
     }
   }
 }
@@ -88,7 +90,8 @@ async function closeShelterProcesses(db: Db, shelterId: number): Promise<void> {
       details: { before: { status: visit.previousStatus }, after: { status: "VOIDED", voidReason: "ACCOUNT_DELETED" } },
     });
   }
-  for (const adoption of await voidOpenAdoptionsOf(db, "shelter_id", shelterId)) {
+  const voided = await voidOpenAdoptionsOf(db, "shelter_id", shelterId);
+  for (const adoption of voided) {
     await createNotification(db, {
       userId: adoption.adopterId,
       type: "ADOPTION_VOIDED_ACCOUNT_DELETED",
@@ -104,7 +107,9 @@ async function closeShelterProcesses(db: Db, shelterId: number): Promise<void> {
     });
   }
   for (const pet of await unlistShelterPets(db, shelterId)) {
-    await alertFavorites(db, pet.id, "UNLISTED"); // RN-200
+    // RN-200: the adopters whose adoptions of this pet were just voided are already told
+    const alreadyTold = voided.filter((adoption) => adoption.petId === pet.id).map((adoption) => adoption.adopterId);
+    await alertFavorites(db, pet.id, "UNLISTED", alreadyTold);
     await audit(db, {
       actorUserId: shelterId,
       action: "PET_STATUS_CHANGED",

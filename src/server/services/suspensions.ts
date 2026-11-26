@@ -16,7 +16,7 @@ import {
 } from "../models/suspensions.js";
 import { audit } from "./audit.js";
 import { createNotification } from "./notifications.js";
-import { alertPetAvailable } from "./pet-alerts.js";
+import { alertPetAvailable, alertShelterPets } from "./pet-alerts.js";
 
 export type { AdminUserRow, Suspension, SuspensionReason };
 
@@ -75,10 +75,12 @@ async function applyAdopterSuspension(db: Db, adminId: number, adopterId: number
         entityId: adoption.petId,
         details: { before: { status: "RESERVED" }, after: { status: "AVAILABLE" } },
       });
-      for (const userId of await selectNotSelectedAdopters(db, adoption.petId)) {
+      const notSelected = await selectNotSelectedAdopters(db, adoption.petId);
+      for (const userId of notSelected) {
         await createNotification(db, { userId, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
-      await alertPetAvailable(db, adoption.petId); // RN-199, RN-200
+      // RN-199, RN-200: the adopter of this adoption and the candidates were already told
+      await alertPetAvailable(db, adoption.petId, [adopterId, ...notSelected]);
     }
   }
 }
@@ -107,12 +109,17 @@ export async function suspendUser(adminId: number, userId: number, reason: Suspe
   });
 }
 
-/** CU-40, RN-156: the administrator ends the active suspension; it stays in the history. Audited (RN-208). */
+/**
+ * CU-40, RN-156: the administrator ends the active suspension; it stays in the history. Audited
+ * (RN-208). A shelter's available pets are visible again (RN-23), so they are announced (RN-199).
+ */
 export async function reactivateUser(adminId: number, userId: number): Promise<void> {
   await withTransaction(async (client) => {
-    if (!(await lockSuspendableUser(client, userId))) throw new NotFoundError(NOT_FOUND);
+    const user = await lockSuspendableUser(client, userId);
+    if (!user) throw new NotFoundError(NOT_FOUND);
     const id = await endActiveSuspension(client, userId);
     if (id === null) throw new ConflictError("Esta cuenta no está suspendida.");
     await audit(client, { actorUserId: adminId, action: "ACCOUNT_REACTIVATED", entityType: "Suspension", entityId: id, details: { before: { endedAt: null }, after: { userId } } });
+    if (user.role === "SHELTER") await alertShelterPets(client, userId);
   });
 }

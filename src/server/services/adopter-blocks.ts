@@ -97,10 +97,12 @@ async function applyBlockEffects(db: Db, shelterId: number, shelterName: string,
         entityId: adoption.petId,
         details: { before: { status: "RESERVED" }, after: { status: "AVAILABLE" } },
       });
-      for (const userId of await selectNotSelectedAdopters(db, adoption.petId)) {
+      const notSelected = await selectNotSelectedAdopters(db, adoption.petId);
+      for (const userId of notSelected) {
         await createNotification(db, { userId, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
-      await alertPetAvailable(db, adoption.petId); // RN-199, RN-200
+      // RN-199, RN-200: the adopter of this adoption and the candidates were already told
+      await alertPetAvailable(db, adoption.petId, [adopterId, ...notSelected]);
     }
   }
 }

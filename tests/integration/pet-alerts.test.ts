@@ -55,13 +55,14 @@ async function sent(type: string): Promise<{ user_id: number; body: string; pet_
 }
 
 /** An adoption of the pet by the adopter, enabled by a completed visit, with that status. */
-async function adoption(adopterId: number, petId: number, status: "PENDING" | "APPROVED" | "NOT_SELECTED" | "COMPLETED"): Promise<number> {
+async function adoption(adopterId: number, petId: number, status: "PENDING" | "APPROVED" | "NOT_SELECTED" | "REJECTED" | "COMPLETED"): Promise<number> {
   const slot = await createVisitSlot({ shelterId: shelter.id, startsAt: new Date(Date.now() - 3 * DAY) });
   const v = await createVisit({ adopterId, shelterId: shelter.id, petId, slotId: slot.id, status: "CONFIRMED" });
   await getPool().query(`UPDATE "Visit" SET status = 'COMPLETED', attendance_marked_by = 'SYSTEM', attendance_marked_at = now() WHERE id = $1`, [v.id]);
   const { rows } = await getPool().query<{ id: number }>(
-    `INSERT INTO "Adoption" (adopter_id, pet_id, visit_id, questionnaire_answers, status, decided_at, delivered_at)
-     VALUES ($1, $2, $3, '{}', $4, CASE WHEN $4 <> 'PENDING' THEN now() END, CASE WHEN $4 = 'COMPLETED' THEN now() END) RETURNING id`,
+    `INSERT INTO "Adoption" (adopter_id, pet_id, visit_id, questionnaire_answers, status, decided_at, delivered_at, rejection_reason)
+     VALUES ($1, $2, $3, '{}', $4, CASE WHEN $4 <> 'PENDING' THEN now() END, CASE WHEN $4 = 'COMPLETED' THEN now() END,
+             CASE WHEN $4 = 'REJECTED' THEN 'No encaja' END) RETURNING id`,
     [adopterId, petId, v.id, status],
   );
   if (status === "APPROVED") await getPool().query(`UPDATE "Pet" SET status = 'RESERVED' WHERE id = $1`, [petId]);
@@ -215,5 +216,50 @@ describe("T-38 CU-55 changes in the favourites", () => {
     expect((await post(`/api/shelter/pets/${String(pet.id)}/unlist`, { reason: "TREATMENT" })).status).toBe(200);
 
     expect(await sent("FAVORITE_STATUS_CHANGED")).toEqual([]);
+  });
+});
+
+describe("T-38 review 26/11: only the adopters already told about the same change are left out", () => {
+  it("RN-200: an adopter with an old rejected request who has the pet in favourites is told it is available again after a return", async () => {
+    const pet = await createPet({ shelterId: shelter.id, name: "Luna" });
+    const rejected = await createAdopter();
+    const loser = await createAdopter();
+    const owner = await createAdopter();
+    for (const a of [rejected, loser, owner]) await favorite(a.id, pet.id);
+    await adoption(rejected.id, pet.id, "REJECTED");
+    await adoption(loser.id, pet.id, "NOT_SELECTED");
+    const id = await adoption(owner.id, pet.id, "COMPLETED");
+
+    expect((await post(`/api/shelter/adoptions/${String(id)}/return`, { reason: "Alergia" })).status).toBe(200);
+
+    expect((await sent("FAVORITE_STATUS_CHANGED")).map((a) => a.user_id)).toEqual([rejected.id, loser.id]);
+  });
+
+  it("RN-200: approving an adoption tells an adopter with an old rejected request who has the pet in favourites, but not the candidates just not selected", async () => {
+    const pet = await createPet({ shelterId: shelter.id, name: "Luna" });
+    const winner = await createAdopter();
+    const rejected = await createAdopter();
+    const pending = await createAdopter();
+    for (const a of [winner, rejected, pending]) await favorite(a.id, pet.id);
+    await adoption(rejected.id, pet.id, "REJECTED");
+    await adoption(pending.id, pet.id, "PENDING");
+    const id = await adoption(winner.id, pet.id, "PENDING");
+
+    expect((await post(`/api/shelter/adoptions/${String(id)}/approve`)).status).toBe(200);
+
+    expect((await sent("FAVORITE_STATUS_CHANGED")).map((a) => a.user_id)).toEqual([rejected.id]);
+    expect((await sent("ADOPTION_NOT_SELECTED")).map((a) => a.user_id)).toEqual([pending.id]);
+  });
+
+  it("RN-199: a compatible adopter with an old rejected request is told the pet is available again after a return", async () => {
+    const pet = await createPet({ shelterId: shelter.id, name: "Luna", size: "MEDIUM" });
+    const rejected = await adopterWithPreferences();
+    const owner = await adopterWithPreferences();
+    await adoption(rejected.id, pet.id, "REJECTED");
+    const id = await adoption(owner.id, pet.id, "COMPLETED");
+
+    expect((await post(`/api/shelter/adoptions/${String(id)}/return`, { reason: "Alergia" })).status).toBe(200);
+
+    expect((await sent("NEW_COMPATIBLE_PET")).map((a) => a.user_id)).toEqual([rejected.id]);
   });
 });

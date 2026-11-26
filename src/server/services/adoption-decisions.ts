@@ -56,7 +56,6 @@ export async function approveAdoption(shelterId: number, adoptionId: number): Pr
     });
 
     await reservePet(client, adoption.petId);
-    await alertFavorites(client, adoption.petId, "RESERVED"); // RN-200
     await audit(client, {
       actorUserId: shelterId,
       action: "PET_STATUS_CHANGED",
@@ -65,7 +64,8 @@ export async function approveAdoption(shelterId: number, adoptionId: number): Pr
       details: { before: { status: "AVAILABLE" }, after: { status: "RESERVED" } },
     });
 
-    for (const other of await markOthersNotSelected(client, adoption.petId, adoptionId)) {
+    const others = await markOthersNotSelected(client, adoption.petId, adoptionId);
+    for (const other of others) {
       await createNotification(client, { userId: other.adopterId, type: "ADOPTION_NOT_SELECTED", params: { petName: other.petName }, link: { adoptionId: other.id } });
       await audit(client, {
         actorUserId: shelterId,
@@ -75,6 +75,8 @@ export async function approveAdoption(shelterId: number, adoptionId: number): Pr
         details: { before: { status: "PENDING" }, after: { status: "NOT_SELECTED" } },
       });
     }
+    // RN-200: the approved adopter and the candidates not selected are already told
+    await alertFavorites(client, adoption.petId, "RESERVED", [adoption.adopterId, ...others.map((other) => other.adopterId)]);
 
     for (const visit of await voidPetOpenVisits(client, adoption.petId, "PET_RESERVED")) {
       // RN-110

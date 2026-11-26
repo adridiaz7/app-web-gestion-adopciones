@@ -19,7 +19,6 @@ export type ShelterUnlistReason = Exclude<UnlistReason, "REMOVED_BY_ADMIN">;
  */
 async function applyUnlisting(db: Db, actorUserId: number, petId: number, reason: UnlistReason): Promise<void> {
   await markPetUnlisted(db, petId, reason);
-  await alertFavorites(db, petId, "UNLISTED"); // RN-200
   await audit(db, {
     actorUserId,
     action: "PET_STATUS_CHANGED",
@@ -44,7 +43,8 @@ async function applyUnlisting(db: Db, actorUserId: number, petId: number, reason
     });
   }
 
-  for (const adoption of await voidPetPendingAdoptions(db, petId, "PET_UNLISTED")) {
+  const voided = await voidPetPendingAdoptions(db, petId, "PET_UNLISTED");
+  for (const adoption of voided) {
     await createNotification(db, {
       userId: adoption.adopterId,
       type: "ADOPTION_VOIDED_PET_UNLISTED",
@@ -59,6 +59,8 @@ async function applyUnlisting(db: Db, actorUserId: number, petId: number, reason
       details: { before: { status: "PENDING" }, after: { status: "VOIDED", voidReason: "PET_UNLISTED" } },
     });
   }
+  // RN-200: the adopters whose requests were just voided are already told
+  await alertFavorites(db, petId, "UNLISTED", voided.map((adoption) => adoption.adopterId));
 }
 
 /**

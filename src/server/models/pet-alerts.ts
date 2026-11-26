@@ -78,8 +78,3 @@ export async function selectAvailablePetIds(db: Db, shelterId: number): Promise<
   return rows.map((row) => row.id);
 }
 
-/** The adopters with an adoption of the pet (any status): they get the alerts of their own adoption. */
-export async function selectPetAdoptionAdopters(db: Db, petId: number): Promise<number[]> {
-  const { rows } = await db.query<{ id: number }>(`SELECT DISTINCT adopter_id AS id FROM "Adoption" WHERE pet_id = $1`, [petId]);
-  return rows.map((row) => row.id);
-}

@@ -84,10 +84,12 @@ export async function cancelAdoption(
     // RN-130
     if (await releaseReservedPet(client, adoption.petId)) {
       await auditPetStatus(client, userId, adoption.petId, "RESERVED", "AVAILABLE");
-      for (const candidate of await selectNotSelectedAdopters(client, adoption.petId)) {
+      const notSelected = await selectNotSelectedAdopters(client, adoption.petId);
+      for (const candidate of notSelected) {
         await createNotification(client, { userId: candidate, type: "PET_AVAILABLE_AGAIN", params: { petName: adoption.petName }, link: { petId: adoption.petId } });
       }
-      await alertPetAvailable(client, adoption.petId); // RN-199, RN-200
+      // RN-199, RN-200: the adopter of this adoption and the candidates were already told
+      await alertPetAvailable(client, adoption.petId, [adoption.adopterId, ...notSelected]);
     }
     return "CANCELLED";
   });
@@ -106,7 +108,7 @@ export async function deliverAdoption(shelterId: number, adoptionId: number): Pr
       details: { before: { status: "APPROVED" }, after: { status: "COMPLETED" } },
     });
     await setPetStatus(client, adoption.petId, "ADOPTED");
-    await alertFavorites(client, adoption.petId, "ADOPTED"); // RN-200
+    await alertFavorites(client, adoption.petId, "ADOPTED", [adoption.adopterId]); // RN-200
     await auditPetStatus(client, shelterId, adoption.petId, "RESERVED", "ADOPTED");
     return "COMPLETED";
   });
@@ -125,7 +127,7 @@ export async function returnAdoption(shelterId: number, adoptionId: number, reas
       details: { before: { status: "COMPLETED" }, after: { status: "RETURNED", reason } },
     });
     await setPetStatus(client, adoption.petId, "AVAILABLE");
-    await alertPetAvailable(client, adoption.petId); // RN-199, RN-200
+    await alertPetAvailable(client, adoption.petId, [adoption.adopterId]); // RN-199, RN-200
     await auditPetStatus(client, shelterId, adoption.petId, "ADOPTED", "AVAILABLE");
     return "RETURNED";
   });
