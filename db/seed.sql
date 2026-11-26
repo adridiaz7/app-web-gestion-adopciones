@@ -160,4 +160,131 @@ FROM (VALUES
 JOIN "Pet" pet ON pet.name = ph.pet_name
 JOIN "Shelter" s ON s.user_id = pet.shelter_id AND s.cif IN ('G48123457', 'G31123458', 'G01123459');
 
+-- -----------------------------------------------------------------------------
+-- History for the demo (T-42): household data, preferences, favourites, visit
+-- slots, visits, one adoption request and chats. Every date is relative to the day
+-- the seed runs, and slot times are Madrid times, so the demo always looks current.
+--
+-- One more demo account (verified, same password: Lagun-demo-2026):
+--   iker@lagun.test   adopter "Iker Goikoetxea"
+--
+-- What each account finds:
+--   adoptante@lagun.test  visited Pistacho (Can Solo) 5 days ago and can apply to adopt
+--                         him; a confirmed visit to Diana (Nakama) in 3 days; a request
+--                         for Txuri (Txiki) waiting for an answer; favourites; chats.
+--   iker@lagun.test       visited Pistacho 20 days ago and has already applied to adopt
+--                         him; cancelled a visit to Paco (Nakama).
+--   cansolo@lagun.test    Iker's adoption request, Ane's completed visit, chats.
+--   nakama@lagun.test     Ane's confirmed visit in its calendar.
+--   protectora@lagun.test Ane's pending visit request, to confirm or reject.
+-- -----------------------------------------------------------------------------
+
+-- Household data (RN-27) of Ane, so she can apply for an adoption in the demo.
+UPDATE "Adopter"
+SET housing_type = 'HOUSE', has_outdoor_space = true, housing_tenure = 'OWNED', household_members = 2,
+    has_children = false, has_other_pets = false, has_pet_experience = true, hours_alone_per_day = 4
+WHERE user_id = (SELECT id FROM "App_user" WHERE email = 'adoptante@lagun.test');
+
+INSERT INTO "App_user" (email, password_hash, role, email_verified_at, terms_accepted_at)
+VALUES ('iker@lagun.test', '$argon2id$v=19$m=19456,t=2,p=1$MbyFPFJQLwNBv+G35ujGXA$VLOWtIsSo4xMxyvj2zrhnnlpIwsUXRgomZ4bynQeBOk',
+        'ADOPTER', now(), now());
+
+INSERT INTO "Adopter" (user_id, first_name, last_name, phone, birth_date, province_id, locality,
+                       housing_type, has_outdoor_space, housing_tenure, household_members, has_children,
+                       has_other_pets, other_pets_description, has_pet_experience, hours_alone_per_day)
+SELECT id, 'Iker', 'Goikoetxea', '600654321', DATE '1988-09-23', 48, 'Getxo',
+       'APARTMENT', true, 'RENTED', 3, true, true, 'Una gata de 6 años, muy tranquila.', true, 5
+FROM "App_user" WHERE email = 'iker@lagun.test';
+
+-- Ane's preferences questionnaire (CU-08): dogs and cats, small or medium.
+INSERT INTO "Adopter_preferences" (adopter_id, sizes, sexes, activity_levels, min_age_months, max_age_months)
+SELECT id, ARRAY['SMALL', 'MEDIUM'], '{}', '{}', NULL, 120
+FROM "App_user" WHERE email = 'adoptante@lagun.test';
+
+INSERT INTO adopter_preferences_species_rel (adopter_id, species_id, is_wanted, must_get_along)
+SELECT u.id, sp.id, true, false
+FROM "App_user" u CROSS JOIN "Species" sp
+WHERE u.email = 'adoptante@lagun.test' AND sp.name IN ('Perro', 'Gato');
+
+-- Favourites and one recent discard (within the 15 days of RN-71).
+INSERT INTO adopter_pet_rel (adopter_id, pet_id, type, created_at)
+SELECT u.id, p.id, f.type, now() - f.ago
+FROM (VALUES
+  ('adoptante@lagun.test', 'Pistacho', 'FAVORITE',  interval '8 days'),
+  ('adoptante@lagun.test', 'Diana',    'FAVORITE',  interval '6 days'),
+  ('adoptante@lagun.test', 'Txuri',    'FAVORITE',  interval '4 days'),
+  ('adoptante@lagun.test', 'Beltza',   'DISCARDED', interval '2 days'),
+  ('iker@lagun.test',      'Pistacho', 'FAVORITE',  interval '9 days'),
+  ('iker@lagun.test',      'Paprika',  'FAVORITE',  interval '3 days')
+) AS f (email, pet_name, type, ago)
+JOIN "App_user" u ON u.email = f.email
+JOIN "Pet" p ON p.name = f.pet_name;
+
+-- Visit slots: some in the past (history) and some in the coming days, from 10:00 to 11:00.
+INSERT INTO "Visit_slot" (shelter_id, starts_at, ends_at, capacity, created_at)
+SELECT s.user_id,
+       ((current_date + d.day_offset) + time '10:00') AT TIME ZONE 'Europe/Madrid',
+       ((current_date + d.day_offset) + time '11:00') AT TIME ZONE 'Europe/Madrid',
+       2, now() - interval '30 days'
+FROM "Shelter" s
+CROSS JOIN (VALUES (-20), (-5), (3), (5), (7), (10)) AS d (day_offset)
+WHERE s.cif IN ('G20123456', 'G48123457', 'G31123458', 'G01123459');
+
+-- Visits, each in the slot of its shelter starting on that day.
+INSERT INTO "Visit" (adopter_id, shelter_id, pet_id, slot_id, status, responded_at, cancelled_by, cancelled_at,
+                     attendance_marked_by, attendance_marked_at, created_at)
+SELECT u.id, p.shelter_id, p.id, vs.id, v.status,
+       CASE WHEN v.status IN ('CONFIRMED', 'COMPLETED') THEN now() - v.requested_ago + interval '3 hours' END,
+       CASE WHEN v.status = 'CANCELLED' THEN 'ADOPTER' END,
+       CASE WHEN v.status = 'CANCELLED' THEN now() - v.requested_ago + interval '1 day' END,
+       CASE WHEN v.status = 'COMPLETED' THEN 'SHELTER' END,
+       CASE WHEN v.status = 'COMPLETED' THEN vs.ends_at + interval '2 hours' END,
+       now() - v.requested_ago
+FROM (VALUES
+  ('adoptante@lagun.test', 'Pistacho', -5, 'COMPLETED', interval '9 days'),
+  ('iker@lagun.test',      'Pistacho', -20, 'COMPLETED', interval '25 days'),
+  ('iker@lagun.test',      'Paco',      -5, 'CANCELLED', interval '10 days'),
+  ('adoptante@lagun.test', 'Diana',     3, 'CONFIRMED', interval '2 days'),
+  ('adoptante@lagun.test', 'Txuri',     5, 'PENDING',   interval '2 hours')
+) AS v (email, pet_name, day_offset, status, requested_ago)
+JOIN "App_user" u ON u.email = v.email
+JOIN "Pet" p ON p.name = v.pet_name
+JOIN "Visit_slot" vs ON vs.shelter_id = p.shelter_id
+                    AND vs.starts_at = ((current_date + v.day_offset) + time '10:00') AT TIME ZONE 'Europe/Madrid';
+
+-- Iker applies to adopt Pistacho after his completed visit (RN-113, RN-114).
+INSERT INTO "Adoption" (adopter_id, pet_id, visit_id, questionnaire_answers, created_at)
+SELECT v.adopter_id, v.pet_id, v.id,
+       '{"reason": "Mis hijos y yo nos enamoramos de Pistacho en la visita. Tenemos tiempo para paseos largos.", "canAffordCosts": true}'::jsonb,
+       now() - interval '1 day'
+FROM "Visit" v
+JOIN "App_user" u ON u.id = v.adopter_id AND u.email = 'iker@lagun.test'
+JOIN "Pet" p ON p.id = v.pet_id AND p.name = 'Pistacho'
+WHERE v.status = 'COMPLETED';
+
+-- One conversation per adopter and shelter with a visit (RN-133, RN-134).
+INSERT INTO "Conversation" (adopter_id, shelter_id, created_at)
+SELECT adopter_id, shelter_id, min(created_at)
+FROM "Visit"
+GROUP BY adopter_id, shelter_id;
+
+-- Messages: the older ones already read, the last one of each chat still unread.
+INSERT INTO "Message" (conversation_id, sender_id, body, read_at, created_at)
+SELECT c.id, CASE m.sender WHEN 'ADOPTER' THEN c.adopter_id ELSE c.shelter_id END, m.body,
+       CASE WHEN m.unread THEN NULL ELSE now() - m.ago + interval '10 minutes' END,
+       now() - m.ago
+FROM (VALUES
+  ('adoptante@lagun.test', 'G48123457', 'ADOPTER', '¡Hola! ¿Pistacho se lleva bien con otros perros?', interval '9 days', false),
+  ('adoptante@lagun.test', 'G48123457', 'SHELTER', 'Hola, Ane. Sí, es muy sociable. Te esperamos en la visita.', interval '9 days' - interval '2 hours', false),
+  ('adoptante@lagun.test', 'G48123457', 'ADOPTER', 'Gracias por la visita, Pistacho es un encanto. Me lo voy a pensar.', interval '4 days', false),
+  ('adoptante@lagun.test', 'G48123457', 'SHELTER', 'Un placer. Si quieres adoptarlo, puedes enviarnos la solicitud desde su ficha.', interval '4 days' - interval '1 hour', true),
+  ('adoptante@lagun.test', 'G31123458', 'ADOPTER', 'Hola, ¿puedo llevar a mi pareja a la visita de Diana?', interval '1 day', false),
+  ('adoptante@lagun.test', 'G31123458', 'SHELTER', 'Claro que sí, os esperamos a los dos.', interval '20 hours', true),
+  ('iker@lagun.test',      'G48123457', 'ADOPTER', 'Hola, me encantó conocer a Pistacho. Os acabo de enviar la solicitud de adopción de Pistacho.', interval '1 day', false),
+  ('iker@lagun.test',      'G48123457', 'SHELTER', 'Recibida, Iker. La revisamos esta semana y te decimos algo.', interval '22 hours', true)
+) AS m (email, cif, sender, body, ago, unread)
+JOIN "App_user" u ON u.email = m.email
+JOIN "Shelter" s ON s.cif = m.cif
+JOIN "Conversation" c ON c.adopter_id = u.id AND c.shelter_id = s.user_id;
+
 COMMIT;

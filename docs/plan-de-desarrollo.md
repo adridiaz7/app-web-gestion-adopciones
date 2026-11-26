@@ -317,7 +317,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | PENDIENTE |
+| T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | EN_REVISION |
 
 ### Para el final, si da tiempo
 
