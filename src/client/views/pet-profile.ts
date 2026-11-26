@@ -1,5 +1,6 @@
 import type { AdoptionEligibilityResponse, PetProfile } from "../../shared/api.js";
 import { adoptionNoticeLink } from "../adoption-eligibility.js";
+import { removePet } from "../api/admin.js";
 import { getAdoptionEligibility } from "../api/adoptions.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
@@ -77,8 +78,27 @@ function adoptionAction(pet: PetProfile, eligibility: Eligibility | null): HTMLE
   );
 }
 
+/** CU-41, RN-163: "Retirar ficha", after a confirmation; the shelter cannot reactivate it (RN-64). */
+function removeButton(pet: PetProfile, message: HTMLElement): HTMLElement {
+  const button = h("button", { type: "button", class: "button button--danger" }, "Retirar ficha");
+  button.addEventListener("click", () => {
+    if (!window.confirm(`¿Retirar la ficha de ${pet.name} por contenido inapropiado? La protectora no podrá reactivarla.`)) return;
+    button.disabled = true;
+    removePet(pet.id).then(
+      () => {
+        message.replaceChildren(notice("success", `Has retirado la ficha de ${pet.name}.`));
+      },
+      (error: unknown) => {
+        button.disabled = false;
+        message.replaceChildren(notice("error", error instanceof ApiError ? error.message : "No se ha podido retirar la ficha."));
+      },
+    );
+  });
+  return button;
+}
+
 /** `favorite`: null when the user is not an adopter (only adopters keep favourites, CU-12). */
-function profileContent(pet: PetProfile, favorite: boolean | null, eligibility: Eligibility | null): Node[] {
+function profileContent(pet: PetProfile, favorite: boolean | null, eligibility: Eligibility | null, isAdmin = false): Node[] {
   const message = h("div", {});
   // RN-46: species without a record are unknown, so they are not listed.
   const livesWith: [string, string][] = pet.getsAlongWith.map((g) => [`Con ${g.speciesName.toLowerCase()}s`, g.getsAlong ? "Se lleva bien" : "No se lleva bien"]);
@@ -128,6 +148,8 @@ function profileContent(pet: PetProfile, favorite: boolean | null, eligibility: 
         favorite === null ? null : adoptionAction(pet, eligibility),
         // RN-73: the same favourite as in the gallery and discover mode.
         favorite === null ? null : favoriteButton(pet.id, favorite, (text) => message.replaceChildren(notice("error", text)), true),
+        // CU-41: the administrator removes a pet with inappropriate content.
+        isAdmin ? removeButton(pet, message) : null,
         message,
       ),
     ),
@@ -169,7 +191,7 @@ export async function renderPetProfile(root: HTMLElement, params: RouteParams): 
       // T-52: if the check fails, the button stays enabled and the server answers on submit.
       adopter ? getAdoptionEligibility(id).then((r) => r.eligibility, () => null) : Promise.resolve(null),
     ]);
-    content = profileContent(pet, favorites, eligibility);
+    content = profileContent(pet, favorites, eligibility, user.role === "ADMIN");
   } catch (error) {
     content = [
       h("a", { class: "back-link", href: "/mascotas" }, "← Volver a explorar"),

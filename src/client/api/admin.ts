@@ -28,3 +28,6 @@ export const suspendUser = (id: number, body: SuspendUserRequest) => apiRequest<
 
 /** CU-40, RN-156 */
 export const reactivateUser = (id: number) => apiRequest<undefined>("POST", `/admin/users/${String(id)}/reactivate`);
+
+/** CU-41, RN-163: only an available pet. */
+export const removePet = (id: number) => apiRequest<undefined>("POST", `/admin/pets/${String(id)}/remove`);

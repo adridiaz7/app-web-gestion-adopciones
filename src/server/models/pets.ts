@@ -154,3 +154,9 @@ export async function markPetUnlisted(db: Db, petId: number, reason: UnlistReaso
 export async function markPetReactivated(db: Db, petId: number): Promise<void> {
   await db.query(`UPDATE "Pet" SET status = 'AVAILABLE', unlist_reason = NULL, unlisted_at = NULL, updated_at = now() WHERE id = $1`, [petId]);
 }
+
+/** CU-41: the status of any pet, locked; null if it does not exist. */
+export async function lockPetStatus(db: Db, petId: number): Promise<string | null> {
+  const { rows } = await db.query<{ status: string }>(`SELECT status FROM "Pet" WHERE id = $1 FOR UPDATE`, [petId]);
+  return rows[0]?.status ?? null;
+}
