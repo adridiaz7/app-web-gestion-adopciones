@@ -168,6 +168,14 @@ No he tocado nada. T-51 queda `BLOQUEADA`.
 
 **26/11/2026 · T-36 (no bloquea).** CU-06 se contradice sobre el **CIF** (y el nombre) de la protectora. El objetivo enumera los datos públicos que puede modificar (descripción, logo, dirección, teléfono, email de contacto, web y horario), sin el nombre ni el CIF. Pero una excepción dice "el CIF nuevo ya está registrado por otra protectora", como si se pudiera cambiar. Además, dejar cambiar el CIF de una protectora ya validada se saltaría la comprobación del administrador (RN-16). Se ha implementado lo que dice el objetivo: la protectora edita descripción, logo, dirección (con provincia y localidad), teléfono, email de contacto, web y horario; el **nombre y el CIF se muestran pero no se editan**. ¿Es correcto? Si deben poder cambiarse, ¿la protectora vuelve a `PENDING` para que el administrador revise el CIF nuevo? Se haría en una tarea aparte con tests nuevos.
 
+**26/11/2026 · T-37 (bloquea T-37).** Para eliminar la cuenta (CU-07, RN-11–13, RN-210) faltan cuatro decisiones:
+- **(a) Motivo de baja de las mascotas** al eliminar una protectora (RN-12: "sus mascotas pasan a `BAJA`"). `Pet.unlist_reason` es obligatorio en `UNLISTED`, pero su `CHECK` no tiene un valor para esto. Opciones: usar `OTHER`, o añadir `ACCOUNT_DELETED` al `CHECK` de `db/schema.sql` (y al modelo de datos). Recomiendo añadir `ACCOUNT_DELETED`.
+- **(b) Qué mascotas pasan a baja.** ¿Todas, o solo las `AVAILABLE` y `RESERVED`? Propuesta: las `AVAILABLE` y `RESERVED` (una `RESERVED` vuelve a baja y su adopción aprobada se anula con `ACCOUNT_DELETED`); las `ADOPTED` se quedan como están, porque son historial.
+- **(c) Alcance de RN-210 en el registro de auditoría.** Propuesta: en las entradas cuyo `entity_type`/`entity_id` es el perfil eliminado (`Adopter` o `Shelter`), por ejemplo `PROFILE_UPDATED`, se vacían los valores de `details` (se conservan las claves que cambiaron, no los valores), y se borra `ip_address` de las entradas de esa cuenta. `actor_user_id` se mantiene, porque apunta a la cuenta ya anonimizada.
+- **(d) Confirmación (excepción de CU-07).** ¿Basta con una confirmación en la pantalla y un `confirm: true` en la petición, o hay que pedir la contraseña actual? Propuesta: pedir la contraseña actual, porque es una acción irreversible.
+
+Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted.invalid` (sigue siendo único), contraseña inutilizable, nombre "Usuario eliminado", teléfono, localidad y datos del hogar vacíos; en la protectora, también CIF (un valor único ficticio), dirección, descripción, logo, web, horario y email de contacto. Se cierran sus sesiones. T-37 queda `BLOQUEADA`.
+
 ---
 
 ## 5. Tareas
@@ -272,7 +280,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | PENDIENTE |
+| T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | BLOQUEADA |
 | T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | PENDIENTE |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | PENDIENTE |
 | T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | PENDIENTE |
