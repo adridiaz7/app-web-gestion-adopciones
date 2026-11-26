@@ -75,3 +75,45 @@ export async function updateHousehold(db: Db, adopterId: number, h: Household): 
     ],
   );
 }
+
+/** CU-06: the personal data of the profile (the email lives in "App_user"). */
+export interface AdopterPersonalData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  /** YYYY-MM-DD */
+  birthDate: string;
+  provinceId: number;
+  locality: string;
+}
+
+export interface AdopterProfileRow extends AdopterPersonalData {
+  email: string;
+  household: Household;
+}
+
+/** CU-06: the adopter's own profile. With `forUpdate`, the row stays locked until the end of the transaction. */
+export async function selectAdopterProfile(db: Db, adopterId: number, forUpdate = false): Promise<AdopterProfileRow | null> {
+  const { rows } = await db.query<AdopterPersonalData & { email: string }>(
+    `SELECT u.email, a.first_name AS "firstName", a.last_name AS "lastName", a.phone,
+            to_char(a.birth_date, 'YYYY-MM-DD') AS "birthDate", a.province_id AS "provinceId", a.locality
+       FROM "Adopter" a JOIN "App_user" u ON u.id = a.user_id
+      WHERE a.user_id = $1${forUpdate ? " FOR UPDATE OF a" : ""}`,
+    [adopterId],
+  );
+  const row = rows[0];
+  if (!row) return null;
+  const household = await selectHousehold(db, adopterId);
+  if (!household) return null;
+  return { ...row, household };
+}
+
+/** CU-06: updates the personal data of the profile. */
+export async function updateAdopterPersonalData(db: Db, adopterId: number, p: AdopterPersonalData): Promise<void> {
+  await db.query(
+    `UPDATE "Adopter"
+        SET first_name = $2, last_name = $3, phone = $4, birth_date = $5, province_id = $6, locality = $7, updated_at = now()
+      WHERE user_id = $1`,
+    [adopterId, p.firstName, p.lastName, p.phone, p.birthDate, p.provinceId, p.locality],
+  );
+}

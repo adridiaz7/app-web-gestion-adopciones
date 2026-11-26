@@ -108,3 +108,50 @@ export async function markShelterRejected(db: Db, id: number, reason: string): P
     [id, reason],
   );
 }
+
+/** CU-06: the public data a shelter edits from its profile. */
+export interface ShelterPublicData {
+  description: string | null;
+  address: string;
+  provinceId: number;
+  locality: string;
+  phone: string;
+  contactEmail: string | null;
+  website: string | null;
+  openingHours: string | null;
+}
+
+export interface ShelterOwnProfile extends ShelterPublicData {
+  email: string;
+  name: string;
+  cif: string;
+  logoUrl: string | null;
+}
+
+/** CU-06: the shelter's own profile. With `forUpdate`, the row stays locked until the end of the transaction. */
+export async function selectShelterOwnProfile(db: Db, shelterId: number, forUpdate = false): Promise<ShelterOwnProfile | null> {
+  const { rows } = await db.query<ShelterOwnProfile>(
+    `SELECT u.email, s.name, s.cif, s.description, s.logo_path AS "logoUrl", s.address, s.province_id AS "provinceId",
+            s.locality, s.phone, s.contact_email AS "contactEmail", s.website, s.opening_hours AS "openingHours"
+       FROM "Shelter" s JOIN "App_user" u ON u.id = s.user_id
+      WHERE s.user_id = $1${forUpdate ? " FOR UPDATE OF s" : ""}`,
+    [shelterId],
+  );
+  return rows[0] ?? null;
+}
+
+/** CU-06: updates the public data of the shelter. */
+export async function updateShelterPublicData(db: Db, shelterId: number, p: ShelterPublicData): Promise<void> {
+  await db.query(
+    `UPDATE "Shelter"
+        SET description = $2, address = $3, province_id = $4, locality = $5, phone = $6, contact_email = $7,
+            website = $8, opening_hours = $9, updated_at = now()
+      WHERE user_id = $1`,
+    [shelterId, p.description, p.address, p.provinceId, p.locality, p.phone, p.contactEmail, p.website, p.openingHours],
+  );
+}
+
+/** CU-06, RN-52: sets (or clears, with null) the path of the shelter's logo. */
+export async function updateShelterLogo(db: Db, shelterId: number, logoPath: string | null): Promise<void> {
+  await db.query(`UPDATE "Shelter" SET logo_path = $2, updated_at = now() WHERE user_id = $1`, [shelterId, logoPath]);
+}

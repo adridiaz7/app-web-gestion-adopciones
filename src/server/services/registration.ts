@@ -29,7 +29,7 @@ export function isAdult(birthDate: string, today: string): boolean {
 const madridDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" });
 
 /** Today's date in Spain, as `YYYY-MM-DD`. */
-function madridToday(): string {
+export function madridToday(): string {
   return madridDate.format(new Date());
 }
 

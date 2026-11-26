@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getDiscover, postDiscard, postFavorite, postUndo } from "../controllers/discover.js";
 import { deleteDiscard, deleteFavorite, getDiscards, getFavorites, putFavorite } from "../controllers/favorites.js";
 import { getAdopterAdoptions, getMyHousehold, postAdopterCancelAdoption, postAdoption } from "../controllers/adoptions.js";
+import { getMyAdopterProfile, putMyAdopterProfile } from "../controllers/adopter-profile.js";
 import { getMyPreferences, putMyPreferences } from "../controllers/preferences.js";
 import {
   getAdopterVisits,
@@ -18,6 +19,9 @@ import { requireRole } from "../middlewares/session.js";
 export function createAdopterRouter(): Router {
   const router = Router();
   router.use(requireRole("ADOPTER"));
+
+  router.get("/profile", getMyAdopterProfile);
+  router.put("/profile", putMyAdopterProfile);
 
   router.get("/preferences", getMyPreferences);
   router.put("/preferences", putMyPreferences);

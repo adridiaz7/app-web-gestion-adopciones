@@ -680,3 +680,47 @@ export interface AdopterAdoptionsResponse {
 export interface ShelterAdoptionsResponse {
   adoptions: { id: number; status: string; petId: number; petName: string; adopterId: number; adopterName: string; deliveredAt: string | null }[];
 }
+
+/** CU-06 · the adopter's own profile (birthDate as YYYY-MM-DD). The email changes only through CU-49. */
+export interface AdopterProfile {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  birthDate: string;
+  provinceId: number;
+  locality: string;
+  household: Household;
+}
+
+/** CU-06 · body of PUT /api/adopter/profile (RN-27: the household data may be left empty). */
+export type AdopterProfileUpdate = Omit<AdopterProfile, "email">;
+
+/** CU-06 · GET and PUT /api/adopter/profile */
+export interface AdopterProfileResponse {
+  profile: AdopterProfile;
+}
+
+/** CU-06 · the shelter's own profile. Name and CIF are shown but not edited here. */
+export interface ShelterProfile {
+  email: string;
+  name: string;
+  cif: string;
+  description: string | null;
+  logoUrl: string | null;
+  address: string;
+  provinceId: number;
+  locality: string;
+  phone: string;
+  contactEmail: string | null;
+  website: string | null;
+  openingHours: string | null;
+}
+
+/** CU-06 · body of PUT /api/shelter/profile: the public data (the logo has its own endpoint). */
+export type ShelterProfileUpdate = Omit<ShelterProfile, "email" | "name" | "cif" | "logoUrl">;
+
+/** CU-06 · GET and PUT /api/shelter/profile, POST and DELETE /api/shelter/profile/logo */
+export interface ShelterProfileResponse {
+  profile: ShelterProfile;
+}

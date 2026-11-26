@@ -10,6 +10,7 @@ import {
   postShelterCancelAdoption,
 } from "../controllers/adoptions.js";
 import { getShelterAdopter } from "../controllers/shelter-adopters.js";
+import { deleteLogo, getMyShelterProfile, postLogo, putMyShelterProfile, receiveLogo } from "../controllers/shelter-profile.js";
 import { getPet, getPets, postPet, postReactivatePet, postUnlistPet, putPet } from "../controllers/shelter-pets.js";
 import { getInbox, postConfirmVisit, postNoShow, postRejectVisit, postShelterCancelVisit } from "../controllers/visits.js";
 import { deleteSlotHandler, getSlots, postRecurringSlots, postSlot, putSlot } from "../controllers/visit-slots.js";
@@ -19,6 +20,11 @@ import { requireRole } from "../middlewares/session.js";
 export function createShelterRouter(): Router {
   const router = Router();
   router.use(requireRole("SHELTER"));
+
+  router.get("/profile", getMyShelterProfile);
+  router.put("/profile", putMyShelterProfile);
+  router.post("/profile/logo", receiveLogo, postLogo);
+  router.delete("/profile/logo", deleteLogo);
 
   router.get("/pets", getPets);
   router.post("/pets", postPet);

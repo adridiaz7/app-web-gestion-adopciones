@@ -23,30 +23,37 @@ function shelterId(user: Request["user"]): number {
 }
 
 /**
- * Reads one file from the multipart field "photo" into memory, limited to the configured
- * size, and translates multer's errors into messages for the user.
+ * Reads one image from the multipart field `field` into memory, limited to the configured
+ * size, and translates multer's errors into messages for the user. `noun` names the file
+ * in them ("foto", "logo").
  */
-export const receivePhoto: RequestHandler = (req, res, next) => {
-  const { maxPhotoSizeMb } = getConfig();
-  const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: maxPhotoSizeMb * 1024 * 1024, files: 1 },
-  }).single("photo");
+export function receiveImage(field: string, noun: string): RequestHandler {
+  return (req, res, next) => {
+    const { maxPhotoSizeMb } = getConfig();
+    const upload = multer({
+      storage: multer.memoryStorage(),
+      limits: { fileSize: maxPhotoSizeMb * 1024 * 1024, files: 1 },
+    }).single(field);
 
-  upload(req, res, (error: unknown) => {
-    if (error instanceof multer.MulterError) {
-      next(
-        new BadRequestError(
-          error.code === "LIMIT_FILE_SIZE"
-            ? `La foto no puede ocupar más de ${String(maxPhotoSizeMb)} MB.`
-            : "Sube una sola foto en el campo «photo».",
-        ),
-      );
-      return;
-    }
-    next(error);
-  });
-};
+    upload(req, res, (error: unknown) => {
+      if (error instanceof multer.MulterError) {
+        const article = noun === "foto" ? "La" : "El";
+        next(
+          new BadRequestError(
+            error.code === "LIMIT_FILE_SIZE"
+              ? `${article} ${noun} no puede ocupar más de ${String(maxPhotoSizeMb)} MB.`
+              : `Sube ${article === "La" ? "una sola" : "un solo"} ${noun} en el campo «${field}».`,
+          ),
+        );
+        return;
+      }
+      next(error);
+    });
+  };
+}
+
+/** The pet photos come in the multipart field "photo". */
+export const receivePhoto = receiveImage("photo", "foto");
 
 /** CU-16 · GET /api/shelter/pets/:id/photos */
 export const getPhotos: RequestHandler = async (req, res) => {

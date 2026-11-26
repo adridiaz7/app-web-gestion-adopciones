@@ -3,6 +3,7 @@ import { h } from "../dom.js";
 import { navigate } from "../router.js";
 import { brand } from "./auth-layout.js";
 import { notificationBell } from "./notification-bell.js";
+import { profileCard } from "./profile-card.js";
 
 const ROLE_LABELS: Record<SessionUser["role"], string> = {
   ADOPTER: "Adoptante",
@@ -38,6 +39,7 @@ export function appLayout(user: SessionUser, nav: NavItem[], content: Node[]): H
       "aside",
       { class: "sidebar" },
       brand(),
+      profileCard(user),
       h(
         "nav",
         { class: "sidebar__nav", "aria-label": "Secciones" },

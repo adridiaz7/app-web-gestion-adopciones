@@ -10,7 +10,7 @@ import { logIn, logOut } from "../services/sessions.js";
 
 const REQUIRED = "Este campo es obligatorio.";
 
-const requiredText = (max: number) =>
+export const requiredText = (max: number) =>
   z
     .string({ error: REQUIRED })
     .trim()
@@ -37,7 +37,7 @@ export const phoneSchema = z
 
 const PROVINCE = "Elige una provincia.";
 // "Province".id is a smallint: a larger value would reach PostgreSQL and fail as a 500.
-const provinceIdSchema = z
+export const provinceIdSchema = z
   .number({ error: PROVINCE })
   .int({ error: PROVINCE })
   .positive({ error: PROVINCE })

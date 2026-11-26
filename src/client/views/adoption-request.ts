@@ -4,6 +4,7 @@ import { ApiError } from "../api/client.js";
 import { getHousehold, requestAdoption } from "../api/adoptions.js";
 import { getPetProfile } from "../api/pets.js";
 import { appLayout } from "../components/app-layout.js";
+import { boolChoice, numberField as numberInput, radios as radioGroup, YES_NO } from "../components/choice-fields.js";
 import { onSubmit, submitButton, textValue } from "../components/form.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
@@ -11,39 +12,15 @@ import { h, mount } from "../dom.js";
 import { navigate, type RouteParams } from "../router.js";
 
 type Choice = [string, string];
-const YES_NO: Choice[] = [
-  ["true", "Sí"],
-  ["false", "No"],
-];
 
-/** A group of radio buttons with room for its error, `value` checked. */
-function radios(name: string, legend: string, choices: Choice[], value: string | null): HTMLElement {
-  return h(
-    "fieldset",
-    { class: "field radio-group", "data-field": `household.${name}` },
-    h("legend", {}, legend),
-    h(
-      "div",
-      { class: "radio-group__options" },
-      ...choices.map(([optionValue, label]) =>
-        h("label", { class: "checkbox" }, h("input", { type: "radio", name, value: optionValue, checked: optionValue === value }), label),
-      ),
-    ),
-    h("p", { class: "field__error" }),
-  );
-}
+/** The household questions answer to the API's `household.<field>` errors. */
+const radios = (name: string, legend: string, choices: Choice[], value: string | null): HTMLElement =>
+  radioGroup(name, legend, choices, value, `household.${name}`);
 
-function numberField(name: string, label: string, value: number | null, min: number, max: number): HTMLElement {
-  return h(
-    "div",
-    { class: "field", "data-field": `household.${name}` },
-    h("label", { for: `field-${name}` }, label),
-    h("input", { id: `field-${name}`, name, type: "number", min: String(min), max: String(max), value: value === null ? undefined : String(value) }),
-    h("p", { class: "field__error" }),
-  );
-}
+const numberField = (name: string, label: string, value: number | null, min: number, max: number): HTMLElement =>
+  numberInput(name, label, value, min, max, `household.${name}`);
 
-const bool = (value: boolean | null): string | null => (value === null ? null : String(value));
+const bool = boolChoice;
 
 /**
  * CU-27, RN-207 · /mascotas/:id/adoptar: first the household data of the profile, already
