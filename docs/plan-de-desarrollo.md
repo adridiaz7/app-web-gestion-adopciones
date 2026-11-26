@@ -186,6 +186,12 @@ Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted
 - **Validez del enlace al email nuevo:** 24 h, la misma que la verificación de email (RN-177). Cada petición nueva anula el enlace anterior sin usar, pero **no hay espera de 5 minutos** entre peticiones (RN-180 solo habla de la verificación). Si el email nuevo ya está registrado, se responde igual y no se envía nada. Si se registra antes de abrir el enlace, el enlace deja de valer.
 - **Auditoría (RN-208):** `PASSWORD_CHANGED` y `EMAIL_CHANGED`, sin guardar las direcciones, para que no queden datos personales en el registro al eliminar la cuenta (RN-210).
 
+**26/11/2026 · T-42 (bloquea T-42).** T-42 es la única tarea `PENDIENTE`, pero no se puede empezar:
+- depende de "todas las anteriores", y T-46 (el seed visual con fotos, que T-42 amplía con el historial) está `BLOQUEADA` porque `db/seed-photos/` no existe en `develop`;
+- la propia T-42 pide fotos de ejemplo guardadas en el repositorio, que son las mismas de T-46.
+
+Hacer ahora solo el historial obligaría a rehacerlo cuando T-46 añada las protectoras y mascotas de la demo. T-42 queda `BLOQUEADA`; cuando se suban las fotos a `db/seed-photos/`, T-46 y T-42 pueden pasar a `PENDIENTE` (primero T-46). No queda ninguna otra tarea disponible: el resto está `APROBADA`, `EN_REVISION` (T-38, T-40, T-43) o `BLOQUEADA` (T-46, T-47, T-51).
+
 ---
 
 ## 5. Tareas
@@ -301,7 +307,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | PENDIENTE |
+| T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | BLOQUEADA |
 
 ### Para el final, si da tiempo
 
