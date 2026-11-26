@@ -80,6 +80,7 @@ Las reglas de `CLAUDE.md` se aplican igual en modo autónomo. En las ejecuciones
 | **Preguntas del cuestionario de adopción** (RN-207). | T-30 | **Decidido (25/11/2026):** el formulario muestra los datos del hogar del perfil ya rellenados; siguen siendo obligatorios (RN-117) y se pueden corregir allí mismo. Además hay dos preguntas opcionales (motivo y gastos). Se añade `RENT_TO_OWN` a `housing_tenure`. Ver RN-27 y RN-207. |
 | **Filtros de la galería:** ¿en una línea compacta (maqueta 02) o en un panel lateral con casillas, como en una tienda, que en el móvil se abre con un botón "Filtros"? | T-47, punto 4 | Pendiente del responsable. Mientras tanto, T-47 sigue la maqueta 02. |
 | **Inicio del adoptante** (qué ve nada más iniciar sesión). Propuesta: avisos de lo que le falta (preferencias, datos del hogar), lo que tiene en marcha (próxima visita, solicitudes abiertas, favoritos que han cambiado de estado) y de 4 a 6 mascotas compatibles con un botón a Descubrir. | Nueva tarea cuando se decida | Pendiente del responsable. No se toca la pantalla de inicio actual. |
+| **Revisión de la app por el responsable antes del pulido visual** (26/11/2026). Cuando T-32 y T-36 estén terminadas, el responsable revisa la app y decide los ajustes del pulido. | T-47 | Pendiente del responsable. T-47 queda `BLOQUEADA`; solo el responsable la pasa a `PENDIENTE`. |
 
 Cuando el responsable decida, escribe la respuesta en la columna "Estado" y el desarrollador desbloqueará las tareas en su siguiente ejecución.
 
@@ -240,6 +241,15 @@ No he tocado nada. T-51 queda `BLOQUEADA`.
 | T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | APROBADA |
 | T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos; no se modifican los de T-29. | RN-149, 198; decisión del responsable del 25/11/2026 (sección 4) | T-29 | BLOQUEADA |
 
+### Prioridad para la demo (decisión del responsable del 26/11/2026)
+
+Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Proceden de la Fase 8 (T-36) y de la Fase 9 (T-47). El orden es: terminar las funcionalidades clave (T-32, ya hecha, y T-36), luego **el responsable revisa la app** y, con su visto bueno, se hace el pulido visual (T-47). Mientras tanto, el desarrollador sigue con las demás tareas pendientes en el orden de la lista.
+
+| ID | Tarea | Referencias | Depende de | Estado |
+|---|---|---|---|---|
+| T-36 | Editar el perfil (datos personales y del hogar, o datos públicos de la protectora, **logo incluido**, subido con multer como las fotos de T-13). Se entra desde una **tarjeta arriba de la barra lateral**, "Hola, {nombre} · Ver mi perfil" (el nombre de la protectora en su caso), como en las maquetas de `docs/ux-ui/app-adoptante`. | CU-06; RN-25, 27 | T-07 | PENDIENTE |
+| T-47 | **Repaso visual según las maquetas** (indicaciones del responsable del 25/11/2026). Para estas pantallas, las maquetas de `docs/ux-ui/app-adoptante` **dejan de ser solo orientativas**: se siguen fielmente, salvo lo que diga esta tarea. Solo front, sin cambios en reglas ni API. Incluye: **(1) Explorar como una sola sección** con **tabs** Mascotas / Protectoras debajo del título, la activa subrayada en naranja; nada de botones. **(2) Interruptor flotante fijo** abajo en el centro, "Descubrir \| Buscador", para pasar del modo descubrir a la galería sin salir de Explorar. Es un rasgo distintivo de la app. **(3) Modo descubrir como la maqueta `01-explorar-modo-descubrir`:** foto grande, información superpuesta con la protectora encima del nombre y botón "Ver ficha"; botones ✕ y ♥ a los lados con su texto; pista "Arrastra la tarjeta"; al soltar, la tarjeta sale hacia el lado elegido. **(4) Filtros de la galería** compactos, en una sola línea y con menos espacio entre chips, como la maqueta `02-explorar-buscador`, salvo que la sección 3 diga otra cosa. **(5) Iconos SVG propios** junto a cada entrada de la barra lateral, para el adoptante y la protectora: brújula para Explorar, corazón para Favoritos, calendario para Visitas, etc. Con los colores del sistema de diseño y sin emojis. **(6) Logo de la protectora** en pequeño junto a su nombre en la ficha de la mascota, o sus iniciales en un círculo si no tiene logo. **Bloqueada hasta que el responsable revise la app** (sección 3); él la pasará a `PENDIENTE`, quizá con indicaciones nuevas. | Maquetas `docs/ux-ui/app-adoptante`; `docs/ux-ui/design-system.md` | T-32, T-36 | BLOQUEADA |
+
 ### Fase 6 · Adopción
 
 | ID | Tarea | Referencias | Depende de | Estado |
@@ -260,7 +270,6 @@ No he tocado nada. T-51 queda `BLOQUEADA`.
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-36 | Editar el perfil (datos personales y del hogar, o datos públicos de la protectora, **logo incluido**, subido con multer como las fotos de T-13). Se entra desde una **tarjeta arriba de la barra lateral**, "Hola, {nombre} · Ver mi perfil" (el nombre de la protectora en su caso), como en las maquetas de `docs/ux-ui/app-adoptante`. | CU-06; RN-25, 27 | T-07 | PENDIENTE |
 | T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | PENDIENTE |
 | T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | PENDIENTE |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | PENDIENTE |
@@ -271,7 +280,6 @@ No he tocado nada. T-51 queda `BLOQUEADA`.
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-47 | **Repaso visual según las maquetas** (indicaciones del responsable del 25/11/2026). Para estas pantallas, las maquetas de `docs/ux-ui/app-adoptante` **dejan de ser solo orientativas**: se siguen fielmente, salvo lo que diga esta tarea. Solo front, sin cambios en reglas ni API. Incluye: **(1) Explorar como una sola sección** con **tabs** Mascotas / Protectoras debajo del título, la activa subrayada en naranja; nada de botones. **(2) Interruptor flotante fijo** abajo en el centro, "Descubrir \| Buscador", para pasar del modo descubrir a la galería sin salir de Explorar. Es un rasgo distintivo de la app. **(3) Modo descubrir como la maqueta `01-explorar-modo-descubrir`:** foto grande, información superpuesta con la protectora encima del nombre y botón "Ver ficha"; botones ✕ y ♥ a los lados con su texto; pista "Arrastra la tarjeta"; al soltar, la tarjeta sale hacia el lado elegido. **(4) Filtros de la galería** compactos, en una sola línea y con menos espacio entre chips, como la maqueta `02-explorar-buscador`, salvo que la sección 3 diga otra cosa. **(5) Iconos SVG propios** junto a cada entrada de la barra lateral, para el adoptante y la protectora: brújula para Explorar, corazón para Favoritos, calendario para Visitas, etc. Con los colores del sistema de diseño y sin emojis. **(6) Logo de la protectora** en pequeño junto a su nombre en la ficha de la mascota, o sus iniciales en un círculo si no tiene logo. | Maquetas `docs/ux-ui/app-adoptante`; `docs/ux-ui/design-system.md` | T-41 | PENDIENTE |
 | T-42 | **`db/seed.sql` completo para la demo:** protectoras y mascotas ficticias, usuarios con contraseña conocida, historial (visitas, chat, favoritos) y fechas relativas al día de ejecución. Las fotos de ejemplo se guardan en el repositorio y el seed las copia a `uploads/`. | Especificaciones §9 | T-10 y todas las anteriores | PENDIENTE |
 
 ### Para el final, si da tiempo
