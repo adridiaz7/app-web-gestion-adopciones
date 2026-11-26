@@ -176,6 +176,8 @@ No he tocado nada. T-51 queda `BLOQUEADA`.
 
 Datos que se anonimizarían según la propuesta: email → `deleted-<id>@deleted.invalid` (sigue siendo único), contraseña inutilizable, nombre "Usuario eliminado", teléfono, localidad y datos del hogar vacíos; en la protectora, también CIF (un valor único ficticio), dirección, descripción, logo, web, horario y email de contacto. Se cierran sus sesiones. T-37 queda `BLOQUEADA`.
 
+> **Respuesta del responsable (26/11/2026):** De acuerdo con las cuatro propuestas: **(a)** se añade `ACCOUNT_DELETED` al `CHECK` de `unlist_reason` (y al modelo de datos); **(b)** pasan a baja solo las `AVAILABLE` y `RESERVED` (la adopción aprobada de una `RESERVED` se anula con `ACCOUNT_DELETED`) y las `ADOPTED` se quedan como están; **(c)** en la auditoría se vacían los valores de `details` de las entradas del perfil eliminado (se conservan las claves) y se borra `ip_address` de las entradas de esa cuenta, manteniendo `actor_user_id`; **(d)** se pide la contraseña actual para confirmar. La anonimización de datos, como se propone. T-37 pasa a `PENDIENTE`.
+
 ---
 
 ## 5. Tareas
@@ -280,7 +282,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | BLOQUEADA |
+| T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | PENDIENTE |
 | T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | EN_REVISION |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | EN_REVISION |
 | T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | PENDIENTE |
