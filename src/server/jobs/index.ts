@@ -1,3 +1,4 @@
+import { alertOverdueAdoptions, remindPendingAdoptions, remindPendingHandovers } from "../services/adoption-reminders.js";
 import { completePastVisits, expireUnansweredVisits } from "../services/visit-attendance.js";
 import { sendVisitReminders } from "../services/visit-reminders.js";
 
@@ -8,6 +9,9 @@ const jobs: { name: string; run: () => Promise<number> }[] = [
   { name: "caducar visitas sin respuesta (CU-45)", run: expireUnansweredVisits },
   { name: "marcar visitas realizadas (CU-46)", run: completePastVisits },
   { name: "recordar visitas próximas (CU-53)", run: sendVisitReminders },
+  { name: "recordar adopciones pendientes (CU-47)", run: remindPendingAdoptions },
+  { name: "recordar entregas pendientes (CU-48)", run: remindPendingHandovers },
+  { name: "avisar de adopciones sin completar en plazo (CU-48)", run: alertOverdueAdoptions },
 ];
 
 async function runAll(): Promise<void> {

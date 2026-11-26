@@ -307,3 +307,73 @@ export async function selectShelterAdoptions(db: Db, shelterId: number): Promise
   );
   return rows;
 }
+
+/** An adoption a reminder or an alert is about (CU-47, CU-48). */
+export interface RemindedAdoption {
+  id: number;
+  shelterId: number;
+  shelterName: string;
+  petName: string;
+  adopterName: string;
+}
+
+const REMINDED_ADOPTION = `a.id, p.shelter_id AS "shelterId", s.name AS "shelterName", p.name AS "petName",
+               ad.first_name || ' ' || ad.last_name AS "adopterName"`;
+
+/**
+ * RN-122, CU-47: marks as reminded the PENDING adoptions whose request, or last reminder,
+ * is at least `intervalDays` old, and returns them. Rows being changed by another
+ * transaction are skipped (they will be picked up next time).
+ */
+export async function markDuePendingReminders(db: Db, intervalDays: number): Promise<RemindedAdoption[]> {
+  const { rows } = await db.query<RemindedAdoption>(
+    `WITH due AS (
+       SELECT id FROM "Adoption"
+        WHERE status = 'PENDING'
+          AND COALESCE(last_pending_reminder_at, created_at) <= now() - make_interval(days => $1)
+          FOR UPDATE SKIP LOCKED
+     )
+     UPDATE "Adoption" a SET last_pending_reminder_at = now()
+       FROM due, "Pet" p, "Shelter" s, "Adopter" ad
+      WHERE a.id = due.id AND p.id = a.pet_id AND s.user_id = p.shelter_id AND ad.user_id = a.adopter_id
+     RETURNING ${REMINDED_ADOPTION}`,
+    [intervalDays],
+  );
+  return rows.sort((x, y) => x.id - y.id);
+}
+
+/** RN-127, CU-48: the same for APPROVED adoptions without handover, counting from the approval. */
+export async function markDueHandoverReminders(db: Db, intervalDays: number): Promise<RemindedAdoption[]> {
+  const { rows } = await db.query<RemindedAdoption>(
+    `WITH due AS (
+       SELECT id FROM "Adoption"
+        WHERE status = 'APPROVED' AND delivered_at IS NULL
+          AND COALESCE(last_delivery_reminder_at, decided_at) <= now() - make_interval(days => $1)
+          FOR UPDATE SKIP LOCKED
+     )
+     UPDATE "Adoption" a SET last_delivery_reminder_at = now()
+       FROM due, "Pet" p, "Shelter" s, "Adopter" ad
+      WHERE a.id = due.id AND p.id = a.pet_id AND s.user_id = p.shelter_id AND ad.user_id = a.adopter_id
+     RETURNING ${REMINDED_ADOPTION}`,
+    [intervalDays],
+  );
+  return rows.sort((x, y) => x.id - y.id);
+}
+
+/** RN-128, CU-48: marks as alerted (once) the APPROVED adoptions approved at least `deadlineDays` ago. */
+export async function markOverdueAdoptions(db: Db, deadlineDays: number): Promise<RemindedAdoption[]> {
+  const { rows } = await db.query<RemindedAdoption>(
+    `WITH due AS (
+       SELECT id FROM "Adoption"
+        WHERE status = 'APPROVED' AND delivered_at IS NULL AND admin_alerted_at IS NULL
+          AND decided_at <= now() - make_interval(days => $1)
+          FOR UPDATE SKIP LOCKED
+     )
+     UPDATE "Adoption" a SET admin_alerted_at = now()
+       FROM due, "Pet" p, "Shelter" s, "Adopter" ad
+      WHERE a.id = due.id AND p.id = a.pet_id AND s.user_id = p.shelter_id AND ad.user_id = a.adopter_id
+     RETURNING ${REMINDED_ADOPTION}`,
+    [deadlineDays],
+  );
+  return rows.sort((x, y) => x.id - y.id);
+}

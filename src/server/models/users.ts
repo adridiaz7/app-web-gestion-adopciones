@@ -115,3 +115,9 @@ export async function updatePasswordAndVerify(db: Db, userId: number, passwordHa
     [userId, passwordHash],
   );
 }
+
+/** The administrators' accounts (not deleted), to send them alerts such as RN-128. */
+export async function selectAdminIds(db: Db): Promise<number[]> {
+  const { rows } = await db.query<{ id: number }>(`SELECT id FROM "App_user" WHERE role = 'ADMIN' AND deleted_at IS NULL ORDER BY id`);
+  return rows.map((row) => row.id);
+}

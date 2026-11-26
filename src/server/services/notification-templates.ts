@@ -52,6 +52,24 @@ export const notificationTemplates = {
     body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado. ${unlistReasonText(p.petName, p.reason)}`,
   }),
 
+  /** CU-47, RN-122: a request still unanswered (to the shelter). */
+  ADOPTION_PENDING_REMINDER: (p: { petName: string; adopterName: string }): RenderedNotification => ({
+    title: "Solicitud de adopción pendiente",
+    body: `${p.adopterName} sigue esperando tu respuesta a su solicitud para adoptar a ${p.petName}. Revisa los candidatos y apruébala o recházala.`,
+  }),
+
+  /** CU-48, RN-127: an approved adoption still without its handover (to the shelter). */
+  HANDOVER_REMINDER: (p: { petName: string; adopterName: string }): RenderedNotification => ({
+    title: "Entrega pendiente",
+    body: `La adopción de ${p.petName} por ${p.adopterName} está aprobada, pero aún no has registrado la entrega. Regístrala cuando se la entregues.`,
+  }),
+
+  /** CU-48, RN-128: an approved adoption not completed within the deadline (to the administrator). */
+  ADOPTION_OVERDUE: (p: { petName: string; shelterName: string; days: number }): RenderedNotification => ({
+    title: "Adopción sin completar en plazo",
+    body: `La adopción de ${p.petName} en ${p.shelterName} se aprobó hace más de ${String(p.days)} días y la entrega sigue sin registrarse. No se ha cambiado nada: revísalo.`,
+  }),
+
   /** CU-29, RN-124: the adopter's request was approved. */
   ADOPTION_APPROVED: (p: { petName: string }): RenderedNotification => ({
     title: "Adopción aprobada",

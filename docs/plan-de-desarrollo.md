@@ -259,7 +259,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 | T-30 | Solicitar una adopción: datos del hogar del perfil ya rellenados, obligatorios y editables allí mismo, más el cuestionario opcional de RN-207. Incluye el valor nuevo `RENT_TO_OWN` de `housing_tenure` (RN-27), también en la edición del perfil si ya existe. | CU-27; RN-113–120, 207 | T-25 | EN_REVISION |
 | T-31 | Comparar candidatos y aprobar o rechazar una adopción. | CU-28, CU-29; RN-121–125 | T-30 | EN_REVISION |
 | T-32 | Cancelar una adopción, registrar la entrega y registrar una devolución. | CU-30, CU-31, CU-32; RN-126–131 | T-31 | EN_REVISION |
-| T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | PENDIENTE |
+| T-33 | Recordatorios de adopciones y entregas pendientes. | CU-47, CU-48; RN-122, 127, 128 | T-32 | EN_REVISION |
 
 ### Fase 7 · Bloqueos y notas internas
 
