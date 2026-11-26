@@ -273,7 +273,7 @@ Hacer ahora solo el historial obligaría a rehacerlo cuando T-46 añada las prot
 |---|---|---|---|---|
 | T-28 | Pantalla de notificaciones, marcar como leídas y contador con *polling*. El acceso es una **campana arriba a la derecha** con un punto o contador de no leídas, como en las maquetas de `docs/ux-ui/app-adoptante`, para el adoptante y la protectora. | CU-34; RN-140–144 | T-23 | APROBADA |
 | T-29 | Chat con texto y fotos (multer, reutilizando lo de T-13), avisos de bloqueo y de cuenta eliminada, y *polling* de mensajes nuevos. | CU-33; RN-13, 133–139, 198 | T-22 | APROBADA |
-| T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos. **Excepción autorizada por el responsable el 26/11/2026 (sección 4):** en `tests/integration/chat.test.ts` se modifican solo los tests `"RN-136, RN-198, CU-33: with an active block nobody can write, both can read, and both see a fixed notice with the end date"` y `"RN-198: a permanent block has a notice with no end date; once lifted, they can write again"`, para que comprueben "bloquead" solo con la sesión de la protectora. El resto de tests de T-29 no se tocan. | RN-149, 198; decisiones del responsable del 25/11/2026 y del 26/11/2026 (sección 4) | T-29 | EN_REVISION |
+| T-51 | **Aviso de bloqueo neutro para el adoptante** en el chat. El adoptante ve el texto neutro de RN-149, por ejemplo "La protectora X ha restringido tu acceso hasta el …". La protectora sigue viendo "Has bloqueado a este adoptante hasta el …". Tests nuevos. **Excepción autorizada por el responsable el 26/11/2026 (sección 4):** en `tests/integration/chat.test.ts` se modifican solo los tests `"RN-136, RN-198, CU-33: with an active block nobody can write, both can read, and both see a fixed notice with the end date"` y `"RN-198: a permanent block has a notice with no end date; once lifted, they can write again"`, para que comprueben "bloquead" solo con la sesión de la protectora. El resto de tests de T-29 no se tocan. | RN-149, 198; decisiones del responsable del 25/11/2026 y del 26/11/2026 (sección 4) | T-29 | APROBADA |
 
 ### Prioridad para la demo (decisión del responsable del 26/11/2026)
 
@@ -306,12 +306,12 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
 | T-37 | Eliminar la cuenta con anonimización. | CU-07; RN-11–13, 210 | T-34 | APROBADA |
-| T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | EN_REVISION |
+| T-38 | Avisos de nuevas mascotas compatibles y de cambios en los favoritos. | CU-54, CU-55; RN-199, 200 | T-19, T-28 | APROBADA |
 | T-39 | Incidencias: abrir, gestionar y corregir una asistencia. | CU-36, CU-37, CU-38; RN-108, 165–170 | T-25 | APROBADA |
-| T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | EN_REVISION |
+| T-40 | Suspender y reactivar cuentas, retirar mascotas y gestionar catálogos. | CU-40, CU-41, CU-42; RN-154–159, 163 | T-11 | APROBADA |
 | T-41 | Supervisar la actividad (incluido el registro de auditoría) y estadísticas. | CU-43, CU-44; RN-160, 161 | T-39 | APROBADA |
-| T-53 | **Aviso a la protectora cuando un adoptante elimina su cuenta** (decisión del responsable del 26/11/2026, sección 4). Al eliminar su cuenta un adoptante, cada protectora con la que tenía visitas o adopciones abiertas, que se anulan con `ACCOUNT_DELETED`, recibe una notificación por cada una, en la misma transacción. El texto habla de "Usuario eliminado", sin datos personales del adoptante (RN-210). Tests nuevos; no se modifican los de T-37. | CU-07; RN-12, 140, 210 | T-37, T-28 | EN_REVISION |
-| T-54 | **Ajustes de la revisión del 26/11/2026** (decisión del responsable). **(1) T-39:** al abrir una incidencia, la protectora solo puede indicar un adoptante que le haya enviado alguna solicitud (`selectAdopterForShelter`, como en los bloqueos). Si no, la respuesta es **la misma** que si el adoptante no existe, para que no se puedan averiguar ids probando por la API (RN-29). **(2) T-52:** `getAdoptionEligibility` es una lectura y no bloquea la fila de la mascota: se lee sin `FOR UPDATE` y sin abrir una transacción, y se mantiene **la misma** comprobación que `POST /api/adopter/adoptions`. Esa petición sigue bloqueando la fila. **(3) T-37:** al eliminar una protectora con logo, su archivo se borra de `uploads/` **después del commit**, como en `setShelterLogo`. Tests nuevos; no se modifican los de T-37, T-39 ni T-52. | RN-29, 166; CU-07, CU-11, CU-36 | T-37, T-39, T-52 | EN_REVISION |
+| T-53 | **Aviso a la protectora cuando un adoptante elimina su cuenta** (decisión del responsable del 26/11/2026, sección 4). Al eliminar su cuenta un adoptante, cada protectora con la que tenía visitas o adopciones abiertas, que se anulan con `ACCOUNT_DELETED`, recibe una notificación por cada una, en la misma transacción. El texto habla de "Usuario eliminado", sin datos personales del adoptante (RN-210). Tests nuevos; no se modifican los de T-37. | CU-07; RN-12, 140, 210 | T-37, T-28 | APROBADA |
+| T-54 | **Ajustes de la revisión del 26/11/2026** (decisión del responsable). **(1) T-39:** al abrir una incidencia, la protectora solo puede indicar un adoptante que le haya enviado alguna solicitud (`selectAdopterForShelter`, como en los bloqueos). Si no, la respuesta es **la misma** que si el adoptante no existe, para que no se puedan averiguar ids probando por la API (RN-29). **(2) T-52:** `getAdoptionEligibility` es una lectura y no bloquea la fila de la mascota: se lee sin `FOR UPDATE` y sin abrir una transacción, y se mantiene **la misma** comprobación que `POST /api/adopter/adoptions`. Esa petición sigue bloqueando la fila. **(3) T-37:** al eliminar una protectora con logo, su archivo se borra de `uploads/` **después del commit**, como en `setShelterLogo`. Tests nuevos; no se modifican los de T-37, T-39 ni T-52. | RN-29, 166; CU-07, CU-11, CU-36 | T-37, T-39, T-52 | APROBADA |
 
 ### Fase 9 · Demo
 
@@ -323,7 +323,7 @@ Estas tareas van **antes que el resto de las pendientes** (T-33 en adelante). Pr
 
 | ID | Tarea | Referencias | Depende de | Estado |
 |---|---|---|---|---|
-| T-43 | Cambiar el email o la contraseña con la sesión iniciada. | CU-49 | T-36 | EN_REVISION |
+| T-43 | Cambiar el email o la contraseña con la sesión iniciada. | CU-49 | T-36 | APROBADA |
 
 ---
 
