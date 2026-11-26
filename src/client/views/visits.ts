@@ -5,7 +5,7 @@ import { cancelVisit, listMyVisits } from "../api/visits.js";
 import { appLayout } from "../components/app-layout.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
-import { openRescheduleDialog } from "../components/visit-request.js";
+import { openReplaceDialog, openRescheduleDialog } from "../components/visit-request.js";
 import { h, mount, queryParam } from "../dom.js";
 import { madridTime } from "../madrid-time.js";
 import { navigate } from "../router.js";
@@ -79,7 +79,13 @@ function closedText(visit: AdopterVisit): string {
   }
 }
 
-function visitRow(visit: AdopterVisit, onCancel: (visit: AdopterVisit) => void, onReschedule: (visit: AdopterVisit) => void): HTMLElement {
+interface RowActions {
+  onCancel: (visit: AdopterVisit) => void;
+  onReschedule: (visit: AdopterVisit) => void;
+  onReplace: (visit: AdopterVisit) => void;
+}
+
+function visitRow(visit: AdopterVisit, { onCancel, onReschedule, onReplace }: RowActions): HTMLElement {
   const side = h("div", { class: "visit-row__side" });
   if (visit.status === "PENDING") side.append(h("span", { class: "muted" }, "Pendiente de respuesta de la protectora"));
   if (isUpcoming(visit)) {
@@ -99,6 +105,14 @@ function visitRow(visit: AdopterVisit, onCancel: (visit: AdopterVisit) => void, 
     }
   } else {
     side.append(h("span", { class: "muted" }, closedText(visit)));
+    // RN-111: the server checks that it was confirmed and has not been replaced yet.
+    if (visit.status === "VOIDED" && visit.voidReason === "SLOT_CANCELLED") {
+      const replace = h("button", { type: "button", class: "button button--primary button--small" }, "Elegir otro turno");
+      replace.addEventListener("click", () => {
+        onReplace(visit);
+      });
+      side.append(replace);
+    }
   }
   return h(
     "article",
@@ -143,6 +157,9 @@ export async function renderVisits(root: HTMLElement): Promise<void> {
     const onReschedule = (visit: AdopterVisit): void => {
       openRescheduleDialog(visit, () => void renderVisits(root));
     };
+    const onReplace = (visit: AdopterVisit): void => {
+      openReplaceDialog(visit, () => void renderVisits(root));
+    };
     const tab = (label: string, count: number, href: string, current: boolean) =>
       h("a", { class: "tabs__tab", href, "aria-current": current ? "page" : undefined }, `${label} (${String(count)})`);
     content = [
@@ -151,7 +168,7 @@ export async function renderVisits(root: HTMLElement): Promise<void> {
       message,
       shown.length === 0
         ? notice("info", history ? "Todavía no tienes visitas pasadas." : "No tienes visitas próximas.", "Solicita una visita desde la ficha de una mascota.")
-        : h("div", { class: "visit-list" }, ...shown.map((visit) => visitRow(visit, onCancel, onReschedule))),
+        : h("div", { class: "visit-list" }, ...shown.map((visit) => visitRow(visit, { onCancel, onReschedule, onReplace }))),
     ].filter((node): node is HTMLElement => node !== null);
   } catch (error) {
     content = [notice("error", error instanceof ApiError ? error.message : "No se han podido cargar tus visitas.")];

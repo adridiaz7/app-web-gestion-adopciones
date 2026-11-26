@@ -40,3 +40,10 @@ export const registerNoShow = (id: number) => apiRequest<VisitStatusResponse>("P
 /** CU-51, RN-195, RN-196: the adopter moves a visit to another slot; returns the new request. */
 export const rescheduleVisit = (id: number, body: RescheduleVisitRequest) =>
   apiRequest<VisitRequestResponse>("POST", `/adopter/visits/${String(id)}/reschedule`, body);
+
+/** RN-111: the free slots to replace a visit voided by a slot change (also less than 48 h ahead). */
+export const getReplacementSlots = (id: number) => apiRequest<AvailableSlotsResponse>("GET", `/adopter/visits/${String(id)}/replacement-slots`);
+
+/** CU-23, RN-111: the adopter replaces that voided visit; the new one is confirmed at once. */
+export const replaceVisit = (id: number, body: RescheduleVisitRequest) =>
+  apiRequest<VisitRequestResponse>("POST", `/adopter/visits/${String(id)}/replace`, body);

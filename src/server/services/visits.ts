@@ -21,11 +21,13 @@ import {
   selectAvailableSlots,
   selectPendingRequests,
   selectQuotaVisitEnds,
+  selectReplaceableVisit,
   selectRequestedVisit,
   selectUpcomingVisits,
   type AdopterVisit,
   type AvailableSlot,
   type InboxVisit,
+  type ReplaceableVisit,
   type RequestedVisit,
   type VisitForChange,
   type VisitStatus,
@@ -59,7 +61,9 @@ export async function requestVisit(adopterId: number, petId: number, slotId: num
 
 /**
  * Checks every rule of a visit request (CU-23) and creates it PENDING, inside the caller's
- * transaction. Also used by a reschedule (RN-196), with the visit it replaces.
+ * transaction. Also used by a reschedule (RN-196), with the visit it replaces. With
+ * `substitute`, it replaces a visit voided by a slot change (RN-111): no 48 h notice, only a
+ * slot not started yet, and it is created CONFIRMED.
  */
 async function insertCheckedRequest(
   client: Db,
@@ -67,6 +71,7 @@ async function insertCheckedRequest(
   petId: number,
   slotId: number,
   replacesVisitId: number | null,
+  substitute = false,
 ): Promise<RequestedVisit> {
   const rules = getConfig().rules;
   const pet = await lockPetForRequest(client, petId);
@@ -88,8 +93,10 @@ async function insertCheckedRequest(
   // RN-83: the slot is one of the pet's shelter. Locked, so two requests cannot take the last place.
   const slot = await lockShelterSlot(client, pet.shelterId, slotId);
   if (!slot) throw new NotFoundError("El turno no existe.");
-  // RN-87
-  if (slot.startsAt.getTime() < Date.now() + rules.visitMinNoticeHours * HOUR) {
+  // RN-87; RN-111: a substitute only needs a slot that has not started.
+  if (substitute) {
+    if (slot.startsAt.getTime() <= Date.now()) throw new ConflictError("Este turno ya ha empezado.");
+  } else if (slot.startsAt.getTime() < Date.now() + rules.visitMinNoticeHours * HOUR) {
     throw new ConflictError(`La visita se tiene que solicitar con al menos ${String(rules.visitMinNoticeHours)} horas de antelación.`);
   }
   // RN-82
@@ -108,18 +115,51 @@ async function insertCheckedRequest(
   }
 
   const visitId = await insertVisit(client, adopterId, pet.shelterId, petId, slotId, replacesVisitId);
+  if (substitute) await markVisitConfirmed(client, visitId);
   await ensureConversation(client, adopterId, pet.shelterId);
+  const status = substitute ? "CONFIRMED" : "PENDING";
   await audit(client, {
     actorUserId: adopterId,
     action: "VISIT_REQUESTED",
     entityType: "Visit",
     entityId: visitId,
-    details: { after: replacesVisitId === null ? { status: "PENDING" } : { status: "PENDING", replacesVisitId } },
+    details: { after: replacesVisitId === null ? { status } : { status, replacesVisitId } },
   });
+  // RN-197: a substitute less than the reminder notice ahead gets its reminder at once.
+  if (substitute) await remindDueVisits(client, visitId);
 
   const visit = await selectRequestedVisit(client, visitId);
   if (!visit) throw new Error("visit not found after creating it");
   return visit;
+}
+
+const NOT_REPLACEABLE = "Esta visita no se puede sustituir por otra.";
+
+/** RN-111: only a visit voided by a slot change that the shelter had confirmed, and only once. */
+function checkReplaceable(visit: ReplaceableVisit | null): ReplaceableVisit {
+  if (!visit) throw new NotFoundError("La visita no existe.");
+  if (visit.status !== "VOIDED" || visit.voidReason !== "SLOT_CANCELLED" || !visit.wasConfirmed) throw new ConflictError(NOT_REPLACEABLE);
+  if (visit.replaced) throw new ConflictError("Ya has elegido otro turno para sustituir esta visita.");
+  return visit;
+}
+
+/** RN-111, RN-194: the free slots for a replacement, for the same pet and also less than 48 h ahead. */
+export async function listReplacementSlots(adopterId: number, visitId: number): Promise<AvailableSlot[]> {
+  const pool = getPool();
+  const visit = checkReplaceable(await selectReplaceableVisit(pool, visitId, adopterId));
+  return selectAvailableSlots(pool, visit.shelterId, visit.petId, 0);
+}
+
+/**
+ * CU-23, RN-111: the adopter replaces a confirmed visit voided because the shelter changed or
+ * deleted its slot. Same pet, only once; the new visit skips the 48 h notice and is confirmed
+ * at once, with every other rule of CU-23 (places, block, no-show and quota). One transaction.
+ */
+export async function replaceVoidedVisit(adopterId: number, visitId: number, slotId: number): Promise<RequestedVisit> {
+  return withTransaction(async (client) => {
+    const visit = checkReplaceable(await selectReplaceableVisit(client, visitId, adopterId, true));
+    return insertCheckedRequest(client, adopterId, visit.petId, slotId, visitId, true);
+  });
 }
 
 /**

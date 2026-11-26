@@ -17,6 +17,8 @@ import {
   listAvailableSlots,
   rejectVisit,
   requestVisit,
+  replaceVoidedVisit,
+  listReplacementSlots,
   rescheduleVisit,
   type InboxVisit,
   type VisitStatusResult,
@@ -104,6 +106,25 @@ export const postRescheduleVisit: RequestHandler = async (req, res) => {
   const { id: visitId } = visitParamsSchema.parse(req.params);
   const { slotId } = rescheduleSchema.parse(req.body ?? {});
   const visit = await rescheduleVisit(userId(req.user), visitId, slotId);
+  const body: VisitRequestResponse = { visit: { ...visit, startsAt: visit.startsAt.toISOString(), endsAt: visit.endsAt.toISOString() } };
+  res.status(201).json(body);
+};
+
+/** CU-23, RN-111 · GET /api/adopter/visits/:id/replacement-slots */
+export const getReplacementSlots: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  const slots = await listReplacementSlots(userId(req.user), visitId);
+  const body: AvailableSlotsResponse = {
+    slots: slots.map((slot) => ({ ...slot, startsAt: slot.startsAt.toISOString(), endsAt: slot.endsAt.toISOString() })),
+  };
+  res.json(body);
+};
+
+/** CU-23, RN-111 · POST /api/adopter/visits/:id/replace */
+export const postReplaceVisit: RequestHandler = async (req, res) => {
+  const { id: visitId } = visitParamsSchema.parse(req.params);
+  const { slotId } = rescheduleSchema.parse(req.body ?? {});
+  const visit = await replaceVoidedVisit(userId(req.user), visitId, slotId);
   const body: VisitRequestResponse = { visit: { ...visit, startsAt: visit.startsAt.toISOString(), endsAt: visit.endsAt.toISOString() } };
   res.status(201).json(body);
 };

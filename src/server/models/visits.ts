@@ -413,3 +413,28 @@ export async function voidPetOpenVisits(db: Db, petId: number, reason: "PET_UNLI
   );
   return rows.sort((a, b) => a.id - b.id);
 }
+
+/** RN-111: what decides whether a visit of the adopter can be replaced by another one. */
+export interface ReplaceableVisit {
+  petId: number;
+  shelterId: number;
+  status: VisitStatus;
+  voidReason: string | null;
+  /** The shelter had confirmed it before it was voided. */
+  wasConfirmed: boolean;
+  /** Another visit already replaces it. */
+  replaced: boolean;
+}
+
+/** With `forUpdate`, the visit stays locked so two replacements cannot happen at the same time. */
+export async function selectReplaceableVisit(db: Db, visitId: number, adopterId: number, forUpdate = false): Promise<ReplaceableVisit | null> {
+  const { rows } = await db.query<ReplaceableVisit>(
+    `SELECT v.pet_id AS "petId", v.shelter_id AS "shelterId", v.status, v.void_reason AS "voidReason",
+            v.responded_at IS NOT NULL AS "wasConfirmed",
+            EXISTS (SELECT 1 FROM "Visit" r WHERE r.replaces_visit_id = v.id) AS replaced
+       FROM "Visit" v
+      WHERE v.id = $1 AND v.adopter_id = $2${forUpdate ? "\n        FOR UPDATE OF v" : ""}`,
+    [visitId, adopterId],
+  );
+  return rows[0] ?? null;
+}
