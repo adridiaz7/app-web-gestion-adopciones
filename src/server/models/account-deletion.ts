@@ -18,6 +18,7 @@ export async function lockAccount(db: Db, userId: number): Promise<AccountToDele
 export interface VoidedByDeletion {
   id: number;
   adopterId: number;
+  shelterId: number;
   petId: number;
   petName: string;
   previousStatus: string;
@@ -39,7 +40,7 @@ export async function voidOpenVisitsOf(db: Db, column: "adopter_id" | "shelter_i
      UPDATE "Visit" v SET status = 'VOIDED', void_reason = $2, voided_at = now()
        FROM open, "Pet" p, "Visit_slot" vs
       WHERE v.id = open.id AND p.id = v.pet_id AND vs.id = v.slot_id
-     RETURNING v.id, v.adopter_id AS "adopterId", v.pet_id AS "petId", p.name AS "petName",
+     RETURNING v.id, v.adopter_id AS "adopterId", v.shelter_id AS "shelterId", v.pet_id AS "petId", p.name AS "petName",
                vs.starts_at AS "startsAt", open.status AS "previousStatus"`,
     [userId, reason],
   );
@@ -66,7 +67,7 @@ export async function voidOpenAdoptionsOf(
      UPDATE "Adoption" a SET status = 'VOIDED', void_reason = $2, voided_at = now()
        FROM open, "Pet" p
       WHERE a.id = open.id AND p.id = a.pet_id
-     RETURNING a.id, a.adopter_id AS "adopterId", a.pet_id AS "petId", p.name AS "petName", open.status AS "previousStatus"`,
+     RETURNING a.id, a.adopter_id AS "adopterId", p.shelter_id AS "shelterId", a.pet_id AS "petId", p.name AS "petName", open.status AS "previousStatus"`,
     [userId, reason, statuses],
   );
   return rows.sort((a, b) => a.id - b.id);

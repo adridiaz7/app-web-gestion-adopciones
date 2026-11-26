@@ -30,11 +30,18 @@ export function emptyValues(value: unknown): unknown {
 }
 
 /**
- * RN-12: the adopter's open visits and adoptions are voided. An approved adoption frees its
+ * RN-12: the adopter's open visits and adoptions are voided, telling each shelter with one
+ * notification per process, as "Usuario eliminado" (RN-210). An approved adoption frees its
  * pet for the other candidates, as when it is cancelled (RN-130).
  */
 async function voidAdopterProcesses(db: Db, adopterId: number): Promise<void> {
   for (const visit of await voidOpenVisitsOf(db, "adopter_id", adopterId)) {
+    await createNotification(db, {
+      userId: visit.shelterId,
+      type: "VISIT_VOIDED_ADOPTER_DELETED",
+      params: { petName: visit.petName, startsAt: visit.startsAt },
+      link: { visitId: visit.id },
+    });
     await audit(db, {
       actorUserId: adopterId,
       action: "VISIT_VOIDED",
@@ -44,6 +51,12 @@ async function voidAdopterProcesses(db: Db, adopterId: number): Promise<void> {
     });
   }
   for (const adoption of await voidOpenAdoptionsOf(db, "adopter_id", adopterId)) {
+    await createNotification(db, {
+      userId: adoption.shelterId,
+      type: "ADOPTION_VOIDED_ADOPTER_DELETED",
+      params: { petName: adoption.petName },
+      link: { adoptionId: adoption.id },
+    });
     await audit(db, {
       actorUserId: adopterId,
       action: "ADOPTION_VOIDED",
