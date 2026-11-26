@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { MessageResponse, SessionResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
 import { clearSessionCookie, readSessionToken, setSessionCookie } from "../middlewares/session.js";
+import { deleteAccount } from "../services/account-deletion.js";
 import { resendVerification, verifyEmail } from "../services/email-verification.js";
 import { requestPasswordReset, resetPassword } from "../services/password-reset.js";
 import { registerAdopter, registerShelter } from "../services/registration.js";
@@ -181,4 +182,18 @@ export const postResetPassword: RequestHandler = async (req, res) => {
   await resetPassword(token, password, req.ip);
   const body: MessageResponse = { message: "Tu contraseña se ha cambiado. Ya puedes iniciar sesión." };
   res.json(body);
+};
+
+/** CU-07: the current password confirms the deletion (decision of 26/11/2026). */
+const deleteAccountSchema = z.object({
+  password: z.string({ error: "Escribe tu contraseña para confirmar." }).min(1, { error: "Escribe tu contraseña para confirmar." }).max(256),
+});
+
+/** CU-07 · POST /api/auth/delete-account: deletes the account and closes the session. */
+export const postDeleteAccount: RequestHandler = async (req, res) => {
+  if (!req.user) throw new UnauthorizedError();
+  const { password } = deleteAccountSchema.parse(req.body ?? {});
+  await deleteAccount(req.user.id, password);
+  clearSessionCookie(res);
+  res.status(204).end();
 };

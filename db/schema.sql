@@ -217,7 +217,7 @@ CREATE TABLE "Pet" (
   status             text        NOT NULL DEFAULT 'AVAILABLE'
                                  CHECK (status IN ('AVAILABLE', 'RESERVED', 'ADOPTED', 'UNLISTED')),
   unlist_reason      text        CHECK (unlist_reason IN ('DECEASED', 'TRANSFERRED', 'TREATMENT', 'FOSTER',
-                                                          'ERROR', 'OTHER', 'REMOVED_BY_ADMIN')),
+                                                          'ERROR', 'OTHER', 'REMOVED_BY_ADMIN', 'ACCOUNT_DELETED')),
   unlisted_at        timestamptz,
   created_at         timestamptz NOT NULL DEFAULT now(),
   updated_at         timestamptz NOT NULL DEFAULT now(),

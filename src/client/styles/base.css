@@ -1895,3 +1895,20 @@ textarea {
 .adoption-action .field__hint {
   margin: 0;
 }
+
+/* CU-07: delete the account (an irreversible action, in the error colours) */
+.button--danger {
+  border-color: var(--error-800);
+  background: var(--error-600);
+  color: #fff;
+}
+
+.button--danger:hover {
+  background: var(--error-800);
+}
+
+.danger-zone {
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  border-color: var(--error-200);
+}

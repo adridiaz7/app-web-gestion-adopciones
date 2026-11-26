@@ -331,7 +331,7 @@ CHECK (`is_wanted OR must_get_along`): no se guardan filas vacías.
 | `microchipped` | `boolean` | NN | Sin el número. |
 | `special_needs` | `text` | | |
 | `status` | `text` | NN, por defecto `AVAILABLE`, CHECK `AVAILABLE`, `RESERVED`, `ADOPTED`, `UNLISTED` | RN-53 a RN-57. |
-| `unlist_reason` | `text` | CHECK `DECEASED`, `TRANSFERRED`, `TREATMENT`, `FOSTER`, `ERROR`, `OTHER`, `REMOVED_BY_ADMIN` | RN-62. CHECK (`(status = 'UNLISTED') = (unlist_reason IS NOT NULL)`). |
+| `unlist_reason` | `text` | CHECK `DECEASED`, `TRANSFERRED`, `TREATMENT`, `FOSTER`, `ERROR`, `OTHER`, `REMOVED_BY_ADMIN`, `ACCOUNT_DELETED` | RN-62. `ACCOUNT_DELETED`: la protectora eliminó su cuenta (RN-12). CHECK (`(status = 'UNLISTED') = (unlist_reason IS NOT NULL)`). |
 | `unlisted_at` | `timestamptz` | | |
 | `created_at` | `timestamptz` | NN | Fecha de alta (RN-49). |
 | `updated_at` | `timestamptz` | NN | |

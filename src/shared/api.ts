@@ -811,3 +811,8 @@ export interface AdminIncident {
 export interface AdminIncidentsResponse {
   incidents: AdminIncident[];
 }
+
+/** CU-07 · body of POST /api/auth/delete-account: the current password confirms it. */
+export interface DeleteAccountRequest {
+  password: string;
+}

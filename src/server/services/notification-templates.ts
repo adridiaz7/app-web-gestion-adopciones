@@ -71,6 +71,18 @@ export const notificationTemplates = {
     body: `Ya puedes volver a ver las mascotas de la protectora ${p.shelterName} y escribirle. Las solicitudes que se anularon no se recuperan: si te interesa alguna mascota, vuelve a solicitarlo.`,
   }),
 
+  /** RN-12, RN-109, RN-110: a visit voided because the shelter deleted its account. */
+  VISIT_VOIDED_ACCOUNT_DELETED: (p: { petName: string; startsAt: Date; shelterName: string }): RenderedNotification => ({
+    title: "Visita anulada",
+    body: `Tu visita para conocer a ${p.petName} el ${formatDateTime(p.startsAt)} se ha anulado porque la protectora ${p.shelterName} ha eliminado su cuenta.`,
+  }),
+
+  /** RN-12, RN-132: an open adoption voided because the shelter deleted its account. */
+  ADOPTION_VOIDED_ACCOUNT_DELETED: (p: { petName: string; shelterName: string }): RenderedNotification => ({
+    title: "Solicitud de adopción anulada",
+    body: `Tu solicitud para adoptar a ${p.petName} se ha anulado porque la protectora ${p.shelterName} ha eliminado su cuenta.`,
+  }),
+
   /** RN-109, RN-110, RN-148: a visit voided because the shelter blocked the adopter (neutral text). */
   VISIT_VOIDED_ADOPTER_BLOCKED: (p: { petName: string; startsAt: Date; shelterName: string }): RenderedNotification => ({
     title: "Visita anulada",

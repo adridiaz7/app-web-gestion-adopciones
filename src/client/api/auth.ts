@@ -1,5 +1,6 @@
 import type {
   AdopterRegistrationRequest,
+  DeleteAccountRequest,
   ForgotPasswordRequest,
   LoginRequest,
   MessageResponse,
@@ -28,6 +29,9 @@ export const resendVerification = (body: ResendVerificationRequest) =>
 export const login = (body: LoginRequest) => apiRequest<SessionResponse>("POST", "/auth/login", body);
 
 export const logout = () => apiRequest<undefined>("POST", "/auth/logout");
+
+/** CU-07: deletes the account and closes the session. */
+export const deleteAccount = (body: DeleteAccountRequest) => apiRequest<undefined>("POST", "/auth/delete-account", body);
 
 export const forgotPassword = (body: ForgotPasswordRequest) =>
   apiRequest<MessageResponse>("POST", "/auth/forgot-password", body);

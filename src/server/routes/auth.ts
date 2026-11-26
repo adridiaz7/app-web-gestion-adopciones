@@ -3,6 +3,7 @@ import {
   getMe,
   postForgotPassword,
   postLogin,
+  postDeleteAccount,
   postLogout,
   postRegisterAdopter,
   postRegisterShelter,
@@ -11,7 +12,7 @@ import {
   postVerifyEmail,
 } from "../controllers/auth.js";
 import { loginRateLimit } from "../middlewares/login-rate-limit.js";
-import { requireAuth } from "../middlewares/session.js";
+import { requireAuth, requireRole } from "../middlewares/session.js";
 
 /** Built per app, so the login rate limit (RN-179) is not shared between app instances. */
 export function createAuthRouter(): Router {
@@ -26,6 +27,7 @@ export function createAuthRouter(): Router {
   router.post("/forgot-password", postForgotPassword);
   router.post("/reset-password", postResetPassword);
   router.get("/me", requireAuth, getMe);
+  router.post("/delete-account", requireRole("ADOPTER", "SHELTER"), postDeleteAccount);
 
   return router;
 }
