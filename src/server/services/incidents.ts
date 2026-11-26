@@ -13,6 +13,7 @@ import {
   type IncidentReason,
   type IncidentStatus,
 } from "../models/incidents.js";
+import { selectAdopterForShelter } from "../models/shelter-adopters.js";
 import { correctNoShow, visitExists } from "../models/visits.js";
 import { audit } from "./audit.js";
 import { createNotification } from "./notifications.js";
@@ -36,9 +37,10 @@ export interface NewIncident {
 export async function openIncident(reporter: { id: number; role: "ADOPTER" | "SHELTER" }, input: NewIncident): Promise<{ id: number; status: "OPEN" }> {
   return withTransaction(async (client) => {
     const otherSide = reporter.role === "ADOPTER" ? "SHELTER" : "ADOPTER";
-    if ((await selectActiveRole(client, input.reportedId)) !== otherSide) {
-      throw new NotFoundError(otherSide === "SHELTER" ? "La protectora no existe." : "El adoptante no existe.");
-    }
+    const notFound = new NotFoundError(otherSide === "SHELTER" ? "La protectora no existe." : "El adoptante no existe.");
+    if ((await selectActiveRole(client, input.reportedId)) !== otherSide) throw notFound;
+    // RN-29: a shelter only reaches adopters who have sent it a request, answering as if the rest did not exist
+    if (reporter.role === "SHELTER" && !(await selectAdopterForShelter(client, reporter.id, input.reportedId))) throw notFound;
 
     const adopterId = reporter.role === "ADOPTER" ? reporter.id : input.reportedId;
     const shelterId = reporter.role === "SHELTER" ? reporter.id : input.reportedId;

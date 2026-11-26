@@ -5,7 +5,7 @@ import { ConflictError, ForbiddenError, NotFoundError } from "../errors.js";
 import { selectHousehold, updateHousehold, type Household } from "../models/adopters.js";
 import { hasOpenAdoption, insertAdoption, selectLatestCompletedVisit } from "../models/adoptions.js";
 import { selectActiveBlock } from "../models/shelter-search.js";
-import { hasNoShow, lockPetForRequest, type PetForRequest } from "../models/visits.js";
+import { hasNoShow, lockPetForRequest, selectPetForRequest, type PetForRequest } from "../models/visits.js";
 import { audit } from "./audit.js";
 
 export type { Household };
@@ -141,16 +141,18 @@ function eligibilityMessage(failure: AdoptionIneligibility, pet: PetForRequest, 
   }
 }
 
-/** T-52, CU-11: whether the adopter can request the adoption of the pet now and, if not, why. */
+/**
+ * T-52, CU-11: whether the adopter can request the adoption of the pet now and, if not, why.
+ * T-54: a read, so it neither opens a transaction nor locks the pet; the request itself does.
+ */
 export async function getAdoptionEligibility(adopterId: number, petId: number): Promise<AdoptionEligibility> {
   const months = getConfig().rules.visitValidityForAdoptionMonths;
-  return withTransaction(async (client) => {
-    const pet = await lockPetForRequest(client, petId);
-    if (!pet?.shelterVisible) throw new NotFoundError(PET_NOT_AVAILABLE);
-    const checked = await checkConditions(client, adopterId, petId, pet, months);
-    if (checked.ok) return { canRequest: true, reason: null, message: null };
-    return { canRequest: false, reason: checked.reason, message: eligibilityMessage(checked, pet, months) };
-  });
+  const db = getPool();
+  const pet = await selectPetForRequest(db, petId);
+  if (!pet?.shelterVisible) throw new NotFoundError(PET_NOT_AVAILABLE);
+  const checked = await checkConditions(db, adopterId, petId, pet, months);
+  if (checked.ok) return { canRequest: true, reason: null, message: null };
+  return { canRequest: false, reason: checked.reason, message: eligibilityMessage(checked, pet, months) };
 }
 
 /**

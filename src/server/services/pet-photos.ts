@@ -33,8 +33,8 @@ export function imageExtension(file: Buffer): "jpg" | "png" | "webp" | null {
 
 const fileOf = (url: string): string => join(getConfig().uploadsDir, url.slice(UPLOADS_URL.length));
 
-/** Deletes a photo's file. A file already gone is not an error: the row is what counts. */
-async function removeFile(url: string): Promise<void> {
+/** Deletes an uploaded file (a photo or a logo). A file already gone is not an error: the row is what counts. */
+export async function removeUploadedFile(url: string): Promise<void> {
   await rm(fileOf(url), { force: true });
 }
 
@@ -92,7 +92,7 @@ export async function addPetPhoto(shelterId: number, petId: number, file: Buffer
       return auditPhotos(client, shelterId, petId, before);
     });
   } catch (error) {
-    if (written) await removeFile(url);
+    if (written) await removeUploadedFile(url);
     throw error;
   }
 }
@@ -111,7 +111,7 @@ export async function removePetPhoto(shelterId: number, petId: number, photoId: 
     );
     return { photos: await auditPhotos(client, shelterId, petId, before), url: deleted };
   });
-  await removeFile(url);
+  await removeUploadedFile(url);
   return photos;
 }
 

@@ -11,8 +11,7 @@ export interface PetForRequest {
   shelterVisible: boolean;
 }
 
-/** The pet, locked so its status does not change while the visit is requested, or null. */
-export async function lockPetForRequest(db: Db, petId: number): Promise<PetForRequest | null> {
+async function selectPetForRequestRow(db: Db, petId: number, lock: boolean): Promise<PetForRequest | null> {
   const { rows } = await db.query<PetForRequest>(
     `SELECT p.name AS "petName", p.shelter_id AS "shelterId", s.name AS "shelterName", p.status,
             (${visibleShelterCondition("NULL")}) AS "shelterVisible"
@@ -20,10 +19,20 @@ export async function lockPetForRequest(db: Db, petId: number): Promise<PetForRe
        JOIN "Shelter"  s  ON s.user_id = p.shelter_id
        JOIN "App_user" su ON su.id = s.user_id
       WHERE p.id = $1
-        FOR SHARE OF p`,
+        ${lock ? "FOR SHARE OF p" : ""}`,
     [petId],
   );
   return rows[0] ?? null;
+}
+
+/** The pet, locked so its status does not change while the visit is requested, or null. */
+export async function lockPetForRequest(db: Db, petId: number): Promise<PetForRequest | null> {
+  return selectPetForRequestRow(db, petId, true);
+}
+
+/** The same data as `lockPetForRequest`, read without locking the row (for reads only). */
+export async function selectPetForRequest(db: Db, petId: number): Promise<PetForRequest | null> {
+  return selectPetForRequestRow(db, petId, false);
 }
 
 /** RN-89: whether the adopter has a NO_SHOW visit at the shelter. */

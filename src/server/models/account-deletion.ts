@@ -101,14 +101,17 @@ export async function anonymiseAdopter(db: Db, adopterId: number, name: string):
 }
 
 /** RN-11, RN-12: the shelter's contact and public data are anonymised; the CIF gets a unique placeholder. */
-export async function anonymiseShelter(db: Db, shelterId: number, name: string): Promise<void> {
-  await db.query(
-    `UPDATE "Shelter"
+export async function anonymiseShelter(db: Db, shelterId: number, name: string): Promise<{ oldLogoPath: string | null }> {
+  const { rows } = await db.query<{ oldLogoPath: string | null }>(
+    `UPDATE "Shelter" s
         SET name = $2, cif = 'DELETED-' || $1::text, description = NULL, logo_path = NULL, address = '',
             locality = '', phone = '', contact_email = NULL, website = NULL, opening_hours = NULL, updated_at = now()
-      WHERE user_id = $1`,
+       FROM (SELECT user_id, logo_path FROM "Shelter" WHERE user_id = $1 FOR UPDATE) old
+      WHERE s.user_id = old.user_id
+     RETURNING old.logo_path AS "oldLogoPath"`,
     [shelterId, name],
   );
+  return { oldLogoPath: rows[0]?.oldLogoPath ?? null };
 }
 
 /** RN-11: the account keeps its row (history) with a unique placeholder email and an unusable password. */

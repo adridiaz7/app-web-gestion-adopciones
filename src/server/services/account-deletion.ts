@@ -18,6 +18,7 @@ import { deleteUserSessions } from "../models/sessions.js";
 import { audit } from "./audit.js";
 import { createNotification } from "./notifications.js";
 import { alertFavorites, alertPetAvailable } from "./pet-alerts.js";
+import { removeUploadedFile } from "./pet-photos.js";
 import { verifyPassword } from "./passwords.js";
 
 /** RN-13: how a deleted account shows everywhere. */
@@ -147,23 +148,27 @@ async function anonymiseAuditLog(db: Db, userId: number, profileType: "Adopter" 
  * history stays; the sessions are closed. One transaction (RN-171), audited (RN-208).
  */
 export async function deleteAccount(userId: number, password: string): Promise<void> {
-  await withTransaction(async (client) => {
+  const oldLogoPath = await withTransaction(async (client) => {
     const account = await lockAccount(client, userId);
     if (!account) throw new UnauthorizedError();
     if (account.role === "ADMIN") throw new ForbiddenError();
     if (!(await verifyPassword(account.passwordHash, password))) throw new BadRequestError("La contraseña no es correcta.");
 
+    let logoPath: string | null = null;
     if (account.role === "ADOPTER") {
       await voidAdopterProcesses(client, userId);
       await anonymiseAdopter(client, userId, DELETED_NAME);
       await anonymiseAuditLog(client, userId, "Adopter");
     } else {
       await closeShelterProcesses(client, userId);
-      await anonymiseShelter(client, userId, DELETED_NAME);
+      logoPath = (await anonymiseShelter(client, userId, DELETED_NAME)).oldLogoPath;
       await anonymiseAuditLog(client, userId, "Shelter");
     }
     await markAccountDeleted(client, userId);
     await deleteUserSessions(client, userId);
     await audit(client, { actorUserId: userId, action: "ACCOUNT_DELETED", entityType: "App_user", entityId: userId, details: { after: { role: account.role } } });
+    return logoPath;
   });
+  // T-54: the logo file goes only once the deletion is committed, as in setShelterLogo
+  if (oldLogoPath) await removeUploadedFile(oldLogoPath);
 }
