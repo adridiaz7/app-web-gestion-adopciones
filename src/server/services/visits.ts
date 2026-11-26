@@ -4,6 +4,7 @@ import { withTransaction, type Db } from "../db/transaction.js";
 import { ConflictError, ForbiddenError, NotFoundError } from "../errors.js";
 import { selectVisiblePet } from "../models/gallery.js";
 import { selectActiveBlock } from "../models/shelter-search.js";
+import { lockAdopter } from "../models/preferences.js";
 import { countOccupied, lockShelterSlot } from "../models/visit-slots.js";
 import {
   ensureConversation,
@@ -202,10 +203,22 @@ function checkCanAnswer(visit: VisitForChange): void {
   }
 }
 
-/** CU-24: the shelter confirms a pending request; the adopter is notified. */
+/**
+ * CU-24: the shelter confirms a pending request; the adopter is notified. RN-90, RN-93: if the
+ * adopter already has the quota full at the shelter, it is refused and the visit stays pending.
+ */
 export async function confirmVisit(shelterId: number, visitId: number): Promise<VisitStatusResult> {
   return changeVisit(shelterId, visitId, { shelterId }, async (client, visit) => {
     checkCanAnswer(visit);
+    const rules = getConfig().rules;
+    // Locks the adopter, so two confirmations at the same time cannot both take the last place.
+    await lockAdopter(client, visit.adopterId);
+    const counted = await selectQuotaVisitEnds(client, visit.adopterId, shelterId, rules.visitQuotaWindowMonths);
+    if (counted.length >= rules.visitQuotaPerShelter) {
+      throw new ConflictError(
+        `El adoptante ya tiene ${String(rules.visitQuotaPerShelter)} visitas confirmadas o realizadas en tu protectora en los últimos ${String(rules.visitQuotaWindowMonths)} meses. La visita sigue pendiente.`,
+      );
+    }
     await markVisitConfirmed(client, visitId);
     await createNotification(client, {
       userId: visit.adopterId,
