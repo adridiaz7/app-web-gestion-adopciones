@@ -54,11 +54,15 @@ const otherName = (c: ConversationForUser): string => (c.otherDeleted ? DELETED_
 /** RN-136, RN-13: nobody writes during an active block or once the other party deleted their account. */
 const canWrite = (c: ConversationForUser): boolean => !c.blocked && !c.otherDeleted;
 
-/** RN-198: a fixed notice for both parties, with the end date of a temporary block; RN-13 for a deleted account. */
+/**
+ * RN-198: a fixed notice for both parties, with the end date of a temporary block. The shelter
+ * sees that it blocked the adopter; the adopter sees the neutral text of RN-149. RN-13 for a
+ * deleted account.
+ */
 function noticeFor(c: ConversationForUser, userId: number): string | null {
   if (c.blocked) {
     const until = c.blockEndsAt ? ` hasta el ${madridDay.format(c.blockEndsAt)}` : "";
-    const who = userId === c.adopterId ? "Esta protectora te ha bloqueado" : "Has bloqueado a este adoptante";
+    const who = userId === c.adopterId ? `La protectora ${otherName(c)} ha restringido tu acceso` : "Has bloqueado a este adoptante";
     return `${who}${until}. Mientras tanto, ninguna de las partes puede escribir en la conversación.`;
   }
   if (c.otherDeleted) return "La otra parte ha eliminado su cuenta. Puedes leer la conversación, pero ya no escribir en ella.";

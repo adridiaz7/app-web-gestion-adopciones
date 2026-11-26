@@ -178,7 +178,8 @@ describe("T-29 CU-33 conversations that can be read but not written", () => {
       expect(read.status).toBe(200);
       expect(read.body.messages).toHaveLength(1);
       expect(read.body.conversation.canWrite).toBe(false);
-      expect(read.body.conversation.notice).toMatch(/bloquead.* hasta el \d+ de \w+ de \d{4}/);
+      const expected = cookie === shelterCookie ? /bloquead.* hasta el \d+ de \w+ de \d{4}/ : /restringido tu acceso hasta el \d+ de \w+ de \d{4}/;
+      expect(read.body.conversation.notice).toMatch(expected);
     }
     expect((await get("/api/conversations", adopterCookie)).body.conversations[0].canWrite).toBe(false);
     expect(await messageRows()).toHaveLength(1);
@@ -188,8 +189,11 @@ describe("T-29 CU-33 conversations that can be read but not written", () => {
     const id = await openConversation();
     await block(null);
 
+    const forShelter = await get(`/api/conversations/${String(id)}/messages`, shelterCookie);
+    expect(forShelter.body.conversation.notice).toMatch(/bloquead/);
+    expect(forShelter.body.conversation.notice).not.toMatch(/hasta el/);
     const read = await get(`/api/conversations/${String(id)}/messages`, adopterCookie);
-    expect(read.body.conversation.notice).toMatch(/bloquead/);
+    expect(read.body.conversation.notice).toMatch(/restringido tu acceso/);
     expect(read.body.conversation.notice).not.toMatch(/hasta el/);
 
     await getPool().query(`UPDATE "Block" SET lifted_at = now(), lifted_by = 'SHELTER'`);
