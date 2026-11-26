@@ -1,5 +1,6 @@
 import type {
   AdopterAdoptionsResponse,
+  AdoptionEligibilityResponse,
   AdoptionRequest,
   AdoptionRequestResponse,
   AdoptionStatusResponse,
@@ -12,6 +13,10 @@ import { apiRequest } from "./client.js";
 
 /** RN-207: the household data of the profile, to prefill the form. */
 export const getHousehold = () => apiRequest<HouseholdResponse>("GET", "/adopter/household");
+
+/** T-52: whether the adopter can request the adoption of the pet now and, if not, why. */
+export const getAdoptionEligibility = (petId: number) =>
+  apiRequest<AdoptionEligibilityResponse>("GET", `/adopter/pets/${String(petId)}/adoption-eligibility`);
 
 /** CU-27 */
 export const requestAdoption = (body: AdoptionRequest) => apiRequest<AdoptionRequestResponse>("POST", "/adopter/adoptions", body);

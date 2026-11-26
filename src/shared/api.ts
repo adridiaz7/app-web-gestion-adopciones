@@ -621,6 +621,13 @@ export interface AdoptionRequest {
 }
 
 /** CU-27 · the adoption just requested. */
+/** T-52 · GET /api/adopter/pets/:id/adoption-eligibility: whether the adopter can request the adoption now and, if not, why. */
+export type AdoptionIneligibilityReason = "BLOCKED" | "NO_SHOW" | "NOT_AVAILABLE" | "OPEN_REQUEST" | "NO_VISIT" | "VISIT_EXPIRED";
+
+export interface AdoptionEligibilityResponse {
+  eligibility: { canRequest: boolean; reason: AdoptionIneligibilityReason | null; message: string | null };
+}
+
 export interface AdoptionRequestResponse {
   adoption: { id: number; status: "PENDING"; petId: number; petName: string };
 }

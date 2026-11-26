@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getDiscover, postDiscard, postFavorite, postUndo } from "../controllers/discover.js";
 import { deleteDiscard, deleteFavorite, getDiscards, getFavorites, putFavorite } from "../controllers/favorites.js";
-import { getAdopterAdoptions, getMyHousehold, postAdopterCancelAdoption, postAdoption } from "../controllers/adoptions.js";
+import { getAdopterAdoptions, getAdoptionEligibilityOf, getMyHousehold, postAdopterCancelAdoption, postAdoption } from "../controllers/adoptions.js";
 import { getMyAdopterProfile, putMyAdopterProfile } from "../controllers/adopter-profile.js";
 import { getMyPreferences, putMyPreferences } from "../controllers/preferences.js";
 import {
@@ -46,6 +46,7 @@ export function createAdopterRouter(): Router {
   router.post("/visits/:id/replace", postReplaceVisit);
 
   router.get("/household", getMyHousehold);
+  router.get("/pets/:id/adoption-eligibility", getAdoptionEligibilityOf);
   router.get("/adoptions", getAdopterAdoptions);
   router.post("/adoptions", postAdoption);
   router.post("/adoptions/:id/cancel", postAdopterCancelAdoption);

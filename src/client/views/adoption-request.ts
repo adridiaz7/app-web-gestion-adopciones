@@ -1,7 +1,8 @@
 import type { AdoptionRequest, Household } from "../../shared/api.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
-import { getHousehold, requestAdoption } from "../api/adoptions.js";
+import { getAdoptionEligibility, getHousehold, requestAdoption } from "../api/adoptions.js";
+import { adoptionNoticeLink } from "../adoption-eligibility.js";
 import { getPetProfile } from "../api/pets.js";
 import { appLayout } from "../components/app-layout.js";
 import { boolChoice, numberField as numberInput, radios as radioGroup, YES_NO } from "../components/choice-fields.js";
@@ -41,7 +42,21 @@ export async function renderAdoptionRequest(root: HTMLElement, params: RoutePara
   const petId = Number(params["id"]);
   let body: Node[];
   try {
-    const [{ pet }, { household }] = await Promise.all([getPetProfile(petId), getHousehold()]);
+    const [{ pet }, { household }, { eligibility }] = await Promise.all([getPetProfile(petId), getHousehold(), getAdoptionEligibility(petId)]);
+    if (!eligibility.canRequest) {
+      // T-52: the same notice as in the profile, instead of a form that would be rejected.
+      const link = eligibility.reason ? adoptionNoticeLink(eligibility.reason) : null;
+      mount(
+        root,
+        appLayout(user, navFor(user.role), [
+          h("a", { class: "back-link", href: `/mascotas/${String(petId)}` }, "← Volver a la ficha"),
+          h("h1", { class: "display" }, "Solicitar la adopción"),
+          notice("info", eligibility.message ?? "Ahora no puedes solicitar esta adopción."),
+          ...(link ? [h("a", { class: "button button--secondary", href: link.href }, link.label)] : []),
+        ]),
+      );
+      return;
+    }
     const h0: Household = household;
     const otherPets = h("textarea", { name: "otherPetsDescription", rows: "2", maxlength: "500" });
     otherPets.value = h0.otherPetsDescription ?? "";

@@ -1,8 +1,8 @@
 import type { Request, RequestHandler } from "express";
 import { z } from "zod";
-import type { AdopterAdoptionsResponse, AdoptionRequestResponse, ShelterAdoptionsResponse, AdoptionStatusResponse, CandidatesResponse, HouseholdResponse } from "../../shared/api.js";
+import type { AdopterAdoptionsResponse, AdoptionEligibilityResponse, AdoptionRequestResponse, ShelterAdoptionsResponse, AdoptionStatusResponse, CandidatesResponse, HouseholdResponse } from "../../shared/api.js";
 import { UnauthorizedError } from "../errors.js";
-import { getHousehold, requestAdoption, type AdoptionAnswers } from "../services/adoption-requests.js";
+import { getAdoptionEligibility, getHousehold, requestAdoption, type AdoptionAnswers } from "../services/adoption-requests.js";
 import { cancelAdoption, deliverAdoption, listAdopterAdoptions, listShelterAdoptions, returnAdoption } from "../services/adoption-closing.js";
 import { approveAdoption, listCandidates, rejectAdoption } from "../services/adoption-decisions.js";
 
@@ -58,6 +58,13 @@ function userId(user: Request["user"]): number {
 /** RN-207 · GET /api/adopter/household */
 export const getMyHousehold: RequestHandler = async (req, res) => {
   const body: HouseholdResponse = { household: await getHousehold(userId(req.user)) };
+  res.json(body);
+};
+
+/** T-52 · GET /api/adopter/pets/:id/adoption-eligibility */
+export const getAdoptionEligibilityOf: RequestHandler = async (req, res) => {
+  const { id } = petParamsSchema.parse(req.params);
+  const body: AdoptionEligibilityResponse = { eligibility: await getAdoptionEligibility(userId(req.user), id) };
   res.json(body);
 };
 

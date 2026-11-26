@@ -1,4 +1,6 @@
-import type { PetProfile } from "../../shared/api.js";
+import type { AdoptionEligibilityResponse, PetProfile } from "../../shared/api.js";
+import { adoptionNoticeLink } from "../adoption-eligibility.js";
+import { getAdoptionEligibility } from "../api/adoptions.js";
 import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { listFavorites } from "../api/favorites.js";
@@ -50,8 +52,33 @@ function photoGallery(pet: PetProfile): HTMLElement {
   return h("div", {}, main, pet.photos.length > 1 ? h("div", { class: "profile-thumbs" }, ...thumbs) : null);
 }
 
+type Eligibility = AdoptionEligibilityResponse["eligibility"];
+
+/**
+ * CU-27, T-52: "Solicitar adopción" is a link only when the adopter can request it; otherwise a
+ * disabled button with the reason below. Without an answer (`null`), the server checks on submit.
+ */
+function adoptionAction(pet: PetProfile, eligibility: Eligibility | null): HTMLElement {
+  if (!eligibility || eligibility.canRequest) {
+    return h("a", { class: "button button--secondary", href: `/mascotas/${String(pet.id)}/adoptar` }, "Solicitar adopción");
+  }
+  const link = eligibility.reason ? adoptionNoticeLink(eligibility.reason) : null;
+  return h(
+    "div",
+    { class: "adoption-action" },
+    h("button", { type: "button", class: "button button--secondary", disabled: true, "aria-describedby": "adoption-reason" }, "Solicitar adopción"),
+    h(
+      "p",
+      { class: "field__hint", id: "adoption-reason" },
+      eligibility.message ?? "",
+      link ? " " : null,
+      link ? h("a", { href: link.href }, link.label) : null,
+    ),
+  );
+}
+
 /** `favorite`: null when the user is not an adopter (only adopters keep favourites, CU-12). */
-function profileContent(pet: PetProfile, favorite: boolean | null): Node[] {
+function profileContent(pet: PetProfile, favorite: boolean | null, eligibility: Eligibility | null): Node[] {
   const message = h("div", {});
   // RN-46: species without a record are unknown, so they are not listed.
   const livesWith: [string, string][] = pet.getsAlongWith.map((g) => [`Con ${g.speciesName.toLowerCase()}s`, g.getsAlong ? "Se lleva bien" : "No se lleva bien"]);
@@ -97,8 +124,8 @@ function profileContent(pet: PetProfile, favorite: boolean | null): Node[] {
         h("p", {}, h("span", { class: "badge badge--available" }, "Disponible"), ` ${pet.shelter.locality} (${pet.shelter.provinceName})`),
         // CU-23: only adopters request visits.
         favorite === null ? null : visitRequestButton(pet),
-        // CU-27: the server checks the completed visit and the other conditions.
-        favorite === null ? null : h("a", { class: "button button--secondary", href: `/mascotas/${String(pet.id)}/adoptar` }, "Solicitar adopción"),
+        // CU-27, T-52: enabled only when RN-113, 116, 118 and 119 are met.
+        favorite === null ? null : adoptionAction(pet, eligibility),
         // RN-73: the same favourite as in the gallery and discover mode.
         favorite === null ? null : favoriteButton(pet.id, favorite, (text) => message.replaceChildren(notice("error", text)), true),
         message,
@@ -135,11 +162,14 @@ export async function renderPetProfile(root: HTMLElement, params: RouteParams): 
   let content: Node[];
   try {
     const id = Number(params["id"]);
-    const [{ pet }, favorites] = await Promise.all([
+    const adopter = user.role === "ADOPTER";
+    const [{ pet }, favorites, eligibility] = await Promise.all([
       getPetProfile(id),
-      user.role === "ADOPTER" ? listFavorites().then((r) => r.favorites.some((f) => f.id === id)) : Promise.resolve(null),
+      adopter ? listFavorites().then((r) => r.favorites.some((f) => f.id === id)) : Promise.resolve(null),
+      // T-52: if the check fails, the button stays enabled and the server answers on submit.
+      adopter ? getAdoptionEligibility(id).then((r) => r.eligibility, () => null) : Promise.resolve(null),
     ]);
-    content = profileContent(pet, favorites);
+    content = profileContent(pet, favorites, eligibility);
   } catch (error) {
     content = [
       h("a", { class: "back-link", href: "/mascotas" }, "← Volver a explorar"),
