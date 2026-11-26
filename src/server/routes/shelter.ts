@@ -10,6 +10,7 @@ import {
   postShelterCancelAdoption,
 } from "../controllers/adoptions.js";
 import { getAdopterBlock, postAdopterBlock, postAdopterUnblock } from "../controllers/adopter-blocks.js";
+import { deleteNoteHandler, getNotes, postNote, putNote } from "../controllers/adopter-notes.js";
 import { getShelterAdopter } from "../controllers/shelter-adopters.js";
 import { deleteLogo, getMyShelterProfile, postLogo, putMyShelterProfile, receiveLogo } from "../controllers/shelter-profile.js";
 import { getPet, getPets, postPet, postReactivatePet, postUnlistPet, putPet } from "../controllers/shelter-pets.js";
@@ -57,6 +58,10 @@ export function createShelterRouter(): Router {
   router.get("/adopters/:id/block", getAdopterBlock);
   router.post("/adopters/:id/block", postAdopterBlock);
   router.post("/adopters/:id/unblock", postAdopterUnblock);
+  router.get("/adopters/:id/notes", getNotes);
+  router.post("/adopters/:id/notes", postNote);
+  router.put("/adopters/:id/notes/:noteId", putNote);
+  router.delete("/adopters/:id/notes/:noteId", deleteNoteHandler);
   router.post("/visits/:id/confirm", postConfirmVisit);
   router.post("/visits/:id/reject", postRejectVisit);
   router.post("/visits/:id/cancel", postShelterCancelVisit);

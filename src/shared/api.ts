@@ -747,3 +747,21 @@ export interface AdopterBlockRequest {
 export interface AdopterBlockResponse {
   block: AdopterBlock | null;
 }
+
+/** CU-52, RN-204 · a shelter's internal note about an adopter (ISO instants). */
+export interface AdopterNote {
+  id: number;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** CU-52 · GET /api/shelter/adopters/:id/notes (newest first) */
+export interface AdopterNotesResponse {
+  notes: AdopterNote[];
+}
+
+/** CU-52 · POST and PUT of /api/shelter/adopters/:id/notes */
+export interface AdopterNoteResponse {
+  note: AdopterNote;
+}

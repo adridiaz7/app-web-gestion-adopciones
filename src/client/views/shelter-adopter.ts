@@ -3,6 +3,7 @@ import { currentUser } from "../api/auth.js";
 import { ApiError } from "../api/client.js";
 import { getShelterAdopter } from "../api/visits.js";
 import { adopterBlockSection } from "../components/adopter-block.js";
+import { adopterNotesSection } from "../components/adopter-notes.js";
 import { appLayout } from "../components/app-layout.js";
 import { navFor } from "../components/nav.js";
 import { notice } from "../components/notice.js";
@@ -55,6 +56,7 @@ export async function renderShelterAdopter(root: HTMLElement, params: RouteParam
       h("h2", {}, "Historial con tu protectora"),
       h("p", { class: "muted" }, `${adopter.visits.length === 1 ? "1 visita" : `${String(adopter.visits.length)} visitas`} · ${noShows}`),
       history(adopter.visits),
+      adopterNotesSection(adopter.id),
       adopterBlockSection(adopter.id, adopter.name),
     ];
   } catch (error) {
