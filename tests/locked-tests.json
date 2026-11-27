@@ -390,6 +390,11 @@
       "sha256": "9a130c90db2677ae3fca590f70c025083f47ca29ea8076aeff4e6b46cc4be509",
       "lockedAt": "2026-11-26T08:56:23.444Z"
     },
+    "tests/unit/seed-demo.test.ts": {
+      "feature": "T-55 Seed robusto para la demo",
+      "sha256": "f2bb4a9ddd874380933b1a198bbf798f6f576ec9ae7e8251dc96c9252eab9451",
+      "lockedAt": "2026-11-27T00:13:04.584Z"
+    },
     "tests/unit/seed-photos.test.ts": {
       "feature": "T-46 Seed visual para la demo",
       "sha256": "8db182d9af1295d8037edf9cce42a8c35f5892c7517034be6159715273b77356",
