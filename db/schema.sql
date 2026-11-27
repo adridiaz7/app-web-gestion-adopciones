@@ -12,6 +12,9 @@
 --         many-to-many join tables are lowercase and end in _rel.
 -- =============================================================================
 
+-- This file is UTF-8: psql must not read it with the console's code page (WIN1252).
+SET client_encoding = 'UTF8';
+
 BEGIN;
 
 -- -----------------------------------------------------------------------------

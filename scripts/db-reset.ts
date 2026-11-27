@@ -25,6 +25,14 @@ export function copySeedPhotos(sourceDir: string, uploadsDir: string): void {
   cpSync(sourceDir, target, { recursive: true, filter: (source) => !source.endsWith(".md") });
 }
 
+/**
+ * T-55: psql reads the SQL files as UTF-8 even when the Windows console uses another
+ * code page (WIN1252), so db:reset works on any machine. The rest of `base` is kept.
+ */
+export function psqlEnv(base: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  return { ...base, PGCLIENTENCODING: "UTF8" };
+}
+
 function main(): void {
   const databaseUrl = process.env["DATABASE_URL"];
   if (!databaseUrl) {
@@ -38,7 +46,10 @@ function main(): void {
       continue;
     }
     console.log(`Running ${file}…`);
-    execFileSync("psql", ["-w", "-q", "-v", "ON_ERROR_STOP=1", "-d", databaseUrl, "-f", file], { stdio: "inherit" });
+    execFileSync("psql", ["-w", "-q", "-v", "ON_ERROR_STOP=1", "-d", databaseUrl, "-f", file], {
+      stdio: "inherit",
+      env: psqlEnv(process.env),
+    });
   }
 
   // Same folder as the server (config.ts): UPLOADS_DIR, or uploads/ in the project root.

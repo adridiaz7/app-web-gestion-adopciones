@@ -12,6 +12,9 @@
 -- To change the password, generate a new hash and replace it below.
 -- =============================================================================
 
+-- This file is UTF-8: psql must not read it with the console's code page (WIN1252).
+SET client_encoding = 'UTF8';
+
 BEGIN;
 
 INSERT INTO "App_user" (email, password_hash, role, email_verified_at, terms_accepted_at)
@@ -27,7 +30,7 @@ INSERT INTO "Shelter" (user_id, name, cif, description, address, province_id, lo
 SELECT id, 'Protectora Txiki', 'G20123456',
        'Protectora de perros y gatos en Donostia. Buscamos hogares responsables para nuestros animales.',
        'Calle del Puerto 3', 20, 'Donostia', '943123456',
-       'hola@txiki.test', 'De lunes a sábado, de 10:00 a 14:00', 'VALIDATED', now()
+       'hola@txiki.test', 'De lunes a sábado, de 10:00 a 14:00', 'VALIDATED', now() - interval '35 days'
 FROM "App_user" WHERE email = 'protectora@lagun.test';
 
 INSERT INTO "Adopter" (user_id, first_name, last_name, phone, birth_date, province_id, locality)
@@ -76,7 +79,7 @@ FROM (VALUES ('cansolo@lagun.test'), ('nakama@lagun.test'), ('parqueamigazo@lagu
 INSERT INTO "Shelter" (user_id, name, cif, description, logo_path, address, province_id, locality, phone,
                        contact_email, website, opening_hours, validation_status, validated_at)
 SELECT u.id, s.name, s.cif, s.description, s.logo, s.address, s.province, s.locality, s.phone,
-       s.contact, s.website, s.hours, 'VALIDATED', now()
+       s.contact, s.website, s.hours, 'VALIDATED', now() - interval '35 days'
 FROM (VALUES
   ('cansolo@lagun.test', 'Can Solo', 'G48123457',
    'Refugio de perros en Bilbao. Ningún perro debería estar solo: cuidamos de ellos hasta encontrarles familia.',
@@ -132,33 +135,33 @@ JOIN "Breed" b ON b.species_id = sp.id AND b.name = p.breed;
 INSERT INTO "Pet_photo" (pet_id, path, position)
 SELECT pet.id, ph.path, ph.position
 FROM (VALUES
-  ('Diana',    '/uploads/seed/mascotas/gato-diana/1.jpg', 1),
-  ('Diana',    '/uploads/seed/mascotas/gato-diana/2.jpg', 2),
-  ('Paco',     '/uploads/seed/mascotas/gato-paco/1.jpg', 1),
-  ('Paco',     '/uploads/seed/mascotas/gato-paco/2.jpg', 2),
-  ('Paco',     '/uploads/seed/mascotas/gato-paco/3.jpg', 3),
-  ('Paprika',  '/uploads/seed/mascotas/gato-paprika/1.jpg', 1),
-  ('Paprika',  '/uploads/seed/mascotas/gato-paprika/2.jpg', 2),
-  ('Paprika',  '/uploads/seed/mascotas/gato-paprika/3.jpg', 3),
-  ('Pistacho', '/uploads/seed/mascotas/perro-pistacho/1.jpg', 1),
-  ('Pistacho', '/uploads/seed/mascotas/perro-pistacho/2.jpg', 2),
-  ('Rocky',    '/uploads/seed/mascotas/perro-rocky/1.jpg', 1),
-  ('Rocky',    '/uploads/seed/mascotas/perro-rocky/2.jpg', 2),
-  ('Rocky',    '/uploads/seed/mascotas/perro-rocky/3.jpg', 3),
-  ('Shiro',    '/uploads/seed/mascotas/perro-shiro/1.jpg', 1),
-  ('Shiro',    '/uploads/seed/mascotas/perro-shiro/2.jpg', 2),
-  ('Shiro',    '/uploads/seed/mascotas/perro-shiro/3.jpg', 3),
-  ('Shiro',    '/uploads/seed/mascotas/perro-shiro/4.jpg', 4),
-  ('Titán',    '/uploads/seed/mascotas/perro-titan/1.jpg', 1),
-  ('Titán',    '/uploads/seed/mascotas/perro-titan/2.jpg', 2),
-  ('Torpedo',  '/uploads/seed/mascotas/perro-torpedo/1.jpg', 1),
-  ('Torpedo',  '/uploads/seed/mascotas/perro-torpedo/2.jpg', 2),
-  ('Torpedo',  '/uploads/seed/mascotas/perro-torpedo/3.jpg', 3),
-  ('Torpedo',  '/uploads/seed/mascotas/perro-torpedo/4.jpg', 4),
-  ('Torpedo',  '/uploads/seed/mascotas/perro-torpedo/5.jpg', 5)
-) AS ph (pet_name, path, position)
-JOIN "Pet" pet ON pet.name = ph.pet_name
-JOIN "Shelter" s ON s.user_id = pet.shelter_id AND s.cif IN ('G48123457', 'G31123458', 'G01123459');
+  ('G31123458', 'Diana',    '/uploads/seed/mascotas/gato-diana/1.jpg', 1),
+  ('G31123458', 'Diana',    '/uploads/seed/mascotas/gato-diana/2.jpg', 2),
+  ('G31123458', 'Paco',     '/uploads/seed/mascotas/gato-paco/1.jpg', 1),
+  ('G31123458', 'Paco',     '/uploads/seed/mascotas/gato-paco/2.jpg', 2),
+  ('G31123458', 'Paco',     '/uploads/seed/mascotas/gato-paco/3.jpg', 3),
+  ('G01123459', 'Paprika',  '/uploads/seed/mascotas/gato-paprika/1.jpg', 1),
+  ('G01123459', 'Paprika',  '/uploads/seed/mascotas/gato-paprika/2.jpg', 2),
+  ('G01123459', 'Paprika',  '/uploads/seed/mascotas/gato-paprika/3.jpg', 3),
+  ('G48123457', 'Pistacho', '/uploads/seed/mascotas/perro-pistacho/1.jpg', 1),
+  ('G48123457', 'Pistacho', '/uploads/seed/mascotas/perro-pistacho/2.jpg', 2),
+  ('G48123457', 'Rocky',    '/uploads/seed/mascotas/perro-rocky/1.jpg', 1),
+  ('G48123457', 'Rocky',    '/uploads/seed/mascotas/perro-rocky/2.jpg', 2),
+  ('G48123457', 'Rocky',    '/uploads/seed/mascotas/perro-rocky/3.jpg', 3),
+  ('G48123457', 'Shiro',    '/uploads/seed/mascotas/perro-shiro/1.jpg', 1),
+  ('G48123457', 'Shiro',    '/uploads/seed/mascotas/perro-shiro/2.jpg', 2),
+  ('G48123457', 'Shiro',    '/uploads/seed/mascotas/perro-shiro/3.jpg', 3),
+  ('G48123457', 'Shiro',    '/uploads/seed/mascotas/perro-shiro/4.jpg', 4),
+  ('G31123458', 'Titán',    '/uploads/seed/mascotas/perro-titan/1.jpg', 1),
+  ('G31123458', 'Titán',    '/uploads/seed/mascotas/perro-titan/2.jpg', 2),
+  ('G01123459', 'Torpedo',  '/uploads/seed/mascotas/perro-torpedo/1.jpg', 1),
+  ('G01123459', 'Torpedo',  '/uploads/seed/mascotas/perro-torpedo/2.jpg', 2),
+  ('G01123459', 'Torpedo',  '/uploads/seed/mascotas/perro-torpedo/3.jpg', 3),
+  ('G01123459', 'Torpedo',  '/uploads/seed/mascotas/perro-torpedo/4.jpg', 4),
+  ('G01123459', 'Torpedo',  '/uploads/seed/mascotas/perro-torpedo/5.jpg', 5)
+) AS ph (cif, pet_name, path, position)
+JOIN "Shelter" s ON s.cif = ph.cif
+JOIN "Pet" pet ON pet.name = ph.pet_name AND pet.shelter_id = s.user_id;
 
 -- -----------------------------------------------------------------------------
 -- History for the demo (T-42): household data, preferences, favourites, visit
@@ -177,6 +180,11 @@ JOIN "Shelter" s ON s.user_id = pet.shelter_id AND s.cif IN ('G48123457', 'G3112
 --   cansolo@lagun.test    Iker's adoption request, Ane's completed visit, chats.
 --   nakama@lagun.test     Ane's confirmed visit in its calendar.
 --   protectora@lagun.test Ane's pending visit request, to confirm or reject.
+--
+-- Timing (T-55): Ane's pending request to Txuri is created 5 minutes before the reset,
+-- and the shelter has 24 h to answer it (RN-94). So it can be confirmed or rejected for
+-- about 23 h 55 min after npm run db:reset; then the job of RN-95 expires it. A reset the
+-- evening before the demo is fine; for a demo more than a day later, reset again.
 -- -----------------------------------------------------------------------------
 
 -- Household data (RN-27) of Ane, so she can apply for an adoption in the demo.
@@ -210,15 +218,16 @@ WHERE u.email = 'adoptante@lagun.test' AND sp.name IN ('Perro', 'Gato');
 INSERT INTO adopter_pet_rel (adopter_id, pet_id, type, created_at)
 SELECT u.id, p.id, f.type, now() - f.ago
 FROM (VALUES
-  ('adoptante@lagun.test', 'Pistacho', 'FAVORITE',  interval '8 days'),
-  ('adoptante@lagun.test', 'Diana',    'FAVORITE',  interval '6 days'),
-  ('adoptante@lagun.test', 'Txuri',    'FAVORITE',  interval '4 days'),
-  ('adoptante@lagun.test', 'Beltza',   'DISCARDED', interval '2 days'),
-  ('iker@lagun.test',      'Pistacho', 'FAVORITE',  interval '9 days'),
-  ('iker@lagun.test',      'Paprika',  'FAVORITE',  interval '3 days')
-) AS f (email, pet_name, type, ago)
+  ('adoptante@lagun.test', 'G48123457', 'Pistacho', 'FAVORITE',  interval '8 days'),
+  ('adoptante@lagun.test', 'G31123458', 'Diana',    'FAVORITE',  interval '6 days'),
+  ('adoptante@lagun.test', 'G20123456', 'Txuri',    'FAVORITE',  interval '4 days'),
+  ('adoptante@lagun.test', 'G20123456', 'Beltza',   'DISCARDED', interval '2 days'),
+  ('iker@lagun.test',      'G48123457', 'Pistacho', 'FAVORITE',  interval '9 days'),
+  ('iker@lagun.test',      'G01123459', 'Paprika',  'FAVORITE',  interval '3 days')
+) AS f (email, cif, pet_name, type, ago)
 JOIN "App_user" u ON u.email = f.email
-JOIN "Pet" p ON p.name = f.pet_name;
+JOIN "Shelter" s ON s.cif = f.cif
+JOIN "Pet" p ON p.name = f.pet_name AND p.shelter_id = s.user_id;
 
 -- Visit slots: some in the past (history) and some in the coming days, from 10:00 to 11:00.
 INSERT INTO "Visit_slot" (shelter_id, starts_at, ends_at, capacity, created_at)
@@ -237,18 +246,22 @@ SELECT u.id, p.shelter_id, p.id, vs.id, v.status,
        CASE WHEN v.status IN ('CONFIRMED', 'COMPLETED') THEN now() - v.requested_ago + interval '3 hours' END,
        CASE WHEN v.status = 'CANCELLED' THEN 'ADOPTER' END,
        CASE WHEN v.status = 'CANCELLED' THEN now() - v.requested_ago + interval '1 day' END,
-       CASE WHEN v.status = 'COMPLETED' THEN 'SHELTER' END,
-       CASE WHEN v.status = 'COMPLETED' THEN vs.ends_at + interval '2 hours' END,
+       -- RN-106: with no no-show marked, the system marks the visit as completed 48 h after it.
+       CASE WHEN v.status = 'COMPLETED' THEN 'SYSTEM' END,
+       CASE WHEN v.status = 'COMPLETED' THEN vs.ends_at + interval '48 hours' END,
        now() - v.requested_ago
 FROM (VALUES
-  ('adoptante@lagun.test', 'Pistacho', -5, 'COMPLETED', interval '9 days'),
-  ('iker@lagun.test',      'Pistacho', -20, 'COMPLETED', interval '25 days'),
-  ('iker@lagun.test',      'Paco',      -5, 'CANCELLED', interval '10 days'),
-  ('adoptante@lagun.test', 'Diana',     3, 'CONFIRMED', interval '2 days'),
-  ('adoptante@lagun.test', 'Txuri',     5, 'PENDING',   interval '2 hours')
-) AS v (email, pet_name, day_offset, status, requested_ago)
+  ('adoptante@lagun.test', 'G48123457', 'Pistacho', -5, 'COMPLETED', interval '9 days'),
+  ('iker@lagun.test',      'G48123457', 'Pistacho', -20, 'COMPLETED', interval '25 days'),
+  ('iker@lagun.test',      'G31123458', 'Paco',      -5, 'CANCELLED', interval '10 days'),
+  ('adoptante@lagun.test', 'G31123458', 'Diana',     3, 'CONFIRMED', interval '2 days'),
+  -- Requested 5 minutes before the reset: it stays pending for almost the full 24 h of RN-94
+  -- before the job of RN-95 expires it (see the header).
+  ('adoptante@lagun.test', 'G20123456', 'Txuri',     5, 'PENDING',   interval '5 minutes')
+) AS v (email, cif, pet_name, day_offset, status, requested_ago)
 JOIN "App_user" u ON u.email = v.email
-JOIN "Pet" p ON p.name = v.pet_name
+JOIN "Shelter" s ON s.cif = v.cif
+JOIN "Pet" p ON p.name = v.pet_name AND p.shelter_id = s.user_id
 JOIN "Visit_slot" vs ON vs.shelter_id = p.shelter_id
                     AND vs.starts_at = ((current_date + v.day_offset) + time '10:00') AT TIME ZONE 'Europe/Madrid';
 
@@ -260,6 +273,7 @@ SELECT v.adopter_id, v.pet_id, v.id,
 FROM "Visit" v
 JOIN "App_user" u ON u.id = v.adopter_id AND u.email = 'iker@lagun.test'
 JOIN "Pet" p ON p.id = v.pet_id AND p.name = 'Pistacho'
+JOIN "Shelter" s ON s.user_id = p.shelter_id AND s.cif = 'G48123457'
 WHERE v.status = 'COMPLETED';
 
 -- One conversation per adopter and shelter with a visit (RN-133, RN-134).
@@ -286,5 +300,91 @@ FROM (VALUES
 JOIN "App_user" u ON u.email = m.email
 JOIN "Shelter" s ON s.cif = m.cif
 JOIN "Conversation" c ON c.adopter_id = u.id AND c.shelter_id = s.user_id;
+
+-- -----------------------------------------------------------------------------
+-- Notifications and audit log (T-55), consistent with the history above, so the bell
+-- and the administrator's activity (CU-43) are not empty in the demo. They use the same
+-- types, texts and details as the services (notification-templates.ts, audit()).
+-- -----------------------------------------------------------------------------
+
+-- formatDateTime() of notification-templates.ts: "3 de diciembre de 2026 a las 10:00", Madrid time.
+CREATE FUNCTION pg_temp.es_datetime(t timestamptz) RETURNS text LANGUAGE sql STABLE
+RETURN extract(day FROM t AT TIME ZONE 'Europe/Madrid')::int || ' de '
+    || (ARRAY['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto',
+              'septiembre', 'octubre', 'noviembre', 'diciembre'])[extract(month FROM t AT TIME ZONE 'Europe/Madrid')::int]
+    || ' de ' || extract(year FROM t AT TIME ZONE 'Europe/Madrid')::int
+    || ' a las ' || extract(hour FROM t AT TIME ZONE 'Europe/Madrid')::int
+    || ':' || to_char(t AT TIME ZONE 'Europe/Madrid', 'MI');
+
+-- CU-24: each confirmed visit told the adopter. Those already held are read; Ane's upcoming one is not.
+INSERT INTO "Notification" (user_id, type, title, body, visit_id, read_at, created_at)
+SELECT v.adopter_id, 'VISIT_CONFIRMED' AS type, 'Visita confirmada',
+       'La protectora ha confirmado tu visita para conocer a ' || p.name || ' el ' || pg_temp.es_datetime(vs.starts_at) || '.',
+       v.id, CASE WHEN v.status = 'COMPLETED' THEN v.responded_at + interval '1 hour' END, v.responded_at
+FROM "Visit" v
+JOIN "Pet" p ON p.id = v.pet_id
+JOIN "Visit_slot" vs ON vs.id = v.slot_id
+WHERE v.status IN ('CONFIRMED', 'COMPLETED');
+
+-- CU-25: Iker cancelled his visit to Paco, so Nakama was told (still unread).
+INSERT INTO "Notification" (user_id, type, title, body, visit_id, created_at)
+SELECT v.shelter_id, 'VISIT_CANCELLED_BY_ADOPTER' AS type, 'Visita cancelada por el adoptante',
+       'El adoptante ha cancelado la visita para conocer a ' || p.name || ' el ' || pg_temp.es_datetime(vs.starts_at)
+         || '. La plaza del turno queda libre.',
+       v.id, v.cancelled_at
+FROM "Visit" v
+JOIN "Pet" p ON p.id = v.pet_id
+JOIN "Visit_slot" vs ON vs.id = v.slot_id
+WHERE v.status = 'CANCELLED' AND v.cancelled_by = 'ADOPTER';
+
+-- CU-54, RN-199: Paprika (a small cat) matches Ane's questionnaire (unread).
+INSERT INTO "Notification" (user_id, type, title, body, pet_id, created_at)
+SELECT u.id, 'NEW_COMPATIBLE_PET' AS type, 'Nueva mascota compatible',
+       p.name || ', de ' || s.name || ', encaja con tus preferencias y está disponible para adopción.',
+       p.id, now() - interval '1 hour'
+FROM "App_user" u
+CROSS JOIN "Shelter" s
+JOIN "Pet" p ON p.name = 'Paprika' AND p.shelter_id = s.user_id
+WHERE u.email = 'adoptante@lagun.test' AND s.cif = 'G01123459';
+
+-- RN-208: CU-39, the administrator validated the four shelters.
+INSERT INTO "Audit_log" (actor_user_id, action, entity_type, entity_id, details, created_at)
+SELECT admin.id, 'SHELTER_VALIDATED', 'Shelter', s.user_id,
+       '{"before": {"validationStatus": "PENDING"}, "after": {"validationStatus": "VALIDATED"}}'::jsonb, s.validated_at
+FROM "Shelter" s
+CROSS JOIN (SELECT id FROM "App_user" WHERE email = 'admin@lagun.test') admin
+WHERE s.validation_status = 'VALIDATED';
+
+-- RN-208: the life of each visit, as the services and the jobs record it.
+INSERT INTO "Audit_log" (actor_user_id, action, entity_type, entity_id, details, created_at)
+SELECT e.actor, e.action, 'Visit', e.visit_id, e.details, e.at
+FROM (
+  -- CU-23: every visit was requested by the adopter.
+  SELECT v.id AS visit_id, v.adopter_id AS actor, 'VISIT_REQUESTED' AS action,
+         '{"after": {"status": "PENDING"}}'::jsonb AS details, v.created_at AS at
+  FROM "Visit" v
+  UNION ALL
+  -- CU-24: confirmed by the shelter.
+  SELECT v.id, v.shelter_id, 'VISIT_CONFIRMED',
+         '{"before": {"status": "PENDING"}, "after": {"status": "CONFIRMED"}}'::jsonb, v.responded_at
+  FROM "Visit" v WHERE v.status IN ('CONFIRMED', 'COMPLETED')
+  UNION ALL
+  -- CU-25: cancelled by the adopter while still pending.
+  SELECT v.id, v.adopter_id, 'VISIT_CANCELLED',
+         '{"before": {"status": "PENDING"}, "after": {"status": "CANCELLED", "cancelledBy": "ADOPTER"}}'::jsonb, v.cancelled_at
+  FROM "Visit" v WHERE v.status = 'CANCELLED'
+  UNION ALL
+  -- CU-46, RN-106: marked as completed by the system (no actor).
+  SELECT v.id, NULL, 'VISIT_COMPLETED',
+         '{"before": {"status": "CONFIRMED"}, "after": {"status": "COMPLETED", "attendanceMarkedBy": "SYSTEM"}}'::jsonb,
+         v.attendance_marked_at
+  FROM "Visit" v WHERE v.status = 'COMPLETED'
+) e;
+
+-- RN-208: CU-27, Iker's adoption request.
+INSERT INTO "Audit_log" (actor_user_id, action, entity_type, entity_id, details, created_at)
+SELECT a.adopter_id, 'ADOPTION_REQUESTED', 'Adoption', a.id,
+       jsonb_build_object('after', jsonb_build_object('status', 'PENDING', 'visitId', a.visit_id)), a.created_at
+FROM "Adoption" a;
 
 COMMIT;
